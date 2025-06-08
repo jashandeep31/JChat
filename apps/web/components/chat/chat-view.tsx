@@ -4,8 +4,7 @@ import ChatInputBox from "../chat-input-box";
 import { SocketContext } from "@/context/socket-context";
 import { useParams } from "next/navigation";
 import { ChatQuestion, ChatQuestionAnswer } from "@repo/db";
-import { MdxRenderer } from "../mdx-components";
-
+import ReactMarkdown from "react-markdown";
 const ChatView = () => {
   const socket = useContext(SocketContext);
   const params = useParams();
@@ -42,17 +41,19 @@ const ChatView = () => {
                 {chatQuestion.question}
               </div>
             </div>
-            <div className="flex justify-start rounded-md mt-6">
+            <div className="flex justify-start rounded-md mt-6 lg:max-w-3/4">
               {answers.find(
                 (answer) => answer.chatQuestionId === chatQuestion.id
               )?.answer && (
-                <MdxRenderer
-                  source={
-                    answers.find(
-                      (answer) => answer.chatQuestionId === chatQuestion.id
-                    )!.answer
-                  }
-                />
+                <div className="bg-red-100 m-3">
+                  <ReactMarkdown>
+                    {
+                      answers.find(
+                        (answer) => answer.chatQuestionId === chatQuestion.id
+                      )!.answer
+                    }
+                  </ReactMarkdown>
+                </div>
               )}
             </div>
           </div>
