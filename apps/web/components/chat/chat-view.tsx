@@ -4,6 +4,7 @@ import ChatInputBox from "../chat-input-box";
 import { SocketContext } from "@/context/socket-context";
 import { useParams } from "next/navigation";
 import { ChatQuestion, ChatQuestionAnswer } from "@repo/db";
+import { MdxRenderer } from "../mdx-components";
 
 const ChatView = () => {
   const socket = useContext(SocketContext);
@@ -33,16 +34,26 @@ const ChatView = () => {
   console.log(answers);
   return (
     <div className="flex flex-col h-screen p-4">
-      <div className="flex-1">
+      <div className="flex-1 max-w-[800px] mx-auto">
         {chatQuestions.map((chatQuestion) => (
-          <div key={chatQuestion.id}>
-            <div>{chatQuestion.question}</div>
-            <div>
-              {
-                answers.find(
-                  (answer) => answer.chatQuestionId === chatQuestion.id
-                )?.answer
-              }
+          <div key={chatQuestion.id} className="my-12">
+            <div className="flex justify-end">
+              <div className="lg:max-w-3/4 bg-accent p-3 rounded-md">
+                {chatQuestion.question}
+              </div>
+            </div>
+            <div className="flex justify-start rounded-md mt-6">
+              {answers.find(
+                (answer) => answer.chatQuestionId === chatQuestion.id
+              )?.answer && (
+                <MdxRenderer
+                  source={
+                    answers.find(
+                      (answer) => answer.chatQuestionId === chatQuestion.id
+                    )!.answer
+                  }
+                />
+              )}
             </div>
           </div>
         ))}
