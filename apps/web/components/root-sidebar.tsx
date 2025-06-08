@@ -4,13 +4,13 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
-import { Button } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
 import SidebarProjects from "./sidebar-projects";
 import SidebarChats from "./sidebar-chats";
+import Link from "next/link";
 
 const RootSideBar = () => {
   return (
@@ -22,7 +22,9 @@ const RootSideBar = () => {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="p-3">
-            <Button>New Chat</Button>
+            <Link href={"/"} className={buttonVariants()}>
+              New Chat
+            </Link>
           </SidebarGroup>
           <SidebarProjects />
           <SidebarChats />

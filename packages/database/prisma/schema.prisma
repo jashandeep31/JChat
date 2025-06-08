@@ -18,6 +18,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Project   Project[]
+  Chat      Chat[]
 }
 
 model Project {
@@ -40,9 +41,11 @@ model Chat {
   type      ChatType @default(DIRECT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userId    String
 
   project      Project?       @relation(fields: [projectId], references: [id])
   ChatQuestion ChatQuestion[]
+  user         User           @relation(fields: [userId], references: [id])
 }
 
 model AiModel {

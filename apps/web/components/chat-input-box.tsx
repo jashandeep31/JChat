@@ -1,4 +1,5 @@
 "use client";
+import { SocketContext } from "@/context/socket-context";
 import useModelsQuery from "@/lib/react-query/use-models-query";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -8,10 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import { ArrowUp, Brain, ChevronDown, FileText, Globe } from "lucide-react";
-import React, { useState, useEffect, useRef, use } from "react";
+import { useParams } from "next/navigation";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 const ChatInputBox = () => {
-  const [message, setMessage] = useState("");
+  const params = useParams();
+  const socket = useContext(SocketContext);
+  const [question, setQuestion] = useState("what is next js in 10 words");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parentDivRef = useRef<HTMLDivElement>(null);
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
@@ -25,12 +29,33 @@ const ChatInputBox = () => {
         10
       );
       const maxLines = 10;
-      const lines = message.split("\n").length;
+      const lines = question.split("\n").length;
       const calculatedHeight = Math.min(lines, maxLines) * lineHeight;
       textarea.style.height = `${calculatedHeight}px`;
       parentDiv.style.height = `${Math.max(calculatedHeight + 40, 50)}px`;
     }
-  }, [message]);
+  }, [question]);
+
+  const handleSubmit = () => {
+    if (!socket) return;
+    if (params.cid) {
+      socket.emit(
+        "chat_question",
+        JSON.stringify({
+          cid: params.cid,
+          question,
+          isWebSearchEnabled,
+        })
+      );
+    } else {
+      socket.emit(
+        "new_chat",
+        JSON.stringify({
+          question,
+        })
+      );
+    }
+  };
 
   return (
     <div className="border-2 border-secondary p-4 rounded-md min-w-[800px] flex gap-2 flex-col">
@@ -43,8 +68,8 @@ const ChatInputBox = () => {
             height: "auto",
           }}
           placeholder="Ask anything..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
         />
       </div>
       <div className="flex justify-between items-end">
@@ -59,7 +84,7 @@ const ChatInputBox = () => {
             <Globe className="w-4 h-4" /> Web Search
           </button>
         </div>
-        <Button>
+        <Button onClick={handleSubmit}>
           <ArrowUp />
         </Button>
       </div>
@@ -78,7 +103,7 @@ const SelectAIModel = () => {
       setSelectedModel(modelsQuery.data[0].id);
     }
     return () => {};
-  }, [modelsQuery.data]);
+  }, [modelsQuery.data, selectedModel]);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
