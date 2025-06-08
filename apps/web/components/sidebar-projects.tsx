@@ -17,12 +17,17 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Button } from "@repo/ui/components/button";
 import useProjectQuery from "@/lib/react-query/use-project-query";
+import { useRouter } from "next/navigation";
 
 const SidebarProjects = () => {
+  const router = useRouter();
   const [createProjectDialogState, setCreateProjectDialogState] =
     useState(false);
-
   const { projectsQuery } = useProjectQuery();
+
+  const handleProjectClick = (projectId: string) => {
+    router.push(`/project/${projectId}`);
+  };
 
   return (
     <>
@@ -39,7 +44,10 @@ const SidebarProjects = () => {
           </SidebarMenuButton>
 
           {projectsQuery.data?.map((project) => (
-            <SidebarMenuButton key={project.id}>
+            <SidebarMenuButton
+              key={project.id}
+              onClick={() => handleProjectClick(project.id)}
+            >
               <FolderClosed /> <span>{project.name}</span>
             </SidebarMenuButton>
           ))}

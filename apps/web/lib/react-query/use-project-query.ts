@@ -1,4 +1,8 @@
-import { createProject, getProjects } from "@/actions/projects";
+import {
+  addInstructionToProject,
+  createProject,
+  getProjects,
+} from "@/actions/projects";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 const useProjectQuery = () => {
@@ -21,7 +25,18 @@ const useProjectQuery = () => {
     },
   });
 
-  return { projectsQuery, createProjectMutation };
+  const updateProjectMutation = useMutation({
+    mutationFn: async (project: { id: string; instruction: string }) => {
+      return await addInstructionToProject({
+        id: project.id,
+        instruction: project.instruction,
+      });
+    },
+    onSuccess: () => {
+      projectsQuery.refetch();
+    },
+  });
+  return { projectsQuery, createProjectMutation, updateProjectMutation };
 };
 
 export default useProjectQuery;
