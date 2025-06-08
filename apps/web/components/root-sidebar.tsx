@@ -27,7 +27,9 @@ const RootSideBar = () => {
           <SidebarProjects />
           <SidebarChats />
         </SidebarContent>
-        <SidebarFooter />
+        <SidebarFooter>
+          <Button variant={"ghost"}>Logout</Button>
+        </SidebarFooter>
       </Sidebar>
     </div>
   );

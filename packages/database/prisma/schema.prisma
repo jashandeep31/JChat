@@ -7,3 +7,87 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  avatar    String?
+  email     String   @unique
+  proUser   Boolean  @default(false)
+  credits   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id       String  @id @default(uuid())
+  name     String
+  archived Boolean @default(false)
+  Chat     Chat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chat {
+  id        String   @id @default(uuid())
+  name      String
+  archived  Boolean  @default(false)
+  projectId String?
+  type      ChatType @default(DIRECT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project      Project?       @relation(fields: [projectId], references: [id])
+  ChatQuestion ChatQuestion[]
+}
+
+model AiModel {
+  id                 String               @id @default(cuid())
+  name               String
+  slug               String               @unique
+  logo               String
+  tag                String?
+  requiresPro        Boolean              @default(false)
+  credits            Int                  @default(0)
+  pdfAnalysis        Boolean              @default(false)
+  imageAnalysis      Boolean              @default(false)
+  webAnalysis        Boolean              @default(false)
+  reasoning          Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  ChatQuestionAnswer ChatQuestionAnswer[]
+}
+
+enum ChatType {
+  BRANCHED
+  DIRECT
+}
+
+model ChatQuestion {
+  id       String @id @default(uuid())
+  chatId   String
+  question String
+  credits  Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chat               Chat                 @relation(fields: [chatId], references: [id])
+  ChatQuestionAnswer ChatQuestionAnswer[]
+}
+
+model ChatQuestionAnswer {
+  id             String @id @default(uuid())
+  chatQuestionId String
+  answer         String
+  credits        Int    @default(0)
+  aiModelId      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chatQuestion ChatQuestion @relation(fields: [chatQuestionId], references: [id])
+  aiModel      AiModel      @relation(fields: [aiModelId], references: [id])
+}
