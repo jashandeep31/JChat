@@ -8,6 +8,7 @@ import { Chat, ChatQuestion, ChatQuestionAnswer } from "@repo/db";
 import "highlight.js/styles/stackoverflow-dark.css";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
+import { Loader } from "lucide-react";
 
 const ChatView = ({
   chat,
@@ -20,6 +21,7 @@ const ChatView = ({
 }) => {
   const socket = useContext(SocketContext);
   const params = useParams();
+  const [isStreaming, setIsStreaming] = useState(false);
   const [chatQuestions, setChatQuestions] = useState<ChatQuestion[]>(
     chat.ChatQuestion
   );
@@ -56,6 +58,7 @@ const ChatView = ({
       const answer = JSON.parse(raw);
       setAnswers((prev) => [...prev, answer]);
       setStreamingResponse(null);
+      setIsStreaming(false);
     };
 
     // Register event listeners
@@ -81,20 +84,32 @@ const ChatView = ({
               {getAnswerForQuestion(q.id) && (
                 <AnswerBubble content={getAnswerForQuestion(q.id)!} />
               )}
-              {!getAnswerForQuestion(q.id) && streamingResponse && (
-                <AnswerBubble content={streamingResponse} />
-              )}
             </div>
           ))}
+          {isStreaming && <StreamingResponse content={streamingResponse!} />}
         </div>
       </div>
       <div className="sticky bottom-0 z-10 bg-background">
         <div className="mx-auto lg:max-w-1/2 w-full  bg-background">
-          <ChatInputBox />
+          <ChatInputBox
+            isStreaming={isStreaming}
+            setIsStreaming={setIsStreaming}
+          />
         </div>
       </div>
     </div>
   );
+};
+
+const StreamingResponse = ({ content }: { content: string }) => {
+  if (!content || content === " ") {
+    return (
+      <div>
+        <Loader className="animate-spin" />
+      </div>
+    );
+  }
+  return <AnswerBubble content={content} />;
 };
 
 export default ChatView;

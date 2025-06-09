@@ -19,7 +19,13 @@ import {
 import { useParams } from "next/navigation";
 import React, { useState, useEffect, useRef, useContext } from "react";
 
-const ChatInputBox = ({ isStreaming = false }: { isStreaming?: boolean }) => {
+const ChatInputBox = ({
+  isStreaming = false,
+  setIsStreaming,
+}: {
+  isStreaming?: boolean;
+  setIsStreaming?: (value: boolean) => void;
+}) => {
   const params = useParams();
   const socket = useContext(SocketContext);
   const [question, setQuestion] = useState("what is next js in 10 words");
@@ -45,6 +51,7 @@ const ChatInputBox = ({ isStreaming = false }: { isStreaming?: boolean }) => {
 
   const handleSubmit = () => {
     if (!socket) return;
+    if (setIsStreaming) setIsStreaming(true);
     if (params.cid) {
       socket.emit(
         "chat_question",
