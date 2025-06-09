@@ -1,4 +1,4 @@
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { db } from "../../lib/db.js";
 import * as z from "zod";
 import { google } from "@ai-sdk/google";
@@ -21,6 +21,24 @@ export const newChatHandler = async ({
     socket.emit("error", result.error.message);
     return;
   }
+
+  const chat = await db.chat.create({
+    data: {
+      name: "New Chat",
+      userId: socket.userId,
+    },
+  });
+  socket.emit("chat_created", chat);
+  getChatName(result.data.question, chat.id, socket);
+  await db.chatQuestion.create({
+    data: {
+      chatId: chat.id,
+      question: result.data.question,
+    },
+  });
+};
+
+const getChatName = async (question: string, cid: string, socket: Socket) => {
   const { text } = await generateText({
     model: google("models/gemini-2.0-flash"),
     messages: [
@@ -29,22 +47,13 @@ export const newChatHandler = async ({
         content:
           "You are a concise assistant. Given a user’s question, generate a clear English title summarizing its core topic in 10 words or fewer.",
       },
-      { role: "user", content: result.data.question },
+      { role: "user", content: question },
     ],
   });
-
-  const chat = await db.chat.create({
-    data: {
-      name: text,
-      userId: socket.userId,
-    },
+  const chat = await db.chat.update({
+    where: { id: cid },
+    data: { name: text },
   });
-  await db.chatQuestion.create({
-    data: {
-      chatId: chat.id,
-      question: result.data.question,
-    },
-  });
-
-  socket.emit("chat_created", chat.id);
+  socket.emit("chat_name_updated", chat);
+  return text;
 };

@@ -1,6 +1,8 @@
 "use client";
 import { SocketContext } from "@/context/socket-context";
+import useChatQuery from "@/lib/react-query/use-chat-query";
 import useModelsQuery from "@/lib/react-query/use-models-query";
+import { Chat } from "@repo/db";
 import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
@@ -16,7 +18,7 @@ import {
   Globe,
   Loader,
 } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import React, { useState, useEffect, useRef, useContext } from "react";
 
 const ChatInputBox = ({
@@ -26,12 +28,26 @@ const ChatInputBox = ({
   isStreaming?: boolean;
   setIsStreaming?: (value: boolean) => void;
 }) => {
+  const router = useRouter();
+  const { appendChat, updateChatName } = useChatQuery();
   const params = useParams();
   const socket = useContext(SocketContext);
   const [question, setQuestion] = useState("what is next js in 10 words");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parentDivRef = useRef<HTMLDivElement>(null);
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("chat_created", (chat: Chat) => {
+        router.push(`/chat/${chat.id}`);
+        appendChat(chat);
+      });
+      socket.on("chat_name_updated", (chat: Chat) => {
+        updateChatName(chat);
+      });
+    }
+  }, [socket, appendChat, updateChatName, router]);
 
   useEffect(() => {
     const textarea = textareaRef.current;
