@@ -1,1 +1,1 @@
-export type ModelProvider = "ollama" | "openai" | "anthropic";
+export type ModelProvider = "ollama" | "openai" | "anthropic" | "gemini";

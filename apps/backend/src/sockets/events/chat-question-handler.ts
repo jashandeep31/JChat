@@ -32,7 +32,7 @@ export const chatQuestionHandler = async (socket: Socket, data: string) => {
     })
   );
 
-  const res = await askQuestion(question, "ollama", socket);
+  const res = await askQuestion(question, "gemini", socket);
   const chatQuestionAnswer = await db.chatQuestionAnswer.create({
     data: {
       aiModelId: "cmbnhzl8s0001punq71ndi2ho",

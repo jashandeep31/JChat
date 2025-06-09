@@ -20,7 +20,9 @@
     "tsc-watch": "^7.0.0"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.2.19",
     "@repo/db": "workspace:*",
+    "ai": "^4.3.16",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

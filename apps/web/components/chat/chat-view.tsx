@@ -1,65 +1,81 @@
 "use client";
+
 import React, { useContext, useEffect, useState } from "react";
 import ChatInputBox from "../chat-input-box";
 import { SocketContext } from "@/context/socket-context";
 import { useParams } from "next/navigation";
 import { ChatQuestion, ChatQuestionAnswer } from "@repo/db";
 import ReactMarkdown from "react-markdown";
+
 const ChatView = () => {
   const socket = useContext(SocketContext);
   const params = useParams();
   const [chatQuestions, setChatQuestions] = useState<ChatQuestion[]>(questions);
   const [answers, setAnswers] = useState<ChatQuestionAnswer[]>(answers1);
-  const [streamingResponse, setStreamingResponse] = useState<string>("");
+  const [streamingResponse, setStreamingResponse] = useState<string | null>(
+    null
+  );
+
   useEffect(() => {
     if (!socket) return;
-    socket.emit("join_chat", params.cid);
-    socket.on("chat_question_created", (data: string) => {
-      const parsedData = JSON.parse(data);
-      setChatQuestions((prev) => [...prev, parsedData]);
-    });
-    socket.on("question_response_chunk", (data: string) => {
-      setStreamingResponse((prev) => prev + data);
-    });
-    socket.on("question_answered", (data: string) => {
-      const parsedData = JSON.parse(data);
-      setAnswers((prev) => [...prev, parsedData]);
-      setStreamingResponse("");
-    });
-    return () => {};
-  }, [socket, params]);
 
-  console.log(chatQuestions);
-  console.log(answers);
+    socket.emit("join_chat", params.cid);
+
+    socket.on("chat_question_created", (raw: string) => {
+      const newQuestion = JSON.parse(raw);
+      setChatQuestions((prev) => [...prev, newQuestion]);
+      setStreamingResponse(" ");
+    });
+
+    socket.on("question_response_chunk", (data: string) => {
+      const parsedData = JSON.parse(data);
+      setStreamingResponse((prev) => prev + parsedData.data);
+    });
+
+    socket.on("question_answered", (raw: string) => {
+      const answer = JSON.parse(raw);
+      setAnswers((prev) => [...prev, answer]);
+      setStreamingResponse(null);
+    });
+
+    return () => {
+      socket.off("chat_question_created");
+      socket.off("question_response_chunk");
+      socket.off("question_answered");
+    };
+  }, [socket, params.cid]);
+
   return (
     <div className="flex flex-col h-screen p-4">
-      <div className="flex-1 max-w-[800px] mx-auto">
-        {chatQuestions.map((chatQuestion) => (
-          <div key={chatQuestion.id} className="my-12">
+      <div className="flex-1 max-w-[800px] mx-auto overflow-y-auto">
+        {chatQuestions.map((q) => (
+          <div key={q.id} className="my-12">
             <div className="flex justify-end">
-              <div className="lg:max-w-3/4 bg-accent p-3 rounded-md">
-                {chatQuestion.question}
+              <div className="bg-accent p-3 rounded-md lg:max-w-3/4">
+                {q.question}
               </div>
             </div>
-            <div className="flex justify-start rounded-md mt-6 lg:max-w-3/4">
-              {answers.find(
-                (answer) => answer.chatQuestionId === chatQuestion.id
-              )?.answer && (
-                <div className="bg-red-100 m-3">
+
+            <div className="flex justify-start mt-6 lg:max-w-3/4">
+              {answers.find((a) => a.chatQuestionId === q.id)?.answer ? (
+                <div className="bg-red-100 m-3 rounded-md p-3">
                   <ReactMarkdown>
-                    {
-                      answers.find(
-                        (answer) => answer.chatQuestionId === chatQuestion.id
-                      )!.answer
-                    }
+                    {answers.find((a) => a.chatQuestionId === q.id)!.answer}
                   </ReactMarkdown>
                 </div>
-              )}
+              ) : null}
+            </div>
+            <div>
+              {streamingResponse ? (
+                <div className="bg-red-100 m-3 rounded-md p-3">
+                  <ReactMarkdown>{streamingResponse}</ReactMarkdown>
+                </div>
+              ) : null}
             </div>
           </div>
         ))}
-        <div className="flex justify-center">{streamingResponse}</div>
       </div>
+
       <div className="flex justify-center">
         <ChatInputBox />
       </div>

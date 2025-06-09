@@ -1,3 +1,4 @@
+import useChatQuery from "@/lib/react-query/use-chat-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,33 +15,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@repo/ui/components/sidebar";
-import {
-  Folder,
-  FolderCheck,
-  MoreHorizontal,
-  Share,
-  Trash2,
-} from "lucide-react";
+import { FolderCheck, MoreHorizontal, Share, Trash2 } from "lucide-react";
 import Link from "next/link";
-
-const Chats = [
-  {
-    name: "How to make the world looking good",
-    id: 1,
-  },
-  {
-    name: "Chat 2",
-    id: 2,
-  },
-];
 
 const SidebarChats = () => {
   const { isMobile } = useSidebar();
+  const { chatsQuery } = useChatQuery();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Chats</SidebarGroupLabel>
       <SidebarMenu>
-        {Chats.map((chat) => (
+        {chatsQuery.data?.map((chat) => (
           <SidebarMenuItem key={chat.id} className="hover:bg-accent rounded-md">
             <SidebarMenuButton className="flex items-center gap-2">
               <Link
