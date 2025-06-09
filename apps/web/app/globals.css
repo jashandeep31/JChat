@@ -1,1 +1,30 @@
 @import "@repo/ui/globals.css";
+pre code.hljs {
+  background-color: transparent !important; /* Forces transparent background */
+  padding: 0; /* Adjust padding if atom-one-light adds it and you want to remove it */
+}
+
+/* Target inline code */
+:not(pre) > code.hljs {
+  background-color: transparent !important; /* Forces transparent background */
+  padding: 0; /* Adjust padding if atom-one-light adds it and you want to remove it */
+}
+
+::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted-foreground);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+  background: var(--primary);
+}

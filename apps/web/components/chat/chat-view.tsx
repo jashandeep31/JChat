@@ -5,7 +5,6 @@ import ChatInputBox from "../chat-input-box";
 import { SocketContext } from "@/context/socket-context";
 import { useParams } from "next/navigation";
 import { Chat, ChatQuestion, ChatQuestionAnswer } from "@repo/db";
-import "highlight.js/styles/stackoverflow-dark.css";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
 import { Loader } from "lucide-react";

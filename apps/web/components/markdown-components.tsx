@@ -1,5 +1,6 @@
 import { cn } from "@repo/ui/lib/utils";
 import React from "react";
+import CodeBlock from "./code-block";
 
 export const markdownComponents = {
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
@@ -161,9 +162,10 @@ export const markdownComponents = {
     };
 
     const rawCode = extractTextContent(children);
-    console.log(rawCode);
     return (
-      <pre className={cn("mb-4 mt-4 overflow-x-auto", className)} {...props} />
+      <CodeBlock rawCode={rawCode}>
+        <pre className={cn("overflow-x-auto", className)} {...props} />
+      </CodeBlock>
     );
   },
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (

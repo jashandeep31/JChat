@@ -72,7 +72,7 @@ const ChatInputBox = ({
   };
 
   return (
-    <div className="border-2 border-secondary p-4 rounded-md w-full flex gap-2 flex-col">
+    <div className="border-2 border-primary p-4 rounded-md w-full flex gap-2 flex-col">
       <div ref={parentDivRef} className="flex-1" style={{ minHeight: "50px" }}>
         <textarea
           ref={textareaRef}
