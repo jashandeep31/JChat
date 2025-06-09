@@ -14,13 +14,20 @@ const page = async ({ params }: { params: Promise<{ cid: string }> }) => {
       id: (await params).cid,
       userId: session.user.id,
     },
+    include: {
+      ChatQuestion: {
+        include: {
+          ChatQuestionAnswer: true,
+        },
+      },
+    },
   });
 
   if (!chat) {
     redirect("/");
   }
 
-  return <ChatView />;
+  return <ChatView chat={chat} />;
 };
 
 export default page;

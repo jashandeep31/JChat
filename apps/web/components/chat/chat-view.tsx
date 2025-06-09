@@ -4,23 +4,38 @@ import React, { useContext, useEffect, useState } from "react";
 import ChatInputBox from "../chat-input-box";
 import { SocketContext } from "@/context/socket-context";
 import { useParams } from "next/navigation";
-import { ChatQuestion, ChatQuestionAnswer } from "@repo/db";
+import { Chat, ChatQuestion, ChatQuestionAnswer } from "@repo/db";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/stackoverflow-dark.css";
+import { markdownComponents } from "../markdown-components";
 
-const ChatView = () => {
+const ChatView = ({
+  chat,
+}: {
+  chat: Chat & {
+    ChatQuestion: (ChatQuestion & {
+      ChatQuestionAnswer: ChatQuestionAnswer[];
+    })[];
+  };
+}) => {
   const socket = useContext(SocketContext);
   const params = useParams();
-  const [chatQuestions, setChatQuestions] = useState<ChatQuestion[]>(questions);
-  const [answers, setAnswers] = useState<ChatQuestionAnswer[]>(answers1);
+  const [chatQuestions, setChatQuestions] = useState<ChatQuestion[]>(
+    chat.ChatQuestion
+  );
+  const [answers, setAnswers] = useState<ChatQuestionAnswer[]>(
+    chat.ChatQuestion.flatMap((q) => q.ChatQuestionAnswer)
+  );
   const [streamingResponse, setStreamingResponse] = useState<string | null>(
     null
   );
 
   useEffect(() => {
     if (!socket) return;
-
     socket.emit("join_chat", params.cid);
-
     socket.on("chat_question_created", (raw: string) => {
       const newQuestion = JSON.parse(raw);
       setChatQuestions((prev) => [...prev, newQuestion]);
@@ -46,29 +61,37 @@ const ChatView = () => {
   }, [socket, params.cid]);
 
   return (
-    <div className="flex flex-col h-screen p-4">
-      <div className="flex-1 max-w-[800px] mx-auto overflow-y-auto">
+    <div className="relative">
+      <div className="mx-auto lg:max-w-1/2">
         {chatQuestions.map((q) => (
           <div key={q.id} className="my-12">
             <div className="flex justify-end">
-              <div className="bg-accent p-3 rounded-md lg:max-w-3/4">
+              <div className="bg-accent p-3 rounded-md lg:max-w-2/3">
                 {q.question}
               </div>
             </div>
-
-            <div className="flex justify-start mt-6 lg:max-w-3/4">
+            <div className="flex justify-start mt-6 ">
               {answers.find((a) => a.chatQuestionId === q.id)?.answer ? (
-                <div className="bg-red-100 m-3 rounded-md p-3">
-                  <ReactMarkdown>
+                <div className="m-3 rounded-md p-3 grid ">
+                  <ReactMarkdown
+                    components={markdownComponents}
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                  >
                     {answers.find((a) => a.chatQuestionId === q.id)!.answer}
                   </ReactMarkdown>
                 </div>
               ) : null}
             </div>
-            <div>
+            <div className="grid">
               {streamingResponse ? (
-                <div className="bg-red-100 m-3 rounded-md p-3">
-                  <ReactMarkdown>{streamingResponse}</ReactMarkdown>
+                <div className="m-3 rounded-md p-3">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                  >
+                    {streamingResponse}
+                  </ReactMarkdown>
                 </div>
               ) : null}
             </div>
@@ -76,103 +99,13 @@ const ChatView = () => {
         ))}
       </div>
 
-      <div className="flex justify-center">
-        <ChatInputBox />
+      <div className="sticky bottom-0 z-10 bg-background ">
+        <div className="mx-auto lg:max-w-1/2 bg-background ">
+          <ChatInputBox />
+        </div>
       </div>
     </div>
   );
 };
 
 export default ChatView;
-
-const questions = [
-  {
-    id: "q1",
-    chatId: "c1",
-    question: "What is Next.js and its main features in 10 words?",
-    credits: 10,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "q2",
-    chatId: "c1",
-    question: "Explain how React hooks work in simple terms.",
-    credits: 5,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "q3",
-    chatId: "c1",
-    question: "Explain how React hooks work in simple terms.",
-    credits: 5,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
-const answers1 = [
-  {
-    id: "a1",
-    chatQuestionId: "q1",
-    answer:
-      "Next.js is a React framework with server-side rendering and static site generation.",
-    credits: 8,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    aiModelId: "aiModel1",
-  },
-  {
-    id: "a2",
-    chatQuestionId: "q2",
-    answer:
-      "React hooks allow you to use state and lifecycle methods in functional components.",
-    credits: 5,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    aiModelId: "aiModel2",
-  },
-  {
-    id: "a3",
-    chatQuestionId: "q3",
-    answer: `\`\`\`javascript
-const nextJsFeatures = {
-  ssr: 'Server-side Rendering',
-  ssg: 'Static Site Generation',
-  apiRoutes: 'API Routes',
-};
-console.log(nextJsFeatures);
-\`\`\``,
-    credits: 12,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    aiModelId: "aiModel3",
-  },
-  {
-    id: "a4",
-    chatQuestionId: "q2",
-    answer: `\`\`\`javascript
-import { useState, useEffect } from 'react';
-
-function Counter() {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    document.title = \`Count: \${count}\`;
-  }, [count]);
-
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
-  );
-}
-\`\`\``,
-    credits: 6,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    aiModelId: "aiModel4",
-  },
-];
