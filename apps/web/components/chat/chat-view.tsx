@@ -51,6 +51,7 @@ const ChatView = ({
     const handleResponseChunk = (data: string) => {
       const parsedData = JSON.parse(data);
       setStreamingResponse((prev) => prev + parsedData.data);
+      if (!isStreaming) setIsStreaming(true);
     };
 
     const handleQuestionAnswered = (raw: string) => {
@@ -61,7 +62,7 @@ const ChatView = ({
     };
 
     // Register event listeners
-    socket.on("chat_question_created", handleQuestionCreated);
+    socket.on("question_created", handleQuestionCreated);
     socket.on("question_response_chunk", handleResponseChunk);
     socket.on("question_answered", handleQuestionAnswered);
 
@@ -71,7 +72,7 @@ const ChatView = ({
       socket.off("question_response_chunk", handleResponseChunk);
       socket.off("question_answered", handleQuestionAnswered);
     };
-  }, [socket, params.cid]);
+  }, [socket, params.cid, isStreaming]);
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">

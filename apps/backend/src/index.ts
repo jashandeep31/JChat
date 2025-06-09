@@ -18,7 +18,7 @@ io.use((socket, next) => {
   next();
 });
 
-io.on("connection", socketHandler);
+io.on("connection", (socket) => socketHandler(socket, io));
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
