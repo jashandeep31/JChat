@@ -8,7 +8,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
     <div>
       <SidebarProvider>
         <RootSideBar />
-        <main className="w-full block">{children}</main>
+        <main className="w-full flex flex-col">{children}</main>
       </SidebarProvider>
     </div>
   );

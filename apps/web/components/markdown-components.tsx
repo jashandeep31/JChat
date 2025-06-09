@@ -133,15 +133,9 @@ export const markdownComponents = {
     />
   ),
   pre: ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre className={cn("mb-4 mt-4 overflow-x-auto  ", className)} {...props} />
+    <pre className={cn("mb-4 mt-4 overflow-x-auto", className)} {...props} />
   ),
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <code
-      className={cn(
-        "relative rounded border px-1 py-0.5 font-mono ",
-        className
-      )}
-      {...props}
-    />
+    <code className={cn("", className)} {...props} />
   ),
 };
