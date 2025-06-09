@@ -8,11 +8,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
-import { ArrowUp, Brain, ChevronDown, FileText, Globe } from "lucide-react";
+import {
+  ArrowUp,
+  Brain,
+  ChevronDown,
+  FileText,
+  Globe,
+  Loader,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState, useEffect, useRef, useContext } from "react";
 
-const ChatInputBox = () => {
+const ChatInputBox = ({ isStreaming = false }: { isStreaming?: boolean }) => {
   const params = useParams();
   const socket = useContext(SocketContext);
   const [question, setQuestion] = useState("what is next js in 10 words");
@@ -84,8 +91,8 @@ const ChatInputBox = () => {
             <Globe className="w-4 h-4" /> Web Search
           </button>
         </div>
-        <Button onClick={handleSubmit}>
-          <ArrowUp />
+        <Button onClick={handleSubmit} disabled={isStreaming}>
+          {isStreaming ? <Loader className="animate-spin" /> : <ArrowUp />}
         </Button>
       </div>
     </div>

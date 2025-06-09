@@ -6,28 +6,8 @@ import { SocketContext } from "@/context/socket-context";
 import { useParams } from "next/navigation";
 import { Chat, ChatQuestion, ChatQuestionAnswer } from "@repo/db";
 import "highlight.js/styles/stackoverflow-dark.css";
-import MarkdownRenderer from "../markdown-renderer";
-const QuestionBubble: React.FC<{ content: string }> = ({ content }) => (
-  <div className="flex justify-end">
-    <div className="bg-accent p-3 rounded-md lg:max-w-2/3">{content}</div>
-  </div>
-);
-
-// AI answer bubble component
-const AnswerBubble: React.FC<{ content: string }> = ({ content }) => (
-  <div>
-    <MarkdownRenderer content={content} />
-  </div>
-);
-
-// Streaming response component
-const StreamingResponse: React.FC<{ content: string | null }> = ({
-  content,
-}) => {
-  if (!content) return null;
-
-  return <MarkdownRenderer content={content} />;
-};
+import QuestionBubble from "./question-bubble";
+import AnswerBubble from "./answer-bubble";
 
 const ChatView = ({
   chat,
@@ -102,7 +82,7 @@ const ChatView = ({
                 <AnswerBubble content={getAnswerForQuestion(q.id)!} />
               )}
               {!getAnswerForQuestion(q.id) && streamingResponse && (
-                <StreamingResponse content={streamingResponse} />
+                <AnswerBubble content={streamingResponse} />
               )}
             </div>
           ))}
