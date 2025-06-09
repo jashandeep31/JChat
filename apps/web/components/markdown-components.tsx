@@ -1,5 +1,5 @@
 import { cn } from "@repo/ui/lib/utils";
-import type React from "react";
+import React from "react";
 
 export const markdownComponents = {
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
@@ -132,9 +132,40 @@ export const markdownComponents = {
       {...props}
     />
   ),
-  pre: ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre className={cn("mb-4 mt-4 overflow-x-auto", className)} {...props} />
-  ),
+  pre: ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => {
+    const children = props.children;
+    const extractTextContent = (node: React.ReactNode): string => {
+      if (typeof node === "string") {
+        return node;
+      }
+      if (typeof node === "number") {
+        return node.toString();
+      }
+      if (node === null || node === undefined || typeof node === "boolean") {
+        return "";
+      }
+      if (React.isValidElement(node)) {
+        const nodeProps = node.props;
+        if (
+          nodeProps &&
+          typeof nodeProps === "object" &&
+          "children" in nodeProps
+        ) {
+          return extractTextContent(nodeProps.children as React.ReactNode);
+        }
+      }
+      if (Array.isArray(node)) {
+        return node.map(extractTextContent).join("");
+      }
+      return "";
+    };
+
+    const rawCode = extractTextContent(children);
+    console.log(rawCode);
+    return (
+      <pre className={cn("mb-4 mt-4 overflow-x-auto", className)} {...props} />
+    );
+  },
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <code className={cn("", className)} {...props} />
   ),
