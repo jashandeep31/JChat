@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React from "react";
 import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
@@ -10,20 +10,12 @@ import { useChatSocket } from "@/hooks/use-chat-socket";
 
 const ChatView: React.FC = () => {
   const { cid } = useParams<{ cid: string }>();
-  const [autoScroll, setAutoScroll] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const anchorRef = useRef<HTMLDivElement>(null);
   const { chatQuestions, isStreaming, streamingResponse } = useChatSocket(cid, {
     questions: [],
   });
 
-  useLayoutEffect(() => {
-    if (autoScroll && anchorRef.current) {
-      anchorRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
-    }
-  }, [chatQuestions, streamingResponse, autoScroll]);
   return (
-    <div className="flex-1 flex flex-col p-4 pb-0" ref={containerRef}>
+    <div className="flex-1 flex flex-col p-4 pb-0">
       <div className="flex-1">
         <div className="mx-auto lg:max-w-1/2 w-full">
           {chatQuestions.map((chatQuestion) => (
@@ -39,7 +31,6 @@ const ChatView: React.FC = () => {
           {isStreaming && (
             <StreamingResponse content={streamingResponse ?? ""} />
           )}
-          <div ref={anchorRef} />
         </div>
       </div>
 
