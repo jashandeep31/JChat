@@ -4,9 +4,17 @@ import React from "react";
 import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
-import { Loader } from "lucide-react";
+import { Loader, SlidersHorizontal } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useChatSocket } from "@/hooks/use-chat-socket";
+import { Button } from "@repo/ui/components/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/dropdown-menu";
+import { Label } from "@repo/ui/components/label";
+import { Textarea } from "@repo/ui/components/textarea";
 
 const ChatView: React.FC = () => {
   const { cid } = useParams<{ cid: string }>();
@@ -16,15 +24,39 @@ const ChatView: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
+      <div className="sticky top-4 right-4 z-10 flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size={"sm"}>
+              <SlidersHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="mx-4">
+            <div className="lg:w-[600px]">
+              <div className="p-2">
+                <Label className="mb-2">Instruction </Label>
+                <Textarea
+                  className="resize-none h-24"
+                  placeholder="Example: Answer the question in 2 sentences"
+                />
+                <div className="mt-3 flex justify-end gap-2">
+                  <Button size={"sm"} variant="outline">
+                    Cancel
+                  </Button>
+                  <Button size={"sm"}>Save</Button>
+                </div>
+              </div>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <div className="flex-1">
         <div className="mx-auto lg:max-w-1/2 w-full">
           {chatQuestions.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
               <QuestionBubble content={chatQuestion.question} />
               {chatQuestion.ChatQuestionAnswer.length > 0 && (
-                <AnswerBubble
-                  content={chatQuestion.ChatQuestionAnswer[0].answer}
-                />
+                <AnswerBubble question={chatQuestion} />
               )}
             </div>
           ))}
