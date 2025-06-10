@@ -25,14 +25,10 @@ export const chatQuestionHandler = async ({
   });
 
   // emit to all clients in the chat room
-  io.to(`chat-${cid}`).emit(
-    "question_created",
-    JSON.stringify({
-      cid: chatQuestion.chatId,
-      question: chatQuestion.question,
-      id: chatQuestion.id,
-    })
-  );
+  io.to(`chat-${cid}`).emit("question_created", {
+    cid: chatQuestion.chatId,
+    question: chatQuestion,
+  });
 
   // ask question to AI
   const res = await askQuestion(question, "gemini", io, cid);
@@ -44,10 +40,8 @@ export const chatQuestionHandler = async ({
       answer: res,
     },
   });
-  io.to(`chat-${cid}`).emit(
-    "question_answered",
-    JSON.stringify({
-      ...chatQuestionAnswer,
-    })
-  );
+  io.to(`chat-${cid}`).emit("question_answered", {
+    cid,
+    answer: chatQuestionAnswer,
+  });
 };
