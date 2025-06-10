@@ -1,7 +1,6 @@
 import { getChat } from "../../services/chat-cache.js";
-import { redis } from "../../lib/db.js";
+import { db, redis } from "../../lib/db.js";
 import { SocketFunctionParams } from "../../models/types.js";
-import { getQAPairs } from "../../services/chat-qa-cache.js";
 export const joinChatHandler = async ({
   socket,
   io,
@@ -23,6 +22,10 @@ export const joinChatHandler = async ({
     );
   }
 
-  const qaPairs = await getQAPairs(cid, 0);
+  const qaPairs = await db.chatQuestion.findMany({
+    where: { chatId: cid },
+    orderBy: { createdAt: "asc" },
+    include: { ChatQuestionAnswer: { orderBy: { createdAt: "asc" } } },
+  });
   io.to(`room:${chat.id}`).emit("qa_pairs", { cid: cid, qaPairs });
 };

@@ -4,9 +4,12 @@ import { useContext, useEffect, useState, useCallback } from "react";
 import { SocketContext } from "@/context/socket-context";
 import { ChatQuestion, ChatQuestionAnswer } from "@repo/db";
 
+export interface FullChatQuestion extends ChatQuestion {
+  ChatQuestionAnswer: ChatQuestionAnswer[];
+}
+
 export interface ChatSocketState {
-  chatQuestions: ChatQuestion[];
-  answers: ChatQuestionAnswer[];
+  chatQuestions: FullChatQuestion[];
   isStreaming: boolean;
   streamingResponse: string | null;
 }
@@ -18,18 +21,15 @@ export interface UseChatSocketReturn extends ChatSocketState {
 export const useChatSocket = (
   chatId: string,
   initialData: {
-    questions: ChatQuestion[];
-    answers: ChatQuestionAnswer[];
+    questions: FullChatQuestion[];
   }
 ): UseChatSocketReturn => {
   const socket = useContext(SocketContext);
 
-  const [chatQuestions, setChatQuestions] = useState<ChatQuestion[]>(
+  const [chatQuestions, setChatQuestions] = useState<FullChatQuestion[]>(
     initialData.questions
   );
-  const [answers, setAnswers] = useState<ChatQuestionAnswer[]>(
-    initialData.answers
-  );
+
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingResponse, setStreamingResponse] = useState<string | null>(
     null
@@ -48,19 +48,21 @@ export const useChatSocket = (
 
     socket.emit("join_chat", chatId);
 
-    const handleQuestionCreated = (raw: {
+    const handleQuestionCreated = (questionData: {
       cid: string;
       question: ChatQuestion;
     }) => {
-      const { question } = raw;
+      const { question } = questionData;
       setChatQuestions((prev) =>
-        prev.some((q) => q.id === question.id) ? prev : [...prev, question]
+        prev.some((q) => q.id === question.id)
+          ? prev
+          : [...prev, { ...question, ChatQuestionAnswer: [] }]
       );
       setStreamingResponse(" ");
     };
 
-    const handleResponseChunk = (data: string) => {
-      const parsed = JSON.parse(data);
+    const handleResponseChunk = (chunkData: string) => {
+      const parsed = JSON.parse(chunkData);
       setStreamingResponse((prev) => (prev ?? "") + parsed.data);
       setIsStreaming(true);
     };
@@ -69,7 +71,18 @@ export const useChatSocket = (
       cid: string;
       answer: ChatQuestionAnswer;
     }) => {
-      setAnswers((prev) => [...prev, raw.answer]);
+      console.log(raw);
+      setChatQuestions((prev) => {
+        return prev.map((q) => {
+          if (q.id === raw.answer.chatQuestionId) {
+            return {
+              ...q,
+              ChatQuestionAnswer: [...q.ChatQuestionAnswer, raw.answer],
+            };
+          }
+          return q;
+        });
+      });
       setStreamingResponse(null);
       setIsStreaming(false);
     };
@@ -77,9 +90,9 @@ export const useChatSocket = (
     socket.on("question_created", handleQuestionCreated);
     socket.on("question_response_chunk", handleResponseChunk);
     socket.on("question_answered", handleQuestionAnswered);
-    socket.on("qa_pairs", (raw) => {
-      console.log(raw.cid === chatId);
-      const questions = raw;
+    socket.on("qa_pairs", (qaData) => {
+      console.log(qaData);
+      setChatQuestions(qaData.qaPairs);
     });
     return () => {
       socket.off("question_created", handleQuestionCreated);
@@ -91,7 +104,6 @@ export const useChatSocket = (
 
   return {
     chatQuestions,
-    answers,
     isStreaming,
     streamingResponse,
     askQuestion,

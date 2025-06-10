@@ -11,24 +11,24 @@ import { useChatSocket } from "@/hooks/use-chat-socket";
 const ChatView: React.FC = () => {
   const { cid } = useParams<{ cid: string }>();
 
-  const { chatQuestions, answers, isStreaming, streamingResponse } =
-    useChatSocket(cid, {
-      questions: [],
-      answers: [],
-    });
+  const { chatQuestions, isStreaming, streamingResponse } = useChatSocket(cid, {
+    questions: [],
+  });
 
-  const getAnswerForQuestion = (questionId: string) =>
-    answers.find((a) => a.chatQuestionId === questionId)?.answer;
+  // const getAnswerForQuestion = (questionId: string) =>
+  //   answers.find((a) => a.chatQuestionId === questionId)?.answer;
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
       <div className="flex-1">
         <div className="mx-auto lg:max-w-1/2 w-full">
-          {chatQuestions.map((q) => (
-            <div key={q.id} className="my-12">
-              <QuestionBubble content={q.question} />
-              {getAnswerForQuestion(q.id) && (
-                <AnswerBubble content={getAnswerForQuestion(q.id)!} />
+          {chatQuestions.map((chatQuestion) => (
+            <div key={chatQuestion.id} className="my-12">
+              <QuestionBubble content={chatQuestion.question} />
+              {chatQuestion.ChatQuestionAnswer.length > 0 && (
+                <AnswerBubble
+                  content={chatQuestion.ChatQuestionAnswer[0].answer}
+                />
               )}
             </div>
           ))}

@@ -1,7 +1,7 @@
-import { askQuestion } from "../../models/index.js";
 import * as z from "zod";
 import { db } from "../../lib/db.js";
 import { SocketFunctionParams } from "src/models/types.js";
+import { handleQuestionAnswer } from "../utils/handle-question-answer.js";
 const chatQuestionSchema = z.object({
   question: z.string(),
   cid: z.string(),
@@ -28,17 +28,5 @@ export const chatQuestionHandler = async ({
     question: chatQuestion,
   });
 
-  const res = await askQuestion(chatQuestion, "gemini", io, cid);
-
-  const chatQuestionAnswer = await db.chatQuestionAnswer.create({
-    data: {
-      aiModelId: "cmbnhzl8s0001punq71ndi2ho",
-      chatQuestionId: chatQuestion.id,
-      answer: res,
-    },
-  });
-  io.to(`room:${cid}`).emit("question_answered", {
-    cid,
-    answer: chatQuestionAnswer,
-  });
+  await handleQuestionAnswer({ chatQuestion, io, cid });
 };
