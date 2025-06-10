@@ -12,6 +12,7 @@ import {
   ArrowUp,
   Brain,
   ChevronDown,
+  Eye,
   FileText,
   Globe,
   Loader,
@@ -113,7 +114,11 @@ const SelectAIModel = () => {
   const { modelsQuery } = useModelsQuery();
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    if (selectedModel === null && modelsQuery.data) {
+    if (
+      selectedModel === null &&
+      modelsQuery.data &&
+      modelsQuery.data.length > 0
+    ) {
       setSelectedModel(modelsQuery.data[0].id);
     }
     return () => {};
@@ -122,7 +127,7 @@ const SelectAIModel = () => {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2">
+        <button className="flex items-center gap-2 text-xs text-foreground hover:bg-accent transition-all rounded font-bold py-1 px-2">
           {selectedModel
             ? modelsQuery.data?.find((model) => model.id === selectedModel)
                 ?.name
@@ -154,6 +159,11 @@ const SelectAIModel = () => {
               </span>
             </div>
             <div className="flex items-center gap-2">
+              {model.imageAnalysis && (
+                <span className="">
+                  <Eye className="text-orange-800 w-4 h-4" />
+                </span>
+              )}
               {model.pdfAnalysis && (
                 <span className="">
                   <FileText className="text-green-800 w-4 h-4" />

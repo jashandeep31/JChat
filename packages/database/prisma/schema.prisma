@@ -49,6 +49,16 @@ model Chat {
   user         User           @relation(fields: [userId], references: [id])
 }
 
+model Company {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  logo      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  AiModel   AiModel[]
+}
+
 model AiModel {
   id                 String               @id @default(cuid())
   name               String
@@ -63,7 +73,9 @@ model AiModel {
   reasoning          Boolean              @default(false)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
+  companyId          String
   ChatQuestionAnswer ChatQuestionAnswer[]
+  company            Company              @relation(fields: [companyId], references: [id])
 }
 
 enum ChatType {

@@ -24,7 +24,7 @@ const ChatView: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
-      <div className="sticky top-4 right-4 z-10 flex justify-end">
+      <div className="fixed  top-4 right-4 p-0 z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size={"sm"}>
@@ -50,7 +50,7 @@ const ChatView: React.FC = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 ">
         <div className="mx-auto lg:max-w-1/2 w-full">
           {chatQuestions.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
@@ -60,9 +60,9 @@ const ChatView: React.FC = () => {
               )}
             </div>
           ))}
-          {isStreaming && (
+          {/* {isStreaming && (
             <StreamingResponse content={streamingResponse ?? ""} />
-          )}
+          )} */}
         </div>
       </div>
 
@@ -75,11 +75,11 @@ const ChatView: React.FC = () => {
   );
 };
 
-const StreamingResponse: React.FC<{ content: string }> = ({ content }) =>
-  !content.trim() ? (
-    <Loader className="animate-spin" />
-  ) : (
-    <AnswerBubble content={content} />
-  );
+// const StreamingResponse: React.FC<{ content: string }> = ({ content }) =>
+//   !content.trim() ? (
+//     <Loader className="animate-spin" />
+//   ) : (
+//     <AnswerBubble question={{ question: content, ChatQuestionAnswer: [] }} />
+//   );
 
 export default ChatView;
