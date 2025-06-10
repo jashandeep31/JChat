@@ -31,7 +31,7 @@ const SidebarProjects = () => {
 
   return (
     <>
-      <SidebarGroup>
+      <SidebarGroup className="hidden">
         <SidebarGroupLabel className="flex items-center justify-between">
           <span>Projects</span>
           {projectsQuery.isLoading ? (
@@ -115,7 +115,7 @@ const CreateProjectDialog = ({
         </div>
         <Alert variant="default" className="border-0 bg-accent">
           <Lightbulb />
-          <AlertTitle>What's a project?</AlertTitle>
+          <AlertTitle>What&apos;s a project?</AlertTitle>
           <AlertDescription>
             Projects keep chats, files, and custom instructions in one place.
             Use them for ongoing work, or just to keep things tidy.

@@ -144,6 +144,7 @@ const SelectAIModel = () => {
             }`}
           >
             <div className="flex items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={model.logo} className="w-3 h-3" alt="" />
               <span>
                 {model.name}{" "}
