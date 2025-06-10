@@ -22,7 +22,7 @@ export const askQuestion = async (
     throw new Error(`Unsupported or unimplemented model provider: ${modelId}`);
   }
   let answer = "";
-  if (1 !== 1) {
+  if (1 === 1) {
     // a long fake response (~300 words) with narrative + sample React component
     const fakeResponse = `Here’s a demonstration of a hypothetical React component named SampleComponent. It imports React from the 'react' package and uses the useState hook to manage an internal count state, with an initial value of zero. A button triggers an increment function when clicked, updating the state and re-rendering the component with the new count displayed. We also show how props can be passed in for additional flexibility. Below is a simple React component example:
   
@@ -56,7 +56,7 @@ export const askQuestion = async (
       );
       answer += chunk;
       await redis.set(redisKey, answer);
-      await new Promise((res) => setTimeout(res, 100));
+      await new Promise((res) => setTimeout(res, 200));
     }
     await redis.del(redisKey);
     return answer;

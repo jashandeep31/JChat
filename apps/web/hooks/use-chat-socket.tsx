@@ -83,6 +83,7 @@ export const useChatSocket = (
           return q;
         });
       });
+      // console.log(raw);
       setStreamingResponse(null);
       setIsStreaming(false);
     };
