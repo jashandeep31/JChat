@@ -1,11 +1,11 @@
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { Job, Queue, Worker } from "bullmq";
-import { db, redisDb } from "../lib/db.js";
+import { db, redis } from "../lib/db.js";
 import { getIO } from "./index.js";
 
 export const renameChatQueue = new Queue("rename-chat-queue", {
-  connection: redisDb,
+  connection: redis,
 });
 const worker = new Worker(
   "rename-chat-queue",
@@ -51,7 +51,7 @@ const worker = new Worker(
       throw error; // This will mark the job as failed
     }
   },
-  { connection: redisDb }
+  { connection: redis }
 );
 
 export default worker;

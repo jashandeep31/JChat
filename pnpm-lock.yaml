@@ -93,6 +93,9 @@ importers:
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
+      ioredis:
+        specifier: ^5.6.1
+        version: 5.6.1
       lucide-react:
         specifier: ^0.511.0
         version: 0.511.0(react@19.1.0)

@@ -77,7 +77,10 @@ export const useChatSocket = (
     socket.on("question_created", handleQuestionCreated);
     socket.on("question_response_chunk", handleResponseChunk);
     socket.on("question_answered", handleQuestionAnswered);
-
+    socket.on("qa_pairs", (raw) => {
+      console.log(raw.cid === chatId);
+      const questions = raw;
+    });
     return () => {
       socket.off("question_created", handleQuestionCreated);
       socket.off("question_response_chunk", handleResponseChunk);

@@ -1,7 +1,9 @@
+import { redis } from "../lib/db.js";
 import { askGeminiQuestion } from "./providers/gemini/index.js";
 import { askOllamaQuestion } from "./providers/ollama/index.js";
 import { ModelProvider } from "./types.js";
 import { Server, Socket } from "socket.io";
+import { ChatQuestion } from "@repo/db";
 
 const providers: Record<ModelProvider, any | undefined> = {
   ollama: askOllamaQuestion,
@@ -10,7 +12,7 @@ const providers: Record<ModelProvider, any | undefined> = {
   gemini: askGeminiQuestion,
 };
 export const askQuestion = async (
-  question: string,
+  chatQuestion: ChatQuestion,
   modelId: ModelProvider,
   io: Server,
   cid: string
@@ -45,15 +47,18 @@ export const askQuestion = async (
     // split into ~100-char chunks
     const fakeChunks = fakeResponse.match(/.{1,100}/g) || [];
 
+    const redisKey = `chat:${cid}:isStreaming`;
     let answer = "";
     for (const chunk of fakeChunks) {
-      io.to(`chat-${cid}`).emit(
+      io.to(`room:${cid}`).emit(
         "question_response_chunk",
         JSON.stringify({ data: chunk })
       );
       answer += chunk;
-      await new Promise((res) => setTimeout(res, 100));
+      await redis.set(redisKey, answer);
+      await new Promise((res) => setTimeout(res, 300));
     }
+    await redis.del(redisKey);
     return answer;
   }
 

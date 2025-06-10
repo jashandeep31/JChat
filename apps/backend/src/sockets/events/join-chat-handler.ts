@@ -1,17 +1,28 @@
-import { db } from "../../lib/db.js";
+import { getChat } from "../../services/chat-cache.js";
+import { redis } from "../../lib/db.js";
 import { SocketFunctionParams } from "../../models/types.js";
+import { getQAPairs } from "../../services/chat-qa-cache.js";
 export const joinChatHandler = async ({
   socket,
   io,
   data,
 }: SocketFunctionParams) => {
   const cid = data;
-  const chat = await db.chat.findUnique({
-    where: { id: cid, userId: socket.userId },
-  });
+  const chat = await getChat(cid, socket.userId);
   if (!chat) {
     socket.emit("error", "Chat not found");
     return;
   }
-  socket.join(`chat-${chat.id}`);
+  socket.join(`room:${chat.id}`);
+
+  const isStreaming = await redis.get(`chat:${chat.id}:isStreaming`);
+  if (isStreaming) {
+    socket.emit(
+      "question_response_chunk",
+      JSON.stringify({ data: isStreaming })
+    );
+  }
+
+  const qaPairs = await getQAPairs(cid, 0);
+  io.to(`room:${chat.id}`).emit("qa_pairs", { cid: cid, qaPairs });
 };

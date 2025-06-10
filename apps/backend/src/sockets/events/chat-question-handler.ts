@@ -15,7 +15,6 @@ export const chatQuestionHandler = async ({
 }: SocketFunctionParams) => {
   const parsedData = JSON.parse(data);
   const result = chatQuestionSchema.parse(parsedData);
-
   const { question, cid } = result;
   const chatQuestion = await db.chatQuestion.create({
     data: {
@@ -24,14 +23,12 @@ export const chatQuestionHandler = async ({
     },
   });
 
-  // emit to all clients in the chat room
-  io.to(`chat-${cid}`).emit("question_created", {
+  io.to(`room:${cid}`).emit("question_created", {
     cid: chatQuestion.chatId,
     question: chatQuestion,
   });
 
-  // ask question to AI
-  const res = await askQuestion(question, "gemini", io, cid);
+  const res = await askQuestion(chatQuestion, "gemini", io, cid);
 
   const chatQuestionAnswer = await db.chatQuestionAnswer.create({
     data: {
@@ -40,7 +37,7 @@ export const chatQuestionHandler = async ({
       answer: res,
     },
   });
-  io.to(`chat-${cid}`).emit("question_answered", {
+  io.to(`room:${cid}`).emit("question_answered", {
     cid,
     answer: chatQuestionAnswer,
   });

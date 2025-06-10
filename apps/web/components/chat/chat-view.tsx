@@ -6,24 +6,15 @@ import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
 import { Loader } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Chat, ChatQuestion, ChatQuestionAnswer } from "@repo/db";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 
-interface Props {
-  chat: Chat & {
-    ChatQuestion: (ChatQuestion & {
-      ChatQuestionAnswer: ChatQuestionAnswer[];
-    })[];
-  };
-}
-
-const ChatView: React.FC<Props> = ({ chat }) => {
+const ChatView: React.FC = () => {
   const { cid } = useParams<{ cid: string }>();
 
   const { chatQuestions, answers, isStreaming, streamingResponse } =
     useChatSocket(cid, {
-      questions: chat.ChatQuestion,
-      answers: chat.ChatQuestion.flatMap((q) => q.ChatQuestionAnswer),
+      questions: [],
+      answers: [],
     });
 
   const getAnswerForQuestion = (questionId: string) =>
