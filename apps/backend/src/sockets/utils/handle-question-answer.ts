@@ -15,7 +15,7 @@ export const handleQuestionAnswer = async ({
   const res = await askQuestion(chatQuestion, "gemini", io, cid);
   const chatQuestionAnswer = await db.chatQuestionAnswer.create({
     data: {
-      aiModelId: "cmbnhzl8s0001punq71ndi2ho",
+      aiModelId: "cmbqscmp80006pueky70prxzz",
       chatQuestionId: chatQuestion.id,
       answer: res,
     },

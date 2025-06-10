@@ -17,7 +17,7 @@ export const io = new Server(server, {
 });
 
 io.use((socket, next) => {
-  socket.userId = "0784bd0c-1d9f-40b5-83b6-31d323cb832d";
+  socket.userId = "1945b260-5c8a-4134-862f-8e255d34c7e6";
   next();
 });
 

@@ -1,6 +1,6 @@
 "use client";
 import { SocketContext } from "@/context/socket-context";
-import useModelsQuery from "@/lib/react-query/use-models-query";
+import { useChatInputBox } from "@/context/chat-input-box-context";
 import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import {
   Loader,
 } from "lucide-react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import React, { useState, useEffect, useRef, useContext } from "react";
 
 const ChatInputBox = ({
@@ -29,10 +30,19 @@ const ChatInputBox = ({
 }) => {
   const params = useParams();
   const socket = useContext(SocketContext);
-  const [question, setQuestion] = useState("what is next js in 10 words");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parentDivRef = useRef<HTMLDivElement>(null);
-  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
+
+  const {
+    question,
+    setQuestion,
+    isWebSearchEnabled,
+    setIsWebSearchEnabled,
+    selectedModel,
+    setSelectedModel,
+    handleSubmit,
+    models,
+  } = useChatInputBox();
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -50,26 +60,12 @@ const ChatInputBox = ({
     }
   }, [question]);
 
-  const handleSubmit = () => {
-    if (!socket) return;
-    if (setIsStreaming) setIsStreaming(true);
-    if (params.cid) {
-      socket.emit(
-        "chat_question",
-        JSON.stringify({
-          cid: params.cid,
-          question,
-          isWebSearchEnabled,
-        })
-      );
-    } else {
-      socket.emit(
-        "new_chat",
-        JSON.stringify({
-          question,
-        })
-      );
-    }
+  const onSubmit = () => {
+    handleSubmit({
+      setIsStreaming,
+      socket,
+      params,
+    });
   };
 
   return (
@@ -85,21 +81,32 @@ const ChatInputBox = ({
           placeholder="Ask anything..."
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSubmit();
+            }
+          }}
         />
       </div>
       <div className="flex justify-between items-end">
         <div className="flex gap-2">
-          <SelectAIModel />
+          <SelectAIModel
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            models={models}
+          />
           <button
             className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
               isWebSearchEnabled ? " text-primary border-primary " : ""
             }`}
-            onClick={() => setIsWebSearchEnabled((prev) => !prev)}
+            onClick={() => setIsWebSearchEnabled(!isWebSearchEnabled)}
+            type="button"
           >
             <Globe className="w-4 h-4" /> Web Search
           </button>
         </div>
-        <Button onClick={handleSubmit} disabled={isStreaming}>
+        <Button onClick={onSubmit} disabled={isStreaming}>
           {isStreaming ? <Loader className="animate-spin" /> : <ArrowUp />}
         </Button>
       </div>
@@ -109,35 +116,41 @@ const ChatInputBox = ({
 
 export default ChatInputBox;
 
-const SelectAIModel = () => {
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const { modelsQuery } = useModelsQuery();
+interface SelectAIModelProps {
+  selectedModel: string | null;
+  setSelectedModel: (model: string) => void;
+  models: Array<{
+    id: string;
+    name: string;
+    logo: string;
+    credits: number;
+    imageAnalysis?: boolean;
+    pdfAnalysis?: boolean;
+    webAnalysis?: boolean;
+    reasoning?: boolean;
+  }>;
+}
+
+const SelectAIModel = ({
+  selectedModel,
+  setSelectedModel,
+  models,
+}: SelectAIModelProps) => {
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (
-      selectedModel === null &&
-      modelsQuery.data &&
-      modelsQuery.data.length > 0
-    ) {
-      setSelectedModel(modelsQuery.data[0].id);
-    }
-    return () => {};
-  }, [modelsQuery.data, selectedModel]);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 text-xs text-foreground hover:bg-accent transition-all rounded font-bold py-1 px-2">
-          {selectedModel
-            ? modelsQuery.data?.find((model) => model.id === selectedModel)
-                ?.name
+          {selectedModel && models?.length
+            ? models.find((model) => model.id === selectedModel)?.name
             : "Select Model"}{" "}
           <ChevronDown className="w-4 h-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="">
+      <DropdownMenuContent>
         <DropdownMenuLabel>AI Models</DropdownMenuLabel>
-        {modelsQuery.data?.map((model) => (
+        {models?.map((model) => (
           <button
             key={model.id}
             onClick={() => {
@@ -149,8 +162,14 @@ const SelectAIModel = () => {
             }`}
           >
             <div className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={model.logo} className="w-3 h-3" alt="" />
+              <Image
+                src={model.logo}
+                width={12}
+                height={12}
+                alt={model.name}
+                className="w-3 h-3"
+                unoptimized={model.logo.startsWith("http")}
+              />
               <span>
                 {model.name}{" "}
                 <span className="text-xs text-muted-foreground">
@@ -160,22 +179,22 @@ const SelectAIModel = () => {
             </div>
             <div className="flex items-center gap-2">
               {model.imageAnalysis && (
-                <span className="">
+                <span>
                   <Eye className="text-orange-800 w-4 h-4" />
                 </span>
               )}
               {model.pdfAnalysis && (
-                <span className="">
+                <span>
                   <FileText className="text-green-800 w-4 h-4" />
                 </span>
               )}
               {model.webAnalysis && (
-                <span className="">
+                <span>
                   <Globe className="text-blue-800 w-4 h-4" />
                 </span>
               )}
               {model.reasoning && (
-                <span className="">
+                <span>
                   <Brain className="text-black w-4 h-4" />
                 </span>
               )}
