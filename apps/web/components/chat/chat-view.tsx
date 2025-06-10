@@ -31,7 +31,7 @@ const ChatView: React.FC = () => {
               <SlidersHorizontal />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="mx-4">
+          <DropdownMenuContent className="mx-4 bg-background">
             <div className="lg:w-[600px]">
               <div className="p-2">
                 <Label className="mb-2">Instruction </Label>
