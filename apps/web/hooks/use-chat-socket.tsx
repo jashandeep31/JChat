@@ -11,7 +11,11 @@ export interface FullChatQuestion extends ChatQuestion {
 export interface ChatSocketState {
   chatQuestions: FullChatQuestion[];
   isStreaming: boolean;
-  streamingResponse: string | null;
+  streamingResponse: {
+    questionId: string;
+    data: string;
+  } | null;
+  setIsStreaming: (value: boolean) => void;
 }
 
 export interface UseChatSocketReturn extends ChatSocketState {
@@ -31,9 +35,10 @@ export const useChatSocket = (
   );
 
   const [isStreaming, setIsStreaming] = useState(false);
-  const [streamingResponse, setStreamingResponse] = useState<string | null>(
-    null
-  );
+  const [streamingResponse, setStreamingResponse] = useState<{
+    questionId: string;
+    data: string;
+  } | null>(null);
 
   const askQuestion = useCallback(
     (text: string) => {
@@ -58,12 +63,22 @@ export const useChatSocket = (
           ? prev
           : [...prev, { ...question, ChatQuestionAnswer: [] }]
       );
-      setStreamingResponse(" ");
+      setStreamingResponse({
+        questionId: question.id,
+        data: "",
+      });
     };
 
     const handleResponseChunk = (chunkData: string) => {
-      const parsed = JSON.parse(chunkData);
-      setStreamingResponse((prev) => (prev ?? "") + parsed.data);
+      const parsed: {
+        data: string;
+        cid: string;
+        questionId: string;
+      } = JSON.parse(chunkData);
+      setStreamingResponse((prev) => ({
+        questionId: parsed.questionId,
+        data: (prev?.data ?? "") + parsed.data,
+      }));
       setIsStreaming(true);
     };
 
@@ -71,7 +86,6 @@ export const useChatSocket = (
       cid: string;
       answer: ChatQuestionAnswer;
     }) => {
-      console.log(raw);
       setChatQuestions((prev) => {
         return prev.map((q) => {
           if (q.id === raw.answer.chatQuestionId) {
@@ -92,7 +106,6 @@ export const useChatSocket = (
     socket.on("question_response_chunk", handleResponseChunk);
     socket.on("question_answered", handleQuestionAnswered);
     socket.on("qa_pairs", (qaData) => {
-      console.log(qaData);
       setChatQuestions(qaData.qaPairs);
     });
     return () => {
@@ -108,5 +121,6 @@ export const useChatSocket = (
     isStreaming,
     streamingResponse,
     askQuestion,
+    setIsStreaming,
   };
 };

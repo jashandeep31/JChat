@@ -18,9 +18,10 @@ import { Textarea } from "@repo/ui/components/textarea";
 
 const ChatView: React.FC = () => {
   const { cid } = useParams<{ cid: string }>();
-  const { chatQuestions, isStreaming, streamingResponse } = useChatSocket(cid, {
-    questions: [],
-  });
+  const { chatQuestions, isStreaming, streamingResponse, setIsStreaming } =
+    useChatSocket(cid, {
+      questions: [],
+    });
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
@@ -56,7 +57,10 @@ const ChatView: React.FC = () => {
             <div key={chatQuestion.id} className="my-12">
               <QuestionBubble content={chatQuestion.question} />
               {chatQuestion.ChatQuestionAnswer.length > 0 && (
-                <AnswerBubble question={chatQuestion} />
+                <AnswerBubble
+                  question={chatQuestion}
+                  streamingResponse={streamingResponse}
+                />
               )}
             </div>
           ))}
@@ -68,7 +72,10 @@ const ChatView: React.FC = () => {
 
       <div className="sticky bottom-0 z-10 bg-background mt-6">
         <div className="mx-auto lg:max-w-1/2 w-full bg-background">
-          <ChatInputBox isStreaming={isStreaming} />
+          <ChatInputBox
+            isStreaming={isStreaming}
+            setIsStreaming={setIsStreaming}
+          />
         </div>
       </div>
     </div>

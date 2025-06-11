@@ -3,10 +3,11 @@ import * as z from "zod";
 import { SocketFunctionParams } from "src/models/types.js";
 import { renameChatQueue } from "../../queues/rename-chat-queue.js";
 import { redis } from "../../lib/db.js";
-import { handleQuestionAnswer } from "../utils/handle-question-answer.js";
+import { questionAnswerHandler } from "../utils/question-answer-handler.js";
 
 const newChatSchema = z.object({
   question: z.string(),
+  modelSlug: z.string(),
 });
 
 export const newChatHandler = async ({
@@ -50,5 +51,11 @@ export const newChatHandler = async ({
     socketId: socket.id,
   });
   console.log(Date.now() - current, "ms is taken");
-  await handleQuestionAnswer({ chatQuestion, io, cid: chat.id });
+  await questionAnswerHandler({
+    chatQuestion,
+    modelSlug: result.data.modelSlug,
+    io,
+    cid: chat.id,
+    userId: socket.userId,
+  });
 };

@@ -21,7 +21,6 @@ export async function getChat(
     await redis.set(key, JSON.stringify(chat), "EX", CHAT_TTL);
     return chat;
   } catch (err) {
-    console.error("getChat cache error", err);
-    return db.chat.findUnique({ where: { id: cid, userId } });
+    throw err;
   }
 }

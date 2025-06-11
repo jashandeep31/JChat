@@ -8,10 +8,11 @@ const googleGenerativeAI = createGoogleGenerativeAI({
 
 export const askGeminiQuestion = async (
   question: string,
+  model: string,
   onChunk?: (chunk: string) => void
 ): Promise<void> => {
   const { textStream } = streamText({
-    model: googleGenerativeAI("models/gemini-2.0-flash"),
+    model: googleGenerativeAI("gemini-2.0-flash"),
     prompt: question,
   });
   for await (const textPart of textStream) {

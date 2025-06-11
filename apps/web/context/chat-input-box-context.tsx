@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import useModelsQuery from "@/lib/react-query/use-models-query";
 import { Socket } from "socket.io-client";
 import { useParams } from "next/navigation";
+import { AiModel } from "@repo/db";
 
 interface ChatInputBoxContext {
   question: string;
@@ -17,16 +18,7 @@ interface ChatInputBoxContext {
     socket: Socket | null;
     params: ReturnType<typeof useParams>;
   }) => void;
-  models: Array<{
-    id: string;
-    name: string;
-    logo: string;
-    credits: number;
-    imageAnalysis?: boolean;
-    pdfAnalysis?: boolean;
-    webAnalysis?: boolean;
-    reasoning?: boolean;
-  }>;
+  models: Array<AiModel>;
 }
 
 export const ChatInputBoxContext = createContext<ChatInputBoxContext | null>(
@@ -46,7 +38,7 @@ export const ChatInputBoxProvider = ({
   // Set default model when models are loaded
   useEffect(() => {
     if (selectedModel === null && modelsQuery.data?.length) {
-      setSelectedModel(modelsQuery.data[0].id);
+      setSelectedModel(modelsQuery.data[0].slug);
     }
   }, [modelsQuery.data, selectedModel]);
 
@@ -63,7 +55,12 @@ export const ChatInputBoxProvider = ({
     if (!socket) return;
 
     // Set streaming to true when starting the request
-    setIsStreaming?.(true);
+    if (!setIsStreaming) {
+      console.log(`not its not here`);
+    } else {
+      console.log(`its her ad done `);
+      setIsStreaming(true);
+    }
 
     try {
       if (params?.cid) {
@@ -72,8 +69,8 @@ export const ChatInputBoxProvider = ({
           JSON.stringify({
             cid: params.cid,
             question,
+            modelSlug: selectedModel,
             isWebSearchEnabled,
-            model: selectedModel,
           })
         );
       } else {
@@ -81,7 +78,8 @@ export const ChatInputBoxProvider = ({
           "new_chat",
           JSON.stringify({
             question,
-            model: selectedModel,
+            modelSlug: selectedModel,
+            isWebSearchEnabled,
           })
         );
       }
@@ -102,16 +100,7 @@ export const ChatInputBoxProvider = ({
         selectedModel,
         setSelectedModel,
         handleSubmit,
-        models: (modelsQuery.data || []).map((model) => ({
-          id: model.id,
-          name: model.name,
-          logo: model.logo,
-          credits: model.credits,
-          imageAnalysis: model.imageAnalysis,
-          pdfAnalysis: model.pdfAnalysis,
-          webAnalysis: model.webAnalysis,
-          reasoning: model.reasoning,
-        })),
+        models: modelsQuery.data || [],
       }}
     >
       {children}

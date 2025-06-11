@@ -21,7 +21,16 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
 
-const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
+const AnswerBubble = ({
+  question,
+  streamingResponse,
+}: {
+  question: FullChatQuestion;
+  streamingResponse: {
+    questionId: string;
+    data: string;
+  } | null;
+}) => {
   const answers = question.ChatQuestionAnswer;
   const [activeAnswer, setActiveAnswer] = useState(answers[0]);
 
@@ -35,9 +44,16 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
     }, 2000);
   };
 
+  if (streamingResponse?.questionId === question.id) {
+    return (
+      <div>
+        <MarkdownRenderer content={streamingResponse.data} />
+      </div>
+    );
+  }
   return (
     <div>
-      {activeAnswer && <MarkdownRenderer content={activeAnswer.answer} />}
+      <MarkdownRenderer content={activeAnswer.answer} />
 
       <div className="flex mt-6 items-center gap-2">
         <CustomTooltip content="Copy">
