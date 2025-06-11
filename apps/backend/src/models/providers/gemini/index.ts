@@ -1,20 +1,19 @@
-import { streamText } from "ai";
+import { extractReasoningMiddleware, streamText } from "ai";
 import { google, createGoogleGenerativeAI } from "@ai-sdk/google";
 import { env } from "process";
-
 const googleGenerativeAI = createGoogleGenerativeAI({
   apiKey: env.GOOGLE_GEMINI_API_KEY,
 });
-
 export const askGeminiQuestion = async (
   question: string,
   model: string,
   onChunk?: (chunk: string) => void
 ): Promise<void> => {
-  const { textStream } = streamText({
-    model: googleGenerativeAI("gemini-2.0-flash"),
+  const { textStream, fullStream } = streamText({
+    model: googleGenerativeAI("gemini-2.5-pro-preview-06-05"),
     prompt: question,
   });
+
   for await (const textPart of textStream) {
     await new Promise((resolve) => setTimeout(resolve, 100));
     onChunk?.(textPart);
