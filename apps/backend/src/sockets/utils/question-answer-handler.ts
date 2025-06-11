@@ -30,7 +30,15 @@ export const questionAnswerHandler = async ({
       io.to(`room:${cid}`).emit("error", "Model not found");
       io.to(`room:${cid}`).emit("question_answered", {
         cid,
-        answer: "Model not found",
+        answer: {
+          id: "",
+          credits: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          chatQuestionId: chatQuestion.id,
+          answer: "Model not found",
+          aiModelId: "",
+        },
       });
       return;
     }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import MarkdownRenderer from "../markdown-renderer";
 import { FullChatQuestion } from "@/hooks/use-chat-socket";
 import { Button } from "@repo/ui/components/button";
@@ -20,10 +20,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
+import { SocketContext } from "@/context/socket-context";
 
 const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
+  const socket = useContext(SocketContext);
   const answers = question.ChatQuestionAnswer;
-  const [activeAnswer, setActiveAnswer] = useState(answers[0]);
+  const [activeAnswer, setActiveAnswer] = useState(answers[answers.length - 1]);
 
   const [isCopied, setIsCopied] = useState(false);
 
@@ -59,7 +61,17 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <button>Gemini 2.0</button>
+              <button
+                onClick={() => {
+                  socket?.emit("re_answer", {
+                    questionId: question.id,
+                    cid: question.chatId,
+                    modelSlug: "gemini-2.0-flash",
+                  });
+                }}
+              >
+                Gemini 2.0
+              </button>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
