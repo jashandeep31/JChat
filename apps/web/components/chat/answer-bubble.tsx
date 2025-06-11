@@ -21,16 +21,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
 
-const AnswerBubble = ({
-  question,
-  streamingResponse,
-}: {
-  question: FullChatQuestion;
-  streamingResponse: {
-    questionId: string;
-    data: string;
-  } | null;
-}) => {
+const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
   const answers = question.ChatQuestionAnswer;
   const [activeAnswer, setActiveAnswer] = useState(answers[0]);
 
@@ -44,13 +35,6 @@ const AnswerBubble = ({
     }, 2000);
   };
 
-  if (streamingResponse?.questionId === question.id) {
-    return (
-      <div>
-        <MarkdownRenderer content={streamingResponse.data} />
-      </div>
-    );
-  }
   return (
     <div>
       <MarkdownRenderer content={activeAnswer.answer} />

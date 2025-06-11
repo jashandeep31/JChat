@@ -55,12 +55,8 @@ export const ChatInputBoxProvider = ({
     if (!socket) return;
 
     // Set streaming to true when starting the request
-    if (!setIsStreaming) {
-      console.log(`not its not here`);
-    } else {
-      console.log(`its her ad done `);
-      setIsStreaming(true);
-    }
+
+    setIsStreaming?.(true);
 
     try {
       if (params?.cid) {

@@ -15,6 +15,7 @@ import {
 } from "@repo/ui/components/dropdown-menu";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
+import StreamBubble from "./stream-bubble";
 
 const ChatView: React.FC = () => {
   const { cid } = useParams<{ cid: string }>();
@@ -56,11 +57,12 @@ const ChatView: React.FC = () => {
           {chatQuestions.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
               <QuestionBubble content={chatQuestion.question} />
-              {chatQuestion.ChatQuestionAnswer.length > 0 && (
-                <AnswerBubble
-                  question={chatQuestion}
-                  streamingResponse={streamingResponse}
-                />
+              {chatQuestion.ChatQuestionAnswer.length > 0 &&
+                streamingResponse?.questionId !== chatQuestion.id && (
+                  <AnswerBubble question={chatQuestion} />
+                )}
+              {streamingResponse?.questionId === chatQuestion.id && (
+                <StreamBubble content={streamingResponse.data} />
               )}
             </div>
           ))}
