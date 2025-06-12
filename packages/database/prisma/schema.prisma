@@ -9,16 +9,17 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  avatar    String?
-  email     String    @unique
-  proUser   Boolean   @default(false)
-  credits   Float     @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Project   Project[]
-  Chat      Chat[]
+  id         String       @id @default(uuid())
+  name       String
+  avatar     String?
+  email      String       @unique
+  proUser    Boolean      @default(false)
+  credits    Float        @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Project    Project[]
+  Chat       Chat[]
+  attachment Attachment[]
 }
 
 model Project {
@@ -90,15 +91,16 @@ enum ChatType {
 }
 
 model ChatQuestion {
-  id       String @id @default(uuid())
-  chatId   String
-  question String
-  credits  Float  @default(0)
+  id           String  @id @default(uuid())
+  chatId       String
+  question     String
+  credits      Float   @default(0)
+  attachmentId String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
   chat               Chat                 @relation(fields: [chatId], references: [id])
+  attachment         Attachment?          @relation(fields: [attachmentId], references: [id])
   ChatQuestionAnswer ChatQuestionAnswer[]
 }
 
@@ -115,4 +117,24 @@ model ChatQuestionAnswer {
 
   chatQuestion ChatQuestion @relation(fields: [chatQuestionId], references: [id])
   aiModel      AiModel      @relation(fields: [aiModelId], references: [id])
+}
+
+model Attachment {
+  id           String         @id @default(uuid())
+  uploadId     String         @unique
+  filename     String
+  publicUrl    String
+  openAiId     String?
+  googleId     String?
+  userId       String
+  type         AttachmentType @default(IMAGE)
+  user         User           @relation(fields: [userId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  ChatQuestion ChatQuestion[]
+}
+
+enum AttachmentType {
+  IMAGE
+  PDF
 }

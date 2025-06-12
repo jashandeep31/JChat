@@ -4,7 +4,11 @@ import useModelsQuery from "@/lib/react-query/use-models-query";
 import { Socket } from "socket.io-client";
 import { useParams } from "next/navigation";
 import { AiModel } from "@repo/db";
-
+export type AttachmentInfo = {
+  uploadId: string;
+  fileType: "IMAGE" | "PDF";
+  filename: string;
+} | null;
 interface ChatInputBoxContext {
   question: string;
   setQuestion: (question: string) => void;
@@ -19,6 +23,10 @@ interface ChatInputBoxContext {
     params: ReturnType<typeof useParams>;
   }) => void;
   models: Array<AiModel>;
+  isAttachmentDialogOpen: boolean;
+  setIsAttachmentDialogOpen: (isAttachmentDialogOpen: boolean) => void;
+  attachmentInfo: AttachmentInfo;
+  setAttachmentInfo: (attachmentInfo: AttachmentInfo) => void;
 }
 
 export const ChatInputBoxContext = createContext<ChatInputBoxContext | null>(
@@ -34,7 +42,8 @@ export const ChatInputBoxProvider = ({
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const { modelsQuery } = useModelsQuery();
-
+  const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] = useState(false);
+  const [attachmentInfo, setAttachmentInfo] = useState<AttachmentInfo>(null);
   // Set default model when models are loaded
   useEffect(() => {
     if (selectedModel === null && modelsQuery.data?.length) {
@@ -67,6 +76,7 @@ export const ChatInputBoxProvider = ({
             question,
             modelSlug: selectedModel,
             isWebSearchEnabled,
+            attachmentId: attachmentInfo?.uploadId,
           })
         );
       } else {
@@ -76,6 +86,7 @@ export const ChatInputBoxProvider = ({
             question,
             modelSlug: selectedModel,
             isWebSearchEnabled,
+            attachmentId: attachmentInfo?.uploadId,
           })
         );
       }
@@ -97,6 +108,10 @@ export const ChatInputBoxProvider = ({
         setSelectedModel,
         handleSubmit,
         models: modelsQuery.data || [],
+        isAttachmentDialogOpen,
+        setIsAttachmentDialogOpen,
+        attachmentInfo,
+        setAttachmentInfo,
       }}
     >
       {children}
