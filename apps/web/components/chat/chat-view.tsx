@@ -4,7 +4,7 @@ import React from "react";
 import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
-import { Loader, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 import { Button } from "@repo/ui/components/button";

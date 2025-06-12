@@ -14,12 +14,9 @@ export const joinChatHandler = async ({
   }
   socket.join(`room:${chat.id}`);
 
-  const isStreaming = await redis.get(`chat:${chat.id}:isStreaming`);
-  if (isStreaming) {
-    socket.emit(
-      "question_response_chunk",
-      JSON.stringify({ data: isStreaming })
-    );
+  const streamingData = await redis.get(`chat:${chat.id}:isStreaming`);
+  if (streamingData) {
+    socket.emit("question_response_chunk", streamingData);
   }
 
   const qaPairs = await db.chatQuestion.findMany({

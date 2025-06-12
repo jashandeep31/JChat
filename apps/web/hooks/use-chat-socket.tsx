@@ -63,6 +63,10 @@ export const useChatSocket = (
           ? prev
           : [...prev, { ...question, ChatQuestionAnswer: [] }]
       );
+      setStreamingResponse({
+        questionId: question.id,
+        data: "",
+      });
     };
 
     const handleResponseChunk = (chunkData: string) => {

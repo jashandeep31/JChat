@@ -5,6 +5,7 @@ import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
@@ -144,56 +145,58 @@ const SelectAIModel = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>AI Models</DropdownMenuLabel>
+
         {models?.map((model) => (
-          <button
-            key={model.slug}
-            onClick={() => {
-              setSelectedModel(model.slug);
-              setOpen(false);
-            }}
-            className={`flex items-center p-2 gap-2 min-h-[50px] min-w-[400px] justify-between hover:bg-accent ${
-              selectedModel === model.slug ? "bg-accent" : ""
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Image
-                src={model.logo}
-                width={12}
-                height={12}
-                alt={model.name}
-                className="w-3 h-3"
-                unoptimized={model.logo.startsWith("http")}
-              />
-              <span>
-                {model.name}{" "}
-                <span className="text-xs text-muted-foreground">
-                  {model.credits} Credits
-                </span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              {model.imageAnalysis && (
+          <DropdownMenuItem key={model.slug} asChild>
+            <button
+              onClick={() => {
+                setSelectedModel(model.slug);
+                setOpen(false);
+              }}
+              className={`flex items-center p-2 gap-2 min-h-[50px] min-w-[400px] justify-between hover:bg-accent ${
+                selectedModel === model.slug ? "bg-accent" : ""
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Image
+                  src={model.logo}
+                  width={12}
+                  height={12}
+                  alt={model.name}
+                  className="w-3 h-3"
+                  unoptimized={model.logo.startsWith("http")}
+                />
                 <span>
-                  <Eye className="text-orange-800 w-4 h-4" />
+                  {model.name}{" "}
+                  <span className="text-xs text-muted-foreground">
+                    {model.credits} Credits
+                  </span>
                 </span>
-              )}
-              {model.pdfAnalysis && (
-                <span>
-                  <FileText className="text-green-800 w-4 h-4" />
-                </span>
-              )}
-              {model.webAnalysis && (
-                <span>
-                  <Globe className="text-blue-800 w-4 h-4" />
-                </span>
-              )}
-              {model.reasoning && (
-                <span>
-                  <Brain className="text-black w-4 h-4" />
-                </span>
-              )}
-            </div>
-          </button>
+              </div>
+              <div className="flex items-center gap-2">
+                {model.imageAnalysis && (
+                  <span>
+                    <Eye className="text-orange-800 w-4 h-4" />
+                  </span>
+                )}
+                {model.pdfAnalysis && (
+                  <span>
+                    <FileText className="text-green-800 w-4 h-4" />
+                  </span>
+                )}
+                {model.webAnalysis && (
+                  <span>
+                    <Globe className="text-blue-800 w-4 h-4" />
+                  </span>
+                )}
+                {model.reasoning && (
+                  <span>
+                    <Brain className="text-black w-4 h-4" />
+                  </span>
+                )}
+              </div>
+            </button>
+          </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
