@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import { db, redis } from "./lib/db.js";
 import { generatePresignedUrl } from "./services/s3.js";
-import { webSearch } from "./services/web-search.js";
 
 const app = express();
 app.use(

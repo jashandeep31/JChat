@@ -16,6 +16,7 @@ import {
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 import StreamBubble from "./stream-bubble";
+import { ShareDropdown } from "./share-dropdown";
 
 const ChatView: React.FC = () => {
   const { cid } = useParams<{ cid: string }>();
@@ -26,7 +27,7 @@ const ChatView: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
-      <div className="fixed  top-4 right-4 p-0 z-10 flex gap-2 bg-sidebar border rounded-lg p-1.5">
+      <div className="fixed  top-4 right-4 z-10 flex gap-2 bg-sidebar border rounded-lg p-1.5">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -39,7 +40,7 @@ const ChatView: React.FC = () => {
           <DropdownMenuContent className="mx-4 bg-background">
             <div className="lg:w-[600px]">
               <div className="p-2">
-                <Label className="mb-2">Instruction </Label>
+                <Label className="mb-2 text-base">Instruction </Label>
                 <Textarea
                   className="resize-none h-24"
                   placeholder="Example: Answer the question in 2 sentences"
@@ -54,33 +55,23 @@ const ChatView: React.FC = () => {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="p-2 rounded hover:bg-accent transition-colors duration-200"
-              aria-label="Search"
-            >
-              <Share2 className="w-4 h-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="mx-4 bg-background">
-            <div className="lg:w-[600px]">
-              <div className="p-2">
-                <Label className="mb-2">Instruction </Label>
-                <Textarea
-                  className="resize-none h-24"
-                  placeholder="Example: Answer the question in 2 sentences"
-                />
-                <div className="mt-3 flex justify-end gap-2">
-                  <Button size={"sm"} variant="outline">
-                    Cancel
-                  </Button>
-                  <Button size={"sm"}>Save</Button>
-                </div>
-              </div>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ShareDropdown
+          links={[
+            {
+              id: "1",
+              url: "https://example.com",
+            },
+          ]}
+          onCreateNewLink={() => {}}
+          onDeleteLink={() => {}}
+        >
+          <button
+            className="p-2 rounded hover:bg-accent transition-colors duration-200"
+            aria-label="Search"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
+        </ShareDropdown>
       </div>
       <div className="flex-1 ">
         <div className="mx-auto lg:max-w-1/2 w-full">
