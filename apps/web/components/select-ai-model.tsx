@@ -10,8 +10,8 @@ import { Brain, ChevronDown, Eye, FileText, Globe } from "lucide-react";
 import { useState } from "react";
 
 interface SelectAIModelProps {
-  selectedModel: string | null;
-  setSelectedModel: (model: string) => void;
+  selectedModel: AiModel | null;
+  setSelectedModel: (model: AiModel) => void;
   models: Array<AiModel>;
 }
 
@@ -24,7 +24,7 @@ export const SelectAIModel = ({
 
   const getSelectedModelName = () => {
     if (!selectedModel) return "Select Model";
-    const model = models.find((model) => model.slug === selectedModel);
+    const model = models.find((model) => model.slug === selectedModel.slug);
     if (!model) return "Select Model";
 
     return model.name.length > 15
@@ -46,11 +46,11 @@ export const SelectAIModel = ({
           <DropdownMenuItem key={model.slug} asChild>
             <button
               onClick={() => {
-                setSelectedModel(model.slug);
+                setSelectedModel(model);
                 setOpen(false);
               }}
               className={`flex items-center p-2 gap-2 min-h-[50px] min-w-[400px] justify-between hover:bg-accent ${
-                selectedModel === model.slug ? "bg-accent" : ""
+                selectedModel?.slug === model.slug ? "bg-accent" : ""
               }`}
             >
               <div className="flex items-center gap-2">

@@ -11,16 +11,7 @@ import {
 } from "@repo/ui/components/dialog";
 import { Button } from "@repo/ui/components/button";
 import { Progress } from "@repo/ui/components/progress";
-import {
-  UploadCloud,
-  FileIcon,
-  X,
-  ImageIcon,
-  FileText,
-  FileArchive,
-  Video,
-  Music,
-} from "lucide-react";
+import { UploadCloud, FileIcon, X, ImageIcon, FileText } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { cn } from "@repo/ui/lib/utils";
 import { BACKEND_URL } from "@/lib/constants";
@@ -182,11 +173,7 @@ export function UploadDialog({
     if (!file) return FileIcon;
     const type = file.type;
     if (type.startsWith("image/")) return ImageIcon;
-    if (type.startsWith("video/")) return Video;
-    if (type.startsWith("audio/")) return Music;
     if (type === "application/pdf") return FileText;
-    if (type === "application/zip" || type === "application/x-rar-compressed")
-      return FileArchive;
     return FileIcon;
   }, [file]);
 
@@ -217,7 +204,7 @@ export function UploadDialog({
                   : "Drag & drop a file here, or click to select"}
               </p>
               <p className="mt-1 block text-xs text-slate-500">
-                Supports images, videos, PDFs, ZIP, etc.
+                Supports images and PDFs.
               </p>
             </div>
           ) : (

@@ -14,8 +14,8 @@ interface ChatInputBoxContext {
   setQuestion: (question: string) => void;
   isWebSearchEnabled: boolean;
   setIsWebSearchEnabled: (isWebSearchEnabled: boolean) => void;
-  selectedModel: string | null;
-  setSelectedModel: (selectedModel: string) => void;
+  selectedModel: AiModel | null;
+  setSelectedModel: (selectedModel: AiModel) => void;
   handleSubmit: (params: {
     isStreaming?: boolean;
     setIsStreaming?: (value: boolean) => void;
@@ -40,14 +40,14 @@ export const ChatInputBoxProvider = ({
 }) => {
   const [question, setQuestion] = useState("what is next js in 10 words");
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<AiModel | null>(null);
   const { modelsQuery } = useModelsQuery();
   const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] = useState(false);
   const [attachmentInfo, setAttachmentInfo] = useState<AttachmentInfo>(null);
   // Set default model when models are loaded
   useEffect(() => {
     if (selectedModel === null && modelsQuery.data?.length) {
-      setSelectedModel(modelsQuery.data[0].slug);
+      setSelectedModel(modelsQuery.data[0]);
     }
   }, [modelsQuery.data, selectedModel]);
 
@@ -74,7 +74,7 @@ export const ChatInputBoxProvider = ({
           JSON.stringify({
             cid: params.cid,
             question,
-            modelSlug: selectedModel,
+            modelSlug: selectedModel?.slug,
             isWebSearchEnabled,
             attachmentId: attachmentInfo?.uploadId,
           })
@@ -84,7 +84,7 @@ export const ChatInputBoxProvider = ({
           "new_chat",
           JSON.stringify({
             question,
-            modelSlug: selectedModel,
+            modelSlug: selectedModel?.slug,
             isWebSearchEnabled,
             attachmentId: attachmentInfo?.uploadId,
           })

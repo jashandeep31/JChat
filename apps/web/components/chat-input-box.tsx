@@ -62,6 +62,12 @@ const ChatInputBox = ({
     });
   };
 
+  useEffect(() => {
+    if (!selectedModel || !selectedModel.imageAnalysis) {
+      setAttachmentInfo(null);
+    }
+  }, [selectedModel, setAttachmentInfo]);
+
   return (
     <div className="border-2 border-primary p-4 rounded-md w-full flex gap-2 flex-col">
       <div ref={parentDivRef} className="flex-1" style={{ minHeight: "50px" }}>
@@ -101,21 +107,26 @@ const ChatInputBox = ({
           >
             <Globe className="w-4 h-4" /> Web Search
           </button>
-          {attachmentInfo ? (
-            <AttachmentInfoComponent
-              attachmentInfo={attachmentInfo}
-              setAttachmentInfo={setAttachmentInfo}
-            />
-          ) : (
-            <button
-              className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
-                isWebSearchEnabled ? " text-primary border-primary " : ""
-              }`}
-              onClick={() => setIsAttachmentDialogOpen(true)}
-              type="button"
-            >
-              <Paperclip className="w-4 h-4" /> Attachment
-            </button>
+
+          {selectedModel?.imageAnalysis && (
+            <div>
+              {attachmentInfo ? (
+                <AttachmentInfoComponent
+                  attachmentInfo={attachmentInfo}
+                  setAttachmentInfo={setAttachmentInfo}
+                />
+              ) : (
+                <button
+                  className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
+                    isWebSearchEnabled ? " text-primary border-primary " : ""
+                  }`}
+                  onClick={() => setIsAttachmentDialogOpen(true)}
+                  type="button"
+                >
+                  <Paperclip className="w-4 h-4" /> Attachment
+                </button>
+              )}
+            </div>
           )}
           <Button onClick={onSubmit} disabled={isStreaming}>
             {isStreaming ? <Loader className="animate-spin" /> : <ArrowUp />}
