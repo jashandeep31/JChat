@@ -1,8 +1,8 @@
 import * as z from "zod";
-import { db, redis } from "../../lib/db.js";
+import { db } from "../../lib/db.js";
 import { SocketFunctionParams } from "src/models/types.js";
 import { questionAnswerHandler } from "../utils/question-answer-handler.js";
-import { Attachment } from "@repo/db";
+import { getAttachment } from "../../services/attachment-cache.js";
 const chatQuestionSchema = z.object({
   question: z.string(),
   cid: z.string(),
@@ -25,12 +25,10 @@ export const chatQuestionHandler = async ({
       return;
     }
     const { question, cid, modelSlug, attachmentId } = result.data;
-    const attachment = await redis.get(`attachment:${attachmentId}`);
-    if (!attachment) {
-      socket.emit("error", "Attachment not found");
-      return;
-    }
-    const attachmentData = JSON.parse(attachment) as Attachment;
+
+    const attachmentData = attachmentId
+      ? await getAttachment(attachmentId)
+      : null;
     const chatQuestion = await db.chatQuestion.create({
       data: {
         chatId: cid,

@@ -1,13 +1,35 @@
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { AiModel } from "@repo/db";
+import { AiModel, Attachment, ChatQuestion } from "@repo/db";
+import { getAttachment } from "../../../services/attachment-cache.js";
 
 export const askOpenAIQuestion = async (
-  question: string,
+  question: ChatQuestion,
   model: AiModel,
   onChunk: (chunk: string) => void,
   onImageChunk: (chunk: string) => void
 ): Promise<{ text: string; images: string }> => {
+  const embedAttachment = async () => {
+    if (!question.attachmentId) return;
+
+    const attachment: Attachment = await getAttachment(question.attachmentId);
+    if (!attachment) return;
+    return {
+      type: "image",
+      image: new URL(attachment.publicUrl),
+      mimeType: "image/jpeg",
+    };
+  };
+  const attachment = await embedAttachment();
+  const content = [];
+  content.push({
+    type: "text",
+    text: question.question,
+  });
+  if (attachment) {
+    content.push(attachment);
+  }
+
   const { fullStream } = streamText({
     model: openai(model.slug),
     providerOptions: {
@@ -21,21 +43,7 @@ export const askOpenAIQuestion = async (
     messages: [
       {
         role: "user",
-        content: [
-          {
-            /* the image part */
-            type: "image",
-            image: new URL(
-              "https://www.wikihow.com/images/thumb/1/15/Write-a-Bill-for-Payment-Step-1-Version-4.jpg/aid1418272-v4-728px-Write-a-Bill-for-Payment-Step-1-Version-4.jpg.webp"
-            ),
-            mimeType: "image/jpeg", // be explicit
-          },
-          {
-            /* the actual question */
-            type: "text",
-            text: question,
-          },
-        ],
+        content: [...content] as any,
       },
     ],
   });

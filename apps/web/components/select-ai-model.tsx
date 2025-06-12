@@ -22,14 +22,21 @@ export const SelectAIModel = ({
 }: SelectAIModelProps) => {
   const [open, setOpen] = useState(false);
 
+  const getSelectedModelName = () => {
+    if (!selectedModel) return "Select Model";
+    const model = models.find((model) => model.slug === selectedModel);
+    if (!model) return "Select Model";
+
+    return model.name.length > 15
+      ? model.name.slice(0, 15) + "..."
+      : model.name;
+  };
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 text-xs text-foreground hover:bg-accent transition-all rounded font-bold py-1 px-2">
-          {selectedModel && models?.length
-            ? models.find((model) => model.slug === selectedModel)?.name
-            : "Select Model"}{" "}
-          <ChevronDown className="w-4 h-4" />
+          {getSelectedModelName()} <ChevronDown className="w-4 h-4" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

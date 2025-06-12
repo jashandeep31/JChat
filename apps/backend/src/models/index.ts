@@ -28,7 +28,7 @@ export const askQuestion = async (
     throw new Error(`Model not found: ${modelId}`);
   }
   const provider: (
-    question: string,
+    question: ChatQuestion,
     model: AiModel,
     onChunk: (chunk: string) => void,
     onImageChunk: (chunk: string) => void
@@ -63,7 +63,7 @@ export const askQuestion = async (
     return { text: answer, images: "" };
   } else {
     const { text, images } = await provider(
-      chatQuestion.question,
+      chatQuestion,
       model,
       async (chunk) => {
         io.to(`room:${cid}`).emit(

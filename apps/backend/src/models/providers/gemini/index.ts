@@ -1,9 +1,9 @@
 import { smoothStream, streamText } from "ai";
 import { google } from "@ai-sdk/google";
-import { AiModel } from "@repo/db";
+import { AiModel, ChatQuestion } from "@repo/db";
 
 export const askGeminiQuestion = async (
-  question: string,
+  question: ChatQuestion,
   model: AiModel,
   onChunk: (chunk: string) => void,
   onImageChunk: (chunk: string) => void
@@ -18,7 +18,7 @@ export const askGeminiQuestion = async (
         ].filter(Boolean),
       },
     },
-    prompt: question,
+    prompt: question.question,
     experimental_transform: smoothStream({
       delayInMs: 20, // optional: defaults to 10ms
       chunking: "line", // optional: defaults to 'word'
