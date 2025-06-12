@@ -1,13 +1,16 @@
 import { db } from "../../lib/db.js";
 import * as z from "zod";
-import { SocketFunctionParams } from "src/models/types.js";
+import { SocketFunctionParams } from "../../models/types.js";
 import { renameChatQueue } from "../../queues/rename-chat-queue.js";
 import { redis } from "../../lib/db.js";
 import { questionAnswerHandler } from "../utils/question-answer-handler.js";
+import { getAttachment } from "../../services/attachment-cache.js";
 
 const newChatSchema = z.object({
   question: z.string(),
   modelSlug: z.string(),
+  isWebSearchEnabled: z.boolean(),
+  attachmentId: z.string().optional(),
 });
 
 export const newChatHandler = async ({
@@ -32,10 +35,14 @@ export const newChatHandler = async ({
   redis.set(`chat:${chat.id}`, JSON.stringify(chat), "EX", 20 * 60);
 
   socket.emit("chat_created", chat);
+  const attachmentData = parsedData.attachmentId
+    ? await getAttachment(parsedData.attachmentId)
+    : null;
   const chatQuestion = await db.chatQuestion.create({
     data: {
       chatId: chat.id,
       question: result.data.question,
+      ...(attachmentData ? { attachmentId: attachmentData.id } : {}),
     },
   });
 
