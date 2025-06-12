@@ -11,7 +11,6 @@ export const askGeminiQuestion = async (
 ): Promise<{ text: string; images: string }> => {
   const embedAttachment = async () => {
     if (!question.attachmentId) return;
-
     const attachment: Attachment = await getAttachment(question.attachmentId);
     if (!attachment) return;
     return {
@@ -32,7 +31,12 @@ export const askGeminiQuestion = async (
   }
 
   const { fullStream } = streamText({
-    model: google(model.slug),
+    model: google(
+      model.slug,
+      model.webAnalysis && question.webSearch
+        ? { useSearchGrounding: true }
+        : undefined
+    ),
     providerOptions: {
       google: {
         responseModalities: [

@@ -117,9 +117,7 @@ const ChatInputBox = ({
                 />
               ) : (
                 <button
-                  className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
-                    isWebSearchEnabled ? " text-primary border-primary " : ""
-                  }`}
+                  className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2`}
                   onClick={() => setIsAttachmentDialogOpen(true)}
                   type="button"
                 >

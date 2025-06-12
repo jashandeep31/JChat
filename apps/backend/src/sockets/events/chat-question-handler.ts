@@ -24,7 +24,8 @@ export const chatQuestionHandler = async ({
       socket.emit("error", result.error.message);
       return;
     }
-    const { question, cid, modelSlug, attachmentId } = result.data;
+    const { question, cid, modelSlug, attachmentId, isWebSearchEnabled } =
+      result.data;
 
     const attachmentData = attachmentId
       ? await getAttachment(attachmentId)
@@ -34,6 +35,7 @@ export const chatQuestionHandler = async ({
         chatId: cid,
         question,
         ...(attachmentData ? { attachmentId: attachmentData.id } : {}),
+        webSearch: isWebSearchEnabled,
       },
     });
     io.to(`room:${cid}`).emit("question_created", {

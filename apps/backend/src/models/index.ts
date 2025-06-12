@@ -40,7 +40,7 @@ export const askQuestion = async (
   }
   const redisKey = `chat:${cid}:isStreaming`;
 
-  if (1 === 1) {
+  if (1 !== 1) {
     const fakeResponse = getTempText();
     const fakeChunks = fakeResponse.match(/.{1,100}/g) || [];
     let answer = "";
