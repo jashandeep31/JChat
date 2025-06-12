@@ -1,4 +1,4 @@
-import { streamText } from "ai";
+import { smoothStream, streamText } from "ai";
 import { google } from "@ai-sdk/google";
 import { AiModel } from "@repo/db";
 
@@ -19,6 +19,10 @@ export const askGeminiQuestion = async (
       },
     },
     prompt: question,
+    experimental_transform: smoothStream({
+      delayInMs: 20, // optional: defaults to 10ms
+      chunking: "line", // optional: defaults to 'word'
+    }),
   });
   let text = "";
   let images = "";
