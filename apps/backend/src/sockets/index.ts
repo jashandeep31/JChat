@@ -4,6 +4,7 @@ import { joinChatHandler } from "./events/join-chat-handler.js";
 import { chatQuestionHandler } from "./events/chat-question-handler.js";
 import { Server } from "socket.io";
 import { reAnswerRequestHandler } from "./events/re-answer-handler.js";
+import { branchOffHandler } from "./events/branch-off-handler.js";
 
 export const socketHandler = (socket: Socket, io: Server) => {
   try {
@@ -17,6 +18,9 @@ export const socketHandler = (socket: Socket, io: Server) => {
     });
     socket.on("re_answer", (data) => {
       reAnswerRequestHandler({ socket, io, data });
+    });
+    socket.on("branch_off", (data) => {
+      branchOffHandler({ socket, io, data });
     });
   } catch (e) {
     socket.emit("error", "Something went wrong");

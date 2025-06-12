@@ -15,7 +15,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@repo/ui/components/sidebar";
-import { FolderCheck, MoreHorizontal, Share, Trash2 } from "lucide-react";
+import {
+  FolderCheck,
+  GitBranch,
+  MoreHorizontal,
+  Share,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 
 const SidebarChats = () => {
@@ -31,9 +37,14 @@ const SidebarChats = () => {
             <SidebarMenuButton className="flex items-center gap-2">
               <Link
                 href={`/chat/${chat.id}`}
-                className="truncate overflow-hidden max-w-full block"
+                className="truncate overflow-hidden max-w-full flex items-center gap-2"
               >
-                {chat.name}
+                <div className="flex items-center gap-2 ">
+                  {chat.type === "BRANCHED" && (
+                    <GitBranch className="w-4 h-4" />
+                  )}
+                  {chat.name}
+                </div>
               </Link>
             </SidebarMenuButton>
             <DropdownMenu>

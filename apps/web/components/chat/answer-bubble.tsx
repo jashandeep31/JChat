@@ -39,6 +39,13 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
     }, 2000);
   };
 
+  const handleBranchOff = () => {
+    socket?.emit("branch_off", {
+      questionId: question.id,
+      cid: question.chatId,
+    });
+  };
+
   return (
     <div>
       <MarkdownRenderer content={activeAnswer.answer} />
@@ -88,7 +95,11 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
           </DropdownMenu>
         </div>
         <CustomTooltip content="Branch Off">
-          <Button variant={"ghost"} size={"sm"}>
+          <Button
+            onClick={() => handleBranchOff()}
+            variant={"ghost"}
+            size={"sm"}
+          >
             <Split className="rotate-180" />
           </Button>
         </CustomTooltip>
