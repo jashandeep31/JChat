@@ -21,8 +21,10 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
 import { SocketContext } from "@/context/socket-context";
+import useModelsQuery from "@/lib/react-query/use-models-query";
 
 const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
+  const { modelsQuery } = useModelsQuery();
   const socket = useContext(SocketContext);
   const answers = question.ChatQuestionAnswer;
   const [activeAnswer, setActiveAnswer] = useState(answers[answers.length - 1]);
@@ -40,6 +42,16 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
   return (
     <div>
       <MarkdownRenderer content={activeAnswer.answer} />
+      {activeAnswer.base64Image && (
+        <div className="mt-6 max-w-[500px]">
+          {/*  eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="rounded-md"
+            src={"data:image/png;base64," + activeAnswer.base64Image}
+            alt=""
+          />
+        </div>
+      )}
 
       <div className="flex mt-6 items-center gap-2">
         <CustomTooltip content="Copy">
@@ -80,13 +92,24 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
             <Split className="rotate-180" />
           </Button>
         </CustomTooltip>
+        <div className="md:hidden hidden lg:block">
+          <CustomTooltip content="Model used / Credits used">
+            <p className="text-xs">
+              {
+                modelsQuery.data?.find(
+                  (model) => model.id === activeAnswer.aiModelId
+                )?.name
+              }{" "}
+              / {activeAnswer.credits}
+            </p>
+          </CustomTooltip>
+        </div>
         <div className="flex items-center gap-2 ml-auto">
           <AnswerNavigation
             answers={answers}
             activeAnswer={activeAnswer}
             setActiveAnswer={setActiveAnswer}
           />
-          <p className="text-xs">Credits: {activeAnswer.credits}</p>
         </div>
       </div>
     </div>
@@ -96,17 +119,21 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
 const CustomTooltip = ({
   children,
   content,
+  className,
 }: {
   children: React.ReactNode;
   content: string;
+  className?: string;
 }) => {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="bottom">
-        <p>{content}</p>
-      </TooltipContent>
-    </Tooltip>
+    <div className={className}>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent side="bottom">
+          <p>{content}</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
   );
 };
 

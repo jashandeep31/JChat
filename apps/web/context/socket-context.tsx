@@ -4,6 +4,7 @@ import { Chat } from "@repo/db";
 import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 export const SocketContext = createContext<Socket | null>(null);
 const SOCKET_URL = "http://localhost:8000";
@@ -31,6 +32,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       socket.on("chat_name_updated", (chat: Chat) => {
         updateChatName(chat);
+      });
+      socket.on("error", (error: string) => {
+        toast.error(error);
       });
     }
   }, [socket, router, appendChat, updateChatName]);

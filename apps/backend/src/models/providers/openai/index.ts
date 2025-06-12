@@ -1,15 +1,15 @@
 import { streamText } from "ai";
-import { google } from "@ai-sdk/google";
+import { openai } from "@ai-sdk/openai";
 import { AiModel } from "@repo/db";
 
-export const askGeminiQuestion = async (
+export const askOpenAIQuestion = async (
   question: string,
   model: AiModel,
   onChunk: (chunk: string) => void,
   onImageChunk: (chunk: string) => void
 ): Promise<{ text: string; images: string }> => {
   const { fullStream } = streamText({
-    model: google(model.slug),
+    model: openai(model.slug),
     providerOptions: {
       google: {
         responseModalities: [

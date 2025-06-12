@@ -65,6 +65,7 @@ model AiModel {
   slug               String               @unique
   logo               String
   tag                String?
+  type               AiModelType          @default(TEXT_GENERATION)
   requiresPro        Boolean              @default(false)
   credits            Float                @default(0)
   pdfAnalysis        Boolean              @default(false)
@@ -76,6 +77,11 @@ model AiModel {
   companyId          String
   ChatQuestionAnswer ChatQuestionAnswer[]
   company            Company              @relation(fields: [companyId], references: [id])
+}
+
+enum AiModelType {
+  TEXT_GENERATION
+  IMAGE_GENERATION
 }
 
 enum ChatType {
@@ -97,10 +103,11 @@ model ChatQuestion {
 }
 
 model ChatQuestionAnswer {
-  id             String @id @default(uuid())
+  id             String  @id @default(uuid())
   chatQuestionId String
+  base64Image    String?
   answer         String
-  credits        Float  @default(0)
+  credits        Float   @default(0)
   aiModelId      String
 
   createdAt DateTime @default(now())

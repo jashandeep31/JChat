@@ -97,6 +97,8 @@ const ChatInputBox = ({
             setSelectedModel={setSelectedModel}
             models={models}
           />
+        </div>
+        <div className="flex gap-2 items-center">
           <button
             className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
               isWebSearchEnabled ? " text-primary border-primary " : ""
@@ -106,10 +108,10 @@ const ChatInputBox = ({
           >
             <Globe className="w-4 h-4" /> Web Search
           </button>
+          <Button onClick={onSubmit} disabled={isStreaming}>
+            {isStreaming ? <Loader className="animate-spin" /> : <ArrowUp />}
+          </Button>
         </div>
-        <Button onClick={onSubmit} disabled={isStreaming}>
-          {isStreaming ? <Loader className="animate-spin" /> : <ArrowUp />}
-        </Button>
       </div>
     </div>
   );

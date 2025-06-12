@@ -87,6 +87,19 @@ async function main() {
       reasoning: false,
       companyId: "cmbqry13y0000pukes6vvnpqn",
     },
+    {
+      name: "Gemini 2.0 Flash Image Generation",
+      slug: "gemini-2.0-flash-preview-image-generation",
+      logo: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.transparentpng.com%2Fcats%2Fgoogle-logo-2025.html&psig=AOvVaw3o2Se7Wh1FwpMFjrrOFjdk&ust=1749661581950000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNCgpbqr540DFQAAAAAdAAAAABAL",
+      tag: "Image",
+      requiresPro: false,
+      credits: 2,
+      pdfAnalysis: false,
+      imageAnalysis: false,
+      webAnalysis: false,
+      reasoning: false,
+      companyId: "cmbqry1470001puke7yf8vd06",
+    },
   ];
 
   for (const model of models) {

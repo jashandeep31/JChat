@@ -27,7 +27,7 @@ export const questionAnswerHandler = async ({
     const user = userRaw as User;
     const model = aiModels.find((model) => model.slug === modelSlug);
     if (!model) {
-      io.to(`room:${cid}`).emit("error", "Model not found");
+      io.to(`room:${cid}`).emit("error", "Model not found ");
       io.to(`room:${cid}`).emit("question_answered", {
         cid,
         answer: {
@@ -75,7 +75,8 @@ export const questionAnswerHandler = async ({
       data: {
         aiModelId: model.id,
         chatQuestionId: chatQuestion.id,
-        answer: res,
+        answer: res.text,
+        base64Image: res.images,
       },
     });
 
