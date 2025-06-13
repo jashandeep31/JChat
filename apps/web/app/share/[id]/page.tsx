@@ -77,10 +77,10 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                 key={question.id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden"
               >
-                <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                <div className=" ">
                   <SharedQuestionBubble content={question.question} />
                 </div>
-                <div className="p-4">
+                <div className="">
                   <SharedAnswerBubble answers={question.ChatQuestionAnswer} />
                 </div>
               </div>

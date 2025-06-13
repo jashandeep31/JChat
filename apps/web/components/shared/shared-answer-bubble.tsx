@@ -32,7 +32,7 @@ export const SharedAnswerBubble = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm ">
       <div className="prose prose-sm dark:prose-invert max-w-full">
         <MarkdownRenderer content={activeAnswer.answer} />
       </div>

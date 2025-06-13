@@ -22,12 +22,12 @@ export const SharedChatHeader = ({
     : null;
 
   return (
-    <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-6 rounded-t-lg shadow-sm">
+    <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-6 rounded-t-lg  sticky top-0 z-30">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           {title}
         </h1>
-        <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 text-sm">
+        <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400 text-xs">
           {formattedDate && (
             <div className="flex items-center gap-1.5">
               <CalendarIcon className="w-4 h-4" />

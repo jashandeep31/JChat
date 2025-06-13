@@ -3,9 +3,9 @@ import React from "react";
 
 export const SharedQuestionBubble = ({ content }: { content: string }) => {
   return (
-    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg shadow-sm border border-blue-100 dark:border-blue-800 mb-2">
+    <div className="bg-primary/10 dark:bg-primary/50 p-4 rounded-lg shadow-sm border border-primary/10 dark:border-primary/10 mb-2">
       <div className="flex items-start gap-3">
-        <div className="bg-blue-600 text-white p-2 rounded-full flex-shrink-0">
+        <div className="bg-primary text-white p-2 rounded-full flex-shrink-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
