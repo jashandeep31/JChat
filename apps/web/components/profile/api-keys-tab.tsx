@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ApiKey, Model } from "./types";
 import {
   Card,
   CardContent,
@@ -28,8 +27,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@repo/ui/components/alert-dialog";
-import { Trash2, Copy, Eye, EyeOff, PlusCircle } from "lucide-react";
+import { Trash2, Copy, Eye, EyeOff, PlusCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import useCompanyQuery from "@/lib/react-query/use-company-query";
+import useApiKeyQuery from "@/lib/react-query/use-apikey-query";
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -41,38 +42,45 @@ const formatDate = (dateString: string) => {
 
 const maskApiKey = (key: string) => `••••••••••••${key.slice(-4)}`;
 
-interface ApiKeysTabProps {
-  apiKeys: ApiKey[];
-  models: Model[];
-  onAddApiKey: (name: string, key: string, model: string) => void;
-  onDeleteApiKey: (id: string) => void;
-}
-
-export const ApiKeysTab = ({
-  apiKeys,
-  models,
-  onAddApiKey,
-  onDeleteApiKey,
-}: ApiKeysTabProps) => {
+export const ApiKeysTab = () => {
+  const { apiKeysQuery, createApiKeyMutation, deleteApiKeyMutation } =
+    useApiKeyQuery();
+  const { companiesQuery } = useCompanyQuery();
   const [newKeyName, setNewKeyName] = useState("");
   const [newApiKey, setNewApiKey] = useState("");
   const [selectedModel, setSelectedModel] = useState<string>(
-    models[0]?.id || ""
+    companiesQuery.data?.[0]?.id || ""
   );
   const [showKeyMap, setShowKeyMap] = useState<Record<string, boolean>>({});
 
   const handleAddKey = (e: React.FormEvent) => {
+    const toastId = toast.loading("Adding API key...");
     e.preventDefault();
-    if (!newKeyName.trim() || !newApiKey.trim() || !selectedModel) {
-      toast.error("Please fill all fields.");
-      return;
-    }
-    const modelName =
-      models.find((m) => m.id === selectedModel)?.name || selectedModel;
-    onAddApiKey(newKeyName, newApiKey, modelName);
-    setNewKeyName("");
-    setNewApiKey("");
-    toast.success(`Key "${newKeyName}" for ${modelName} has been added.`);
+    createApiKeyMutation.mutate(
+      {
+        name: newKeyName,
+        key: newApiKey,
+        companyId: selectedModel,
+      },
+      {
+        onSuccess: () => {
+          apiKeysQuery.refetch();
+          toast.success(
+            `Key "${newKeyName}" for ${selectedModel} has been added.`,
+            {
+              id: toastId,
+            }
+          );
+          setNewKeyName("");
+          setNewApiKey("");
+        },
+        onError: () => {
+          toast.error("Failed to add API key", {
+            id: toastId,
+          });
+        },
+      }
+    );
   };
 
   const copyToClipboard = (text: string, keyName: string) => {
@@ -119,7 +127,7 @@ export const ApiKeysTab = ({
                     <SelectValue placeholder="Select a model" />
                   </SelectTrigger>
                   <SelectContent>
-                    {models.map((model) => (
+                    {companiesQuery.data?.map((model) => (
                       <SelectItem key={model.id} value={model.id}>
                         {model.name}
                       </SelectItem>
@@ -141,11 +149,15 @@ export const ApiKeysTab = ({
                 className="mt-1"
               />
             </div>
-            <Button
-              type="submit"
-              className="bg-brand-pink hover:bg-brand-pink/90 text-white"
-            >
-              <PlusCircle className="w-4 h-4 mr-2" /> Add API Key
+            <Button type="submit" disabled={createApiKeyMutation.isPending}>
+              {createApiKeyMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                </>
+              )}
+              Add API Key
             </Button>
           </form>
         </CardContent>
@@ -158,11 +170,11 @@ export const ApiKeysTab = ({
         <p className="text-sm text-slate-500 mb-4">
           Manage your existing API key connections.
         </p>
-        {apiKeys.length === 0 ? (
+        {apiKeysQuery.data?.length === 0 ? (
           <p className="text-slate-500">No API keys added yet.</p>
         ) : (
           <div className="space-y-3">
-            {apiKeys.map((apiKey) => (
+            {apiKeysQuery.data?.map((apiKey) => (
               <Card
                 key={apiKey.id}
                 className="bg-white/80 backdrop-blur-sm border-none shadow-sm"
@@ -173,7 +185,10 @@ export const ApiKeysTab = ({
                       {apiKey.name}
                     </p>
                     <p className="text-sm text-slate-500">
-                      Provider: {apiKey.model}
+                      Provider:{" "}
+                      {companiesQuery.data?.find(
+                        (model) => model.id === apiKey.companyId
+                      )?.name || "Unknown"}
                     </p>
                     <div className="flex items-center mt-1">
                       <p className="text-sm text-slate-500 font-mono mr-2">
@@ -195,7 +210,7 @@ export const ApiKeysTab = ({
                       </Button>
                     </div>
                     <p className="text-xs text-slate-400">
-                      Added: {formatDate(apiKey.createdAt)}
+                      Added: {formatDate(apiKey.createdAt.toString())}
                     </p>
                   </div>
                   <div className="flex space-x-2 flex-shrink-0">
@@ -228,7 +243,23 @@ export const ApiKeysTab = ({
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => onDeleteApiKey(apiKey.id)}
+                            onClick={() => {
+                              const toastId = toast.loading(
+                                "Deleting API key..."
+                              );
+                              deleteApiKeyMutation.mutate(apiKey.id, {
+                                onSuccess: () => {
+                                  toast.success("API key deleted.", {
+                                    id: toastId,
+                                  });
+                                },
+                                onError: () => {
+                                  toast.error("Failed to delete API key", {
+                                    id: toastId,
+                                  });
+                                },
+                              });
+                            }}
                             className="bg-red-600 hover:bg-red-700"
                           >
                             Delete

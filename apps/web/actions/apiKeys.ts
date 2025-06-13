@@ -39,3 +39,15 @@ export const createApiKey = async ({
   });
   return apiKey;
 };
+
+export const deleteApiKey = async (id: string) => {
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+  await db.apiKey.delete({
+    where: {
+      id,
+      userId: session.user.id,
+    },
+  });
+  return;
+};

@@ -16,57 +16,15 @@ import { KeyboardShortcutsCard } from "./keyboard-shortcuts-card";
 import { DangerZone } from "./danger-zone";
 import { AttachmentsTab } from "./attachments-tab";
 import { ApiKeysTab } from "./api-keys-tab";
-import { ApiKey, Model } from "./types";
+import { ApiKey } from "./types";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 // Mock data
-const mockModels: Model[] = [
-  { id: "gpt-4", name: "GPT-4" },
-  { id: "claude-3", name: "Claude 3 Opus" },
-  { id: "gemini-pro", name: "Gemini Pro" },
-  { id: "dall-e-3", name: "DALL-E 3" },
-];
-
-const initialApiKeys: ApiKey[] = [
-  {
-    id: "key1",
-    name: "My GPT-4 Key",
-    key: "sk-abc123def456ghi789jkl0mno",
-    model: "GPT-4",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-  },
-  {
-    id: "key2",
-    name: "Claude Dev Key",
-    key: "claude-xyz987uvw654rst321q",
-    model: "Claude 3 Opus",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
-  },
-];
 
 const navItems = ["Account", "API Keys", "Attachments"];
 
 export const ProfileView = () => {
   const session = useSession();
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(initialApiKeys);
-
-  const handleAddApiKey = (name: string, key: string, model: string) => {
-    const newKeyEntry: ApiKey = {
-      id: `key_${Date.now()}`,
-      name,
-      key,
-      model,
-      createdAt: new Date().toISOString(),
-    };
-    setApiKeys((prev) => [newKeyEntry, ...prev]);
-  };
-
-  const handleDeleteApiKey = (id: string) => {
-    setApiKeys((prev) => prev.filter((key) => key.id !== id));
-    toast.success("API Key Deleted", {
-      description: "The API key has been removed.",
-    });
-  };
 
   if (session.status === "loading") {
     return null;
@@ -138,12 +96,7 @@ export const ProfileView = () => {
               </TabsContent>
 
               <TabsContent value="API Keys" className="mt-8">
-                <ApiKeysTab
-                  apiKeys={apiKeys}
-                  models={mockModels}
-                  onAddApiKey={handleAddApiKey}
-                  onDeleteApiKey={handleDeleteApiKey}
-                />
+                <ApiKeysTab />
               </TabsContent>
 
               <TabsContent value="Customization" className="mt-8">
