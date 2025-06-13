@@ -27,10 +27,11 @@ import { Button } from "@repo/ui/components/button";
 import useProjectQuery, {
   useProjectChats,
 } from "@/lib/react-query/use-project-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 const SidebarProjects = () => {
   const router = useRouter();
+  const params = useParams();
   const [createProjectDialogState, setCreateProjectDialogState] =
     useState(false);
   const { projectsQuery } = useProjectQuery();
@@ -38,9 +39,60 @@ const SidebarProjects = () => {
     Record<string, boolean>
   >({});
 
-  const handleProjectClick = (projectId: string) => {
-    router.push(`/project/${projectId}`);
-  };
+  // Check if we're on a project page, auto-expand that project
+  React.useEffect(() => {
+    const projectId = params?.pid;
+    if (projectId && typeof projectId === "string") {
+      setExpandedProjects((prev) => ({
+        ...prev,
+        [projectId]: true,
+      }));
+    }
+  }, [params?.pid]);
+
+  // For chat pages, find the associated project and expand it
+  React.useEffect(() => {
+    // Only run this effect if we have a chat ID and project data is loaded
+    if (params?.cid && typeof params.cid === "string" && projectsQuery.data) {
+      // We need to fetch project chats separately for each project
+      // to see which project contains this chat
+      const chatId = params.cid;
+
+      // Create a function to check a single project's chats for the current chat ID
+      const checkProject = async (projectId: string) => {
+        try {
+          // Instead of using the hook, we'll fetch the data directly
+          const response = await fetch(`/api/projects/${projectId}/chats`);
+          if (!response.ok) return;
+
+          const chatsData = await response.json();
+          // Define a proper type for chat objects
+          interface ChatItem {
+            id: string;
+            name?: string;
+            [key: string]: string | number | boolean | null | undefined; // More specific types
+          }
+          const chatBelongsToProject = chatsData.some(
+            (chat: ChatItem) => chat.id === chatId
+          );
+
+          if (chatBelongsToProject) {
+            setExpandedProjects((prev) => ({
+              ...prev,
+              [projectId]: true,
+            }));
+          }
+        } catch (error) {
+          console.error("Error checking project chats:", error);
+        }
+      };
+
+      // Check each project one by one
+      projectsQuery.data.forEach((project) => {
+        checkProject(project.id);
+      });
+    }
+  }, [params?.cid, projectsQuery.data]);
 
   const toggleProjectExpansion = (projectId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -50,6 +102,9 @@ const SidebarProjects = () => {
     }));
   };
 
+  const handleProjectClick = (projectId: string) => {
+    router.push(`/project/${projectId}`);
+  };
   return (
     <>
       <SidebarGroup>
