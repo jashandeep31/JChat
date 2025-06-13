@@ -11,6 +11,7 @@ const newChatSchema = z.object({
   modelSlug: z.string(),
   isWebSearchEnabled: z.boolean(),
   attachmentId: z.string().optional(),
+  projectId: z.string().optional(),
 });
 
 export const newChatHandler = async ({
@@ -30,6 +31,7 @@ export const newChatHandler = async ({
     data: {
       name: "New Chat",
       userId: socket.userId,
+      ...(result.data.projectId ? { projectId: result.data.projectId } : {}),
     },
   });
   redis.set(`chat:${chat.id}`, JSON.stringify(chat), "EX", 20 * 60);

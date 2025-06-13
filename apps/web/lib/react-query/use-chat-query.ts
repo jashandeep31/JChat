@@ -1,4 +1,10 @@
-import { getChats, moveChat, renameChat } from "@/actions/chats";
+import {
+  addChatInstruction,
+  getChat,
+  getChats,
+  moveChat,
+  renameChat,
+} from "@/actions/chats";
 import { Chat } from "@repo/db";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteChat } from "@/actions/chats";
@@ -76,6 +82,22 @@ const useChatQuery = () => {
       chatsQuery.refetch();
     },
   });
+
+  const addChatIntructionMutation = useMutation({
+    mutationFn: async ({
+      chatId,
+      instruction,
+    }: {
+      chatId: string;
+      instruction: string;
+    }) => {
+      return await addChatInstruction(chatId, instruction);
+    },
+    onSuccess: () => {
+      chatsQuery.refetch();
+    },
+  });
+
   return {
     chatsQuery,
     updateChatName,
@@ -83,7 +105,17 @@ const useChatQuery = () => {
     deleteChatMutation,
     renameChatMutation,
     moveChatMutation,
+    addChatIntructionMutation,
   };
 };
 
+export const getChatQuery = (chatId: string) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return useQuery({
+    queryKey: ["chat", chatId],
+    queryFn: async () => {
+      return await getChat(chatId);
+    },
+  });
+};
 export default useChatQuery;

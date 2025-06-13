@@ -49,7 +49,6 @@ const AnswerBubble = ({
       cid: question.chatId,
     });
   };
-  console.log(isStreaming);
 
   return (
     <div>

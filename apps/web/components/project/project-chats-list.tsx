@@ -1,5 +1,11 @@
 "use client";
-import { MoreHorizontal, Pencil, Trash2, FolderCheck, Share } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  FolderCheck,
+  Share,
+} from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 import Link from "next/link";
 import {
@@ -29,16 +35,13 @@ const ProjectChatsList = ({
   return (
     <div className="mt-12 w-full">
       <h2 className="text-xl">Chats</h2>
-      <div className="mt-3">
+      <div className="mt-3 space-y-3">
         {chats?.map((chat) => (
           <div
             key={chat.id}
             className="flex items-center border p-2 rounded-md hover:bg-accent transition-colors relative"
           >
-            <Link
-              href={`/chat/${chat.id}`}
-              className="flex-1"
-            >
+            <Link href={`/chat/${chat.id}`} className="flex-1">
               <div>
                 <p className="text-base mb-2 font-medium">{chat.name}</p>
                 <p className="text-xs text-muted-foreground">

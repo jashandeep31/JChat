@@ -80,6 +80,17 @@ export const ChatInputBoxProvider = ({
             attachmentId: attachmentInfo?.uploadId,
           })
         );
+      } else if (params?.pid) {
+        socket.emit(
+          "new_chat",
+          JSON.stringify({
+            question,
+            modelSlug: selectedModel?.slug,
+            isWebSearchEnabled,
+            attachmentId: attachmentInfo?.uploadId,
+            projectId: params.pid,
+          })
+        );
       } else {
         socket.emit(
           "new_chat",

@@ -32,6 +32,6 @@ const page = async ({ params }: { params: Promise<{ cid: string }> }) => {
     redirect("/");
   }
 
-  return <ChatView />;
+  return <ChatView chat={chat} />;
 };
 export default page;
