@@ -66,6 +66,7 @@ export const ChatInputBoxProvider = ({
     // Set streaming to true when starting the request
 
     setIsStreaming?.(true);
+    setQuestion("");
 
     try {
       if (params?.cid) {

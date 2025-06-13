@@ -7,6 +7,9 @@ export const getModels = async () => {
     orderBy: {
       createdAt: "desc",
     },
+    include: {
+      company: true,
+    },
   });
   return models;
 };

@@ -81,7 +81,7 @@ const ChatInputBox = ({
           className="border-0 outline-0 resize-none w-full flex-1"
           style={{
             overflowY: "auto",
-            height: "auto",
+            minHeight: "70px",
           }}
           placeholder="Ask anything..."
           value={question}

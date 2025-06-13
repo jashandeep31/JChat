@@ -71,16 +71,17 @@ const ChatView: React.FC = () => {
               <QuestionBubble content={chatQuestion.question} />
               {chatQuestion.ChatQuestionAnswer.length > 0 &&
                 streamingResponse?.questionId !== chatQuestion.id && (
-                  <AnswerBubble question={chatQuestion} />
+                  <AnswerBubble
+                    isStreaming={false}
+                    setIsStreaming={setIsStreaming}
+                    question={chatQuestion}
+                  />
                 )}
               {streamingResponse?.questionId === chatQuestion.id && (
                 <StreamBubble content={streamingResponse.data} />
               )}
             </div>
           ))}
-          {/* {isStreaming && (
-            <StreamingResponse content={streamingResponse ?? ""} />
-          )} */}
         </div>
       </div>
 
@@ -95,12 +96,5 @@ const ChatView: React.FC = () => {
     </div>
   );
 };
-
-// const StreamingResponse: React.FC<{ content: string }> = ({ content }) =>
-//   !content.trim() ? (
-//     <Loader className="animate-spin" />
-//   ) : (
-//     <AnswerBubble question={{ question: content, ChatQuestionAnswer: [] }} />
-//   );
 
 export default ChatView;

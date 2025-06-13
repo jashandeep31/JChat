@@ -122,7 +122,9 @@ const CreateProjectDialog = ({
           </AlertDescription>
         </Alert>
         <div className="mt-0 flex gap-2 justify-end">
-          <Button variant="outline">Cancel</Button>
+          <Button onClick={() => onOpenChange(false)} variant="outline">
+            Cancel
+          </Button>
           <Button
             disabled={createProjectMutation.isPending || !name}
             onClick={handleCreateProject}

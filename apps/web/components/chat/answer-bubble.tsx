@@ -11,19 +11,23 @@ import {
   Split,
 } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@repo/ui/components/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
 import { SocketContext } from "@/context/socket-context";
 import useModelsQuery from "@/lib/react-query/use-models-query";
+import { RetryModelSelector } from "../retry-model-selector";
 
-const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
+const AnswerBubble = ({
+  question,
+  isStreaming,
+  setIsStreaming,
+}: {
+  question: FullChatQuestion;
+  isStreaming: boolean;
+  setIsStreaming: (value: boolean) => void;
+}) => {
   const { modelsQuery } = useModelsQuery();
   const socket = useContext(SocketContext);
   const answers = question.ChatQuestionAnswer;
@@ -45,6 +49,7 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
       cid: question.chatId,
     });
   };
+  console.log(isStreaming);
 
   return (
     <div>
@@ -71,28 +76,19 @@ const AnswerBubble = ({ question }: { question: FullChatQuestion }) => {
           </Button>
         </CustomTooltip>
         <div className="flex items-center ">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="hover:bg-accent rounded disabled:opacity-50">
-                <CustomTooltip content="Retry Message">
-                  <RotateCcw className="w-4 h-4" />
-                </CustomTooltip>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <button
-                onClick={() => {
-                  socket?.emit("re_answer", {
-                    questionId: question.id,
-                    cid: question.chatId,
-                    modelSlug: "gemini-2.0-flash",
-                  });
-                }}
-              >
-                Gemini 2.0
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <RetryModelSelector
+            questionId={question.id}
+            isStreaming={isStreaming}
+            setIsStreaming={setIsStreaming}
+            chatId={question.chatId}
+            socket={socket}
+          >
+            <button className="hover:bg-accent p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+              <CustomTooltip content="Retry Message">
+                <RotateCcw className="w-4 h-4" />
+              </CustomTooltip>
+            </button>
+          </RetryModelSelector>
         </div>
         <CustomTooltip content="Branch Off">
           <Button
