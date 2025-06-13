@@ -29,8 +29,8 @@ const useProjectQuery = () => {
   });
 
   const updateProjectMutation = useMutation({
-    mutationFn: async (project: { 
-      id: string; 
+    mutationFn: async (project: {
+      id: string;
       instruction?: string;
       name?: string;
     }) => {
@@ -61,9 +61,9 @@ const useProjectQuery = () => {
     },
   });
 
-  return { 
-    projectsQuery, 
-    createProjectMutation, 
+  return {
+    projectsQuery,
+    createProjectMutation,
     updateProjectMutation,
     deleteProjectMutation,
   };
