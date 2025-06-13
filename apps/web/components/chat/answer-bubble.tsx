@@ -18,6 +18,7 @@ import {
 import { SocketContext } from "@/context/socket-context";
 import useModelsQuery from "@/lib/react-query/use-models-query";
 import { RetryModelSelector } from "../retry-model-selector";
+import { AiModel } from "@repo/db";
 
 const AnswerBubble = ({
   question,
@@ -103,7 +104,7 @@ const AnswerBubble = ({
             <p className="text-xs">
               {
                 modelsQuery.data?.find(
-                  (model) => model.id === activeAnswer.aiModelId
+                  (model: AiModel) => model.id === activeAnswer.aiModelId
                 )?.name
               }{" "}
               / {activeAnswer.credits}
