@@ -4,7 +4,7 @@ import { SidebarProvider, useSidebar } from "@repo/ui/components/sidebar";
 import RootSideBar from "@/components/root-sidebar";
 import { PanelLeft, Plus, Search } from "lucide-react";
 
-const layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <SidebarProvider>
@@ -16,7 +16,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default layout;
+export default Layout;
 
 const SideBarControls = () => {
   const { open, setOpen } = useSidebar();

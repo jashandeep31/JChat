@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect } from "react";
 import { markdownComponents } from "./markdown-components";
 import ReactMarkdown from "react-markdown";
