@@ -1,7 +1,7 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import { db } from "./db";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
   session: {
@@ -15,10 +15,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.user) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         session.user = token.user as any;
-        session.user.jwt = jwt.sign(
-          { user: token.user },
-          process.env.JWT_SECRET as string
-        );
+        // session.user.jwt = jwt.sign(
+        //   { user: token.user },
+        //   process.env.JWT_SECRET as string
+        // );
       }
       return session;
     },

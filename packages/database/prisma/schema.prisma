@@ -21,6 +21,7 @@ model User {
   Chat          Chat[]
   attachment    Attachment[]
   ChatShareLink ChatShareLink[]
+  ApiKey        ApiKey[]
 }
 
 model Project {
@@ -60,6 +61,7 @@ model Company {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   AiModel   AiModel[]
+  ApiKey    ApiKey[]
 }
 
 model AiModel {
@@ -149,4 +151,19 @@ model ChatShareLink {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  companyId String
+  key       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([userId, companyId])
 }

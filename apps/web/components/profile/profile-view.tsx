@@ -16,7 +16,7 @@ import { KeyboardShortcutsCard } from "./keyboard-shortcuts-card";
 import { DangerZone } from "./danger-zone";
 import { AttachmentsTab } from "./attachments-tab";
 import { ApiKeysTab } from "./api-keys-tab";
-import { Attachment, ApiKey, Model } from "./types";
+import { ApiKey, Model } from "./types";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 // Mock data
@@ -25,37 +25,6 @@ const mockModels: Model[] = [
   { id: "claude-3", name: "Claude 3 Opus" },
   { id: "gemini-pro", name: "Gemini Pro" },
   { id: "dall-e-3", name: "DALL-E 3" },
-];
-
-const initialAttachments: Attachment[] = [
-  {
-    id: "attach1",
-    name: "project-brief.pdf",
-    type: "application/pdf",
-    size: "2.3 MB",
-    uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-  },
-  {
-    id: "attach2",
-    name: "logo-design.png",
-    type: "image/png",
-    size: "850 KB",
-    uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
-  },
-  {
-    id: "attach3",
-    name: "meeting-recording.mp4",
-    type: "video/mp4",
-    size: "54.1 MB",
-    uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
-  },
-  {
-    id: "attach4",
-    name: "archive-data.zip",
-    type: "application/zip",
-    size: "12.7 MB",
-    uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(),
-  },
 ];
 
 const initialApiKeys: ApiKey[] = [
@@ -79,16 +48,7 @@ const navItems = ["Account", "API Keys", "Attachments"];
 
 export const ProfileView = () => {
   const session = useSession();
-  const [attachments, setAttachments] =
-    useState<Attachment[]>(initialAttachments);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(initialApiKeys);
-
-  const handleDeleteAttachment = (id: string) => {
-    setAttachments((prev) => prev.filter((att) => att.id !== id));
-    toast.success("Attachment deleted", {
-      description: "The file has been removed.",
-    });
-  };
 
   const handleAddApiKey = (name: string, key: string, model: string) => {
     const newKeyEntry: ApiKey = {
@@ -174,10 +134,7 @@ export const ProfileView = () => {
               </TabsContent>
 
               <TabsContent value="Attachments" className="mt-8">
-                <AttachmentsTab
-                  attachments={attachments}
-                  onDeleteAttachment={handleDeleteAttachment}
-                />
+                <AttachmentsTab />
               </TabsContent>
 
               <TabsContent value="API Keys" className="mt-8">

@@ -1,4 +1,3 @@
-import { Attachment } from "./types";
 import { Card, CardContent } from "@repo/ui/components/card";
 import { Button } from "@repo/ui/components/button";
 import { toast } from "sonner";
@@ -15,27 +14,21 @@ import {
 } from "@repo/ui/components/alert-dialog";
 import {
   Trash2,
-  FileText,
   ImageIcon,
   VideoIcon,
-  FileArchive,
   FileQuestion,
   Paperclip,
+  Eye,
 } from "lucide-react";
+import useAttachmentQuery from "@/lib/react-query/use-attachment-query";
+import { AttachmentType } from "@repo/db";
+import Link from "next/link";
 
-const getFileIcon = (fileType: string) => {
-  if (fileType.startsWith("image/"))
+const getFileIcon = (fileType: AttachmentType) => {
+  if (fileType === "IMAGE")
     return <ImageIcon className="w-6 h-6 text-slate-500" />;
-  if (fileType.startsWith("video/"))
+  if (fileType === "PDF")
     return <VideoIcon className="w-6 h-6 text-slate-500" />;
-  if (fileType === "application/pdf")
-    return <FileText className="w-6 h-6 text-slate-500" />;
-  if (
-    fileType === "application/zip" ||
-    fileType === "application/x-rar-compressed"
-  ) {
-    return <FileArchive className="w-6 h-6 text-slate-500" />;
-  }
   return <FileQuestion className="w-6 h-6 text-slate-500" />;
 };
 
@@ -47,16 +40,10 @@ const formatDate = (dateString: string) => {
   });
 };
 
-interface AttachmentsTabProps {
-  attachments: Attachment[];
-  onDeleteAttachment: (id: string) => void;
-}
-
-export const AttachmentsTab = ({
-  attachments,
-  onDeleteAttachment,
-}: AttachmentsTabProps) => {
-  if (attachments.length === 0) {
+export const AttachmentsTab = () => {
+  const { deleteAttachmentMutation, getAttachmentsQuery } =
+    useAttachmentQuery();
+  if (getAttachmentsQuery.data?.length === 0) {
     return (
       <div className="text-center py-10 text-slate-500">
         <Paperclip className="mx-auto h-12 w-12 mb-4 text-slate-400" />
@@ -69,9 +56,20 @@ export const AttachmentsTab = ({
   }
 
   const handleDelete = (id: string, name: string) => {
-    onDeleteAttachment(id);
-    toast.success("Attachment deleted", {
-      description: `The file "${name}" has been removed.`,
+    const toastId = toast.loading("Deleting attachment...");
+    deleteAttachmentMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Attachment deleted", {
+          description: `The file "${name}" has been removed.`,
+          id: toastId,
+        });
+      },
+      onError: () => {
+        toast.error("Attachment deletion failed", {
+          description: `The file "${name}" could not be removed.`,
+          id: toastId,
+        });
+      },
     });
   };
 
@@ -86,7 +84,7 @@ export const AttachmentsTab = ({
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {attachments.map((attachment) => (
+        {getAttachmentsQuery.data?.map((attachment) => (
           <Card
             key={attachment.id}
             className="bg-white/80 backdrop-blur-sm border-none shadow-sm"
@@ -96,15 +94,19 @@ export const AttachmentsTab = ({
               <div className="flex-grow overflow-hidden">
                 <p
                   className="text-sm font-medium text-slate-700 truncate"
-                  title={attachment.name}
+                  title={attachment.filename}
                 >
-                  {attachment.name}
+                  {attachment.filename}
                 </p>
                 <p className="text-xs text-slate-500">
-                  {attachment.size} • Uploaded:{" "}
-                  {formatDate(attachment.uploadedAt)}
+                  {formatDate(attachment.createdAt.toISOString())}
                 </p>
               </div>
+              <Link href={attachment.publicUrl} target="_blank">
+                <Button variant="ghost" size="icon">
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </Link>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
@@ -119,7 +121,8 @@ export const AttachmentsTab = ({
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Attachment?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete &quot;{attachment.name}
+                      Are you sure you want to delete &quot;
+                      {attachment.filename}
                       &quot;? This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -127,7 +130,7 @@ export const AttachmentsTab = ({
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() =>
-                        handleDelete(attachment.id, attachment.name)
+                        handleDelete(attachment.id, attachment.filename)
                       }
                       className="bg-red-600 hover:bg-red-700"
                     >
