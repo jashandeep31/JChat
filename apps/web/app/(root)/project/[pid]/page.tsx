@@ -1,4 +1,4 @@
-import ProjectView from "@/components/project/project-view";
+import ProjectViewContainer from "@/components/project/project-view-container";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 
@@ -19,7 +19,7 @@ const page = async ({ params }: { params: Promise<{ pid: string }> }) => {
     redirect("/");
   }
 
-  return <ProjectView project={project} />;
+  return <ProjectViewContainer project={project} />;
 };
 
 export default page;

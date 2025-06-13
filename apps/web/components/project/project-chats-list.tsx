@@ -1,5 +1,5 @@
 "use client";
-import { MoreHorizontal, Pencil, Trash2, FolderCheck } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, FolderCheck, Share } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 import Link from "next/link";
 import {
@@ -16,6 +16,7 @@ interface ProjectChatsListProps {
   onChatRenameClick: (chat: { id: string; name: string }) => void;
   onChatMoveClick: (chat: { id: string; name: string }) => void;
   onChatDeleteClick: (chat: { id: string; name: string }) => void;
+  onChatShareClick: (chat: { id: string; name: string }) => void;
 }
 
 const ProjectChatsList = ({
@@ -23,6 +24,7 @@ const ProjectChatsList = ({
   onChatRenameClick,
   onChatMoveClick,
   onChatDeleteClick,
+  onChatShareClick,
 }: ProjectChatsListProps) => {
   return (
     <div className="mt-12 w-full">
@@ -56,6 +58,10 @@ const ProjectChatsList = ({
                   <DropdownMenuItem onClick={() => onChatRenameClick(chat)}>
                     <Pencil className="w-4 h-4 mr-2 text-muted-foreground" />
                     <span>Rename</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onChatShareClick(chat)}>
+                    <Share className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <span>Share</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onChatMoveClick(chat)}>
                     <FolderCheck className="w-4 h-4 mr-2 text-muted-foreground" />

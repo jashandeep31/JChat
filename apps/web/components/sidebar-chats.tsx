@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import DeleteDialog from "./delete-dialog";
 import RenameDialog from "./rename-dialog";
 import MoveToProjectDialog from "./move-to-project-dialog";
+import ShareDialog from "./share-dialog";
 
 const SidebarChats = () => {
   const params = useParams();
@@ -45,6 +46,7 @@ const SidebarChats = () => {
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [currentChat, setCurrentChat] = useState<{
     id: string;
     name: string;
@@ -61,6 +63,11 @@ const SidebarChats = () => {
     setCurrentChat(chat);
     setSelectedProjectId("");
     setIsMoveDialogOpen(true);
+  };
+
+  const handleShareClick = (chat: { id: string; name: string }) => {
+    setCurrentChat(chat);
+    setIsShareDialogOpen(true);
   };
 
   const handleDeleteChat = () => {
@@ -158,6 +165,14 @@ const SidebarChats = () => {
         isLoading={moveChatMutation.isPending}
       />
 
+      {currentChat && (
+        <ShareDialog
+          open={isShareDialogOpen}
+          onOpenChange={setIsShareDialogOpen}
+          chatId={currentChat.id}
+        />
+      )}
+
       <SidebarGroup>
         <SidebarGroupLabel>Chats</SidebarGroupLabel>
         <SidebarMenu>
@@ -195,7 +210,7 @@ const SidebarChats = () => {
                     <Pencil className="w-4 h-4 mr-2 text-muted-foreground" />
                     <span>Rename</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShareClick(chat)}>
                     <Share className="w-4 h-4 mr-2 text-muted-foreground" />
                     <span>Share</span>
                   </DropdownMenuItem>

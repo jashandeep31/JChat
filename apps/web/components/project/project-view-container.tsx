@@ -10,6 +10,7 @@ import ChatInputBox from "../chat-input-box";
 import DeleteDialog from "../delete-dialog";
 import RenameDialog from "../rename-dialog";
 import MoveToProjectDialog from "../move-to-project-dialog";
+import ShareDialog from "../share-dialog";
 
 // Import our new modular components
 import ProjectHeader from "./project-header";
@@ -35,6 +36,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
   const [isChatRenameDialogOpen, setIsChatRenameDialogOpen] = useState(false);
   const [isChatDeleteDialogOpen, setIsChatDeleteDialogOpen] = useState(false);
   const [isChatMoveDialogOpen, setIsChatMoveDialogOpen] = useState(false);
+  const [isChatShareDialogOpen, setIsChatShareDialogOpen] = useState(false);
   const [currentChat, setCurrentChat] = useState<{id: string; name: string} | null>(null);
   const [newChatName, setNewChatName] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState("");
@@ -66,6 +68,11 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
     setCurrentChat(chat);
     setSelectedProjectId(""); // Reset selected project
     setIsChatMoveDialogOpen(true);
+  };
+  
+  const handleChatShareClick = (chat: { id: string; name: string }) => {
+    setCurrentChat(chat);
+    setIsChatShareDialogOpen(true);
   };
 
   const handleChatRenameSubmit = (e: React.FormEvent) => {
@@ -231,6 +238,12 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
                 onSubmit={handleChatMove}
                 isLoading={moveChatMutation.isPending}
               />
+              
+              <ShareDialog
+                open={isChatShareDialogOpen}
+                onOpenChange={setIsChatShareDialogOpen}
+                chatId={currentChat.id}
+              />
             </>
           )}
 
@@ -240,6 +253,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
             onChatRenameClick={handleChatRenameClick}
             onChatMoveClick={handleChatMoveClick}
             onChatDeleteClick={handleChatDeleteClick}
+            onChatShareClick={handleChatShareClick}
           />
         </div>
       </div>
