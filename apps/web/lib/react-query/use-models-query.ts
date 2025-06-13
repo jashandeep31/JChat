@@ -4,12 +4,15 @@ import { useQuery } from "@tanstack/react-query";
 const useModelsQuery = () => {
   const modelsQuery = useQuery({
     queryKey: ["models"],
+    initialData: JSON.parse(localStorage.getItem("models") || "[]"),
     queryFn: async () => {
-      return await getModels();
+      const models = await getModels();
+      localStorage.setItem("models", JSON.stringify(models));
+      return models;
     },
     staleTime: 5 * 60 * 1000, //5min
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
   return { modelsQuery };
 };

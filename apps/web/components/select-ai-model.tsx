@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import { Brain, ChevronDown, Eye, FileText, Globe } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface SelectAIModelProps {
   selectedModel: AiModel | null;
@@ -21,6 +21,14 @@ export const SelectAIModel = ({
   models,
 }: SelectAIModelProps) => {
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const selectedModelSlug = localStorage.getItem("selectedModel");
+    if (!selectedModelSlug) return;
+    const model = models.find((model) => model.slug === selectedModelSlug);
+    if (model) {
+      setSelectedModel(model);
+    }
+  }, [models, selectedModel, setSelectedModel]);
 
   const getSelectedModelName = () => {
     if (!selectedModel) return "Select Model";
@@ -46,6 +54,7 @@ export const SelectAIModel = ({
           <DropdownMenuItem key={model.slug} asChild>
             <button
               onClick={() => {
+                localStorage.setItem("selectedModel", model.slug);
                 setSelectedModel(model);
                 setOpen(false);
               }}

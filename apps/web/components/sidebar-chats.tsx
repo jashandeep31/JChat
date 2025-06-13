@@ -179,7 +179,9 @@ const SidebarChats = () => {
           {chatsQuery.data?.map((chat) => (
             <SidebarMenuItem
               key={chat.id}
-              className="hover:bg-accent rounded-md"
+              className={`hover:bg-accent rounded-md ${
+                chat.id === params.cid ? "bg-accent" : ""
+              }`}
             >
               <SidebarMenuButton className="flex items-center gap-2">
                 <Link
