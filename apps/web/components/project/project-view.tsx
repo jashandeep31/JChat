@@ -21,7 +21,7 @@ const ProjectView = ({ project }: { project: Project }) => {
     <div className="p-4">
       <div className="flex items-center flex-col py-12">
         <h1 className="text-2xl font-bold">{project.name}</h1>
-        <div className="mt-6">
+        <div className="mt-6 lg:min-w-[800px]">
           <ChatInputBox />
           <div className="mt-6">
             <Alert variant="default" className="border-0 bg-accent">
@@ -90,7 +90,7 @@ const AddInstructionDialog = ({
           <DialogTitle>Add Instruction</DialogTitle>
         </DialogHeader>
         <div className="mt-6">
-          <Label className="block mb-1" htmlFor="project_instruction">
+          <Label className="block mb-2 text-base" htmlFor="project_instruction">
             Project Instruction
           </Label>
           <Textarea

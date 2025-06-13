@@ -7,12 +7,14 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
-import { Button, buttonVariants } from "@repo/ui/components/button";
+import { buttonVariants } from "@repo/ui/components/button";
 import SidebarProjects from "./sidebar-projects";
 import SidebarChats from "./sidebar-chats";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const RootSideBar = () => {
+  const { data: session } = useSession();
   return (
     <div>
       <Sidebar>
@@ -30,7 +32,26 @@ const RootSideBar = () => {
           <SidebarChats />
         </SidebarContent>
         <SidebarFooter>
-          <Button variant={"ghost"}>Logout</Button>
+          {session && (
+            <Link
+              href={"/profile"}
+              className="flex items-center gap-2 p-2 rounded-md hover:bg-accent"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-2xl text-white  bg-primary p-2 w-10 h-10 rounded-full flex items-center justify-center">
+                  {session.user.name?.[0]}
+                </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">
+                    {session.user.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {session.user.proUser ? "Pro User" : "Free User"}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          )}
         </SidebarFooter>
       </Sidebar>
     </div>

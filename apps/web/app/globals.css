@@ -1,4 +1,8 @@
 @import "@repo/ui/globals.css";
+.next-dev-overlay {
+  display: none !important;
+}
+
 pre code.hljs {
   background-color: transparent !important; /* Forces transparent background */
   padding: 0; /* Adjust padding if atom-one-light adds it and you want to remove it */

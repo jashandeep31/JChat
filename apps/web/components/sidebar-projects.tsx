@@ -31,7 +31,7 @@ const SidebarProjects = () => {
 
   return (
     <>
-      <SidebarGroup className="hidden">
+      <SidebarGroup>
         <SidebarGroupLabel className="flex items-center justify-between">
           <span>Projects</span>
           {projectsQuery.isLoading ? (
