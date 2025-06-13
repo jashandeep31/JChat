@@ -9,17 +9,18 @@ datasource db {
 }
 
 model User {
-  id         String       @id @default(uuid())
-  name       String
-  avatar     String?
-  email      String       @unique
-  proUser    Boolean      @default(false)
-  credits    Float        @default(0)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  Project    Project[]
-  Chat       Chat[]
-  attachment Attachment[]
+  id            String          @id @default(uuid())
+  name          String
+  avatar        String?
+  email         String          @unique
+  proUser       Boolean         @default(false)
+  credits       Float           @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Project       Project[]
+  Chat          Chat[]
+  attachment    Attachment[]
+  ChatShareLink ChatShareLink[]
 }
 
 model Project {
@@ -45,9 +46,10 @@ model Chat {
   userId      String
   instruction String?
 
-  project      Project?       @relation(fields: [projectId], references: [id])
-  ChatQuestion ChatQuestion[]
-  user         User           @relation(fields: [userId], references: [id])
+  project       Project?        @relation(fields: [projectId], references: [id])
+  ChatQuestion  ChatQuestion[]
+  user          User            @relation(fields: [userId], references: [id])
+  ChatShareLink ChatShareLink[]
 }
 
 model Company {
@@ -137,4 +139,14 @@ model Attachment {
 enum AttachmentType {
   IMAGE
   PDF
+}
+
+model ChatShareLink {
+  id        String   @id @default(uuid())
+  userId    String
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
