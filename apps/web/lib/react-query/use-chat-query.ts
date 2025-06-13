@@ -1,4 +1,4 @@
-import { getChats, renameChat } from "@/actions/chats";
+import { getChats, moveChat, renameChat } from "@/actions/chats";
 import { Chat } from "@repo/db";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteChat } from "@/actions/chats";
@@ -61,12 +61,28 @@ const useChatQuery = () => {
       chatsQuery.refetch();
     },
   });
+
+  const moveChatMutation = useMutation({
+    mutationFn: async ({
+      chatId,
+      projectId,
+    }: {
+      chatId: string;
+      projectId: string;
+    }) => {
+      return await moveChat(chatId, projectId);
+    },
+    onSuccess: () => {
+      chatsQuery.refetch();
+    },
+  });
   return {
     chatsQuery,
     updateChatName,
     appendChat,
     deleteChatMutation,
     renameChatMutation,
+    moveChatMutation,
   };
 };
 

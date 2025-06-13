@@ -13,9 +13,13 @@ import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 import { Lightbulb, Loader, Plus } from "lucide-react";
 import ChatInputBox from "../chat-input-box";
-import useProjectQuery from "@/lib/react-query/use-project-query";
+import useProjectQuery, {
+  useProjectChats,
+} from "@/lib/react-query/use-project-query";
+import Link from "next/link";
 
 const ProjectView = ({ project }: { project: Project }) => {
+  const { data: chats } = useProjectChats(project.id);
   const [instructionDialogState, setInstructionDialogState] = useState(false);
   return (
     <div className="p-4">
@@ -49,14 +53,34 @@ const ProjectView = ({ project }: { project: Project }) => {
               </AlertDescription>
             </Alert>
           </div>
+          <AddInstructionDialog
+            open={instructionDialogState}
+            onOpenChange={setInstructionDialogState}
+            projectId={project.id}
+            projectInstruction={project.instruction}
+          />
+
+          <div className="mt-12 w-full">
+            <h2 className="text-xl">Chats</h2>
+            <div className="mt-3">
+              {chats?.map((chat) => (
+                <Link
+                  href={`/chat/${chat.id}`}
+                  key={chat.id}
+                  className="flex items-center border p-2 rounded-md hover:bg-accent transition-colors"
+                >
+                  <div className="flex-1">
+                    <p className="text-base mb-2 font-medium">{chat.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {chat.updatedAt.toLocaleString()}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-      <AddInstructionDialog
-        open={instructionDialogState}
-        onOpenChange={setInstructionDialogState}
-        projectId={project.id}
-        projectInstruction={project.instruction}
-      />
     </div>
   );
 };
@@ -85,7 +109,7 @@ const AddInstructionDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="min-w-[700px]">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>Add Instruction</DialogTitle>
         </DialogHeader>

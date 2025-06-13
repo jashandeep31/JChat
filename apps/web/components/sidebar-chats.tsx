@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useChatQuery from "@/lib/react-query/use-chat-query";
+import useProjectQuery from "@/lib/react-query/use-project-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import { Input } from "@repo/ui/components/input";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -43,18 +51,31 @@ const SidebarChats = () => {
   const params = useParams();
   const router = useRouter();
   const { isMobile } = useSidebar();
-  const { chatsQuery, deleteChatMutation, renameChatMutation } = useChatQuery();
+  const {
+    chatsQuery,
+    deleteChatMutation,
+    renameChatMutation,
+    moveChatMutation,
+  } = useChatQuery();
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
   const [currentChat, setCurrentChat] = useState<{
     id: string;
     name: string;
   } | null>(null);
   const [newChatName, setNewChatName] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState("");
 
   const handleDeleteClick = (chat: { id: string; name: string }) => {
     setCurrentChat(chat);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleMoveClick = (chat: { id: string; name: string }) => {
+    setCurrentChat(chat);
+    setSelectedProjectId("");
+    setIsMoveDialogOpen(true);
   };
 
   const handleDeleteChat = () => {
@@ -99,6 +120,27 @@ const SidebarChats = () => {
         },
         onError: () => {
           toast.error("Failed to rename chat", { id: toastId });
+        },
+      }
+    );
+  };
+
+  const handleMoveSubmit = () => {
+    if (!currentChat || !selectedProjectId) return;
+
+    const toastId = toast.loading("Moving chat...");
+    moveChatMutation.mutate(
+      {
+        chatId: currentChat.id,
+        projectId: selectedProjectId,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Chat moved successfully", { id: toastId });
+          setIsMoveDialogOpen(false);
+        },
+        onError: () => {
+          toast.error("Failed to move chat", { id: toastId });
         },
       }
     );
@@ -165,6 +207,16 @@ const SidebarChats = () => {
         </DialogContent>
       </Dialog>
 
+      <MoveToProjectDialog
+        open={isMoveDialogOpen}
+        onOpenChange={setIsMoveDialogOpen}
+        chatName={currentChat?.name || ""}
+        selectedProjectId={selectedProjectId}
+        onSelectProject={setSelectedProjectId}
+        onSubmit={handleMoveSubmit}
+        isLoading={moveChatMutation.isPending}
+      />
+
       <SidebarGroup>
         <SidebarGroupLabel>Chats</SidebarGroupLabel>
         <SidebarMenu>
@@ -206,7 +258,7 @@ const SidebarChats = () => {
                     <Share className="w-4 h-4 mr-2 text-muted-foreground" />
                     <span>Share</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleMoveClick(chat)}>
                     <FolderCheck className="w-4 h-4 mr-2 text-muted-foreground" />
                     <span>Move to Project</span>
                   </DropdownMenuItem>
@@ -226,3 +278,60 @@ const SidebarChats = () => {
 };
 
 export default SidebarChats;
+
+interface MoveToProjectDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  chatName: string;
+  selectedProjectId: string;
+  onSelectProject: (projectId: string) => void;
+  onSubmit: () => void;
+  isLoading: boolean;
+}
+
+const MoveToProjectDialog = ({
+  open,
+  onOpenChange,
+  chatName,
+  selectedProjectId,
+  onSelectProject,
+  onSubmit,
+  isLoading,
+}: MoveToProjectDialogProps) => {
+  const { projectsQuery } = useProjectQuery();
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Move Chat to Project</DialogTitle>
+          <DialogDescription>
+            Select a project to move &quot;{chatName}&quot; to.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          <Select value={selectedProjectId} onValueChange={onSelectProject}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a project" />
+            </SelectTrigger>
+            <SelectContent>
+              {projectsQuery.data?.map((project) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={onSubmit} disabled={!selectedProjectId || isLoading}>
+            {isLoading ? "Moving..." : "Move"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};

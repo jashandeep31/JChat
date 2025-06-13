@@ -1,3 +1,4 @@
+import { getChats } from "@/actions/chats";
 import {
   addInstructionToProject,
   createProject,
@@ -40,3 +41,16 @@ const useProjectQuery = () => {
 };
 
 export default useProjectQuery;
+
+export const useProjectChats = (projectId?: string) =>
+  useQuery({
+    queryKey: ["project-chats", projectId],
+    queryFn: async () => {
+      if (!projectId) return [];
+      return await getChats(projectId);
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    enabled: !!projectId,
+  });

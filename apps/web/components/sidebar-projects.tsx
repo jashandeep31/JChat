@@ -11,12 +11,22 @@ import {
   DialogTitle,
 } from "@repo/ui/components/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
-import { FolderClosed, FolderPen, Lightbulb, Loader } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  FolderClosed,
+  FolderOpen,
+  FolderPen,
+  Lightbulb,
+  Loader,
+} from "lucide-react";
 import React, { useState } from "react";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Button } from "@repo/ui/components/button";
-import useProjectQuery from "@/lib/react-query/use-project-query";
+import useProjectQuery, {
+  useProjectChats,
+} from "@/lib/react-query/use-project-query";
 import { useRouter } from "next/navigation";
 
 const SidebarProjects = () => {
@@ -24,9 +34,20 @@ const SidebarProjects = () => {
   const [createProjectDialogState, setCreateProjectDialogState] =
     useState(false);
   const { projectsQuery } = useProjectQuery();
+  const [expandedProjects, setExpandedProjects] = useState<
+    Record<string, boolean>
+  >({});
 
   const handleProjectClick = (projectId: string) => {
     router.push(`/project/${projectId}`);
+  };
+
+  const toggleProjectExpansion = (projectId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedProjects((prev) => ({
+      ...prev,
+      [projectId]: !prev[projectId],
+    }));
   };
 
   return (
@@ -44,12 +65,35 @@ const SidebarProjects = () => {
           </SidebarMenuButton>
 
           {projectsQuery.data?.map((project) => (
-            <SidebarMenuButton
-              key={project.id}
-              onClick={() => handleProjectClick(project.id)}
-            >
-              <FolderClosed /> <span>{project.name}</span>
-            </SidebarMenuButton>
+            <div key={project.id} className="flex flex-col">
+              <SidebarMenuButton
+                className="flex items-center justify-between pr-2"
+                onClick={() => handleProjectClick(project.id)}
+              >
+                <div className="flex items-center">
+                  {expandedProjects[project.id] ? (
+                    <FolderOpen className="shrink-0 w-4 h-4" />
+                  ) : (
+                    <FolderClosed className="shrink-0 w-4 h-4" />
+                  )}
+                  <span className="ml-2">{project.name}</span>
+                </div>
+                <button
+                  onClick={(e) => toggleProjectExpansion(project.id, e)}
+                  className="p-1 hover:bg-accent rounded-sm"
+                >
+                  {expandedProjects[project.id] ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </button>
+              </SidebarMenuButton>
+
+              {expandedProjects[project.id] && (
+                <ProjectChats projectId={project.id} />
+              )}
+            </div>
           ))}
         </SidebarMenu>
       </SidebarGroup>
@@ -58,6 +102,45 @@ const SidebarProjects = () => {
         onOpenChange={setCreateProjectDialogState}
       />
     </>
+  );
+};
+
+const ProjectChats = ({ projectId }: { projectId: string }) => {
+  const { data: chats, isLoading } = useProjectChats(projectId);
+  const router = useRouter();
+
+  const handleChatClick = (chatId: string) => {
+    router.push(`/chat/${chatId}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="pl-8 py-1">
+        <Loader className="animate-spin w-3 h-3" />
+      </div>
+    );
+  }
+
+  if (!chats || chats.length === 0) {
+    return (
+      <div className="pl-8 py-1 text-xs text-muted-foreground">
+        No chats found
+      </div>
+    );
+  }
+
+  return (
+    <div className="pl-6">
+      {chats.map((chat) => (
+        <SidebarMenuButton
+          key={chat.id}
+          onClick={() => handleChatClick(chat.id)}
+          className="text-sm py-1"
+        >
+          <span className="ml-2 truncate">{chat.name || "Untitled Chat"}</span>
+        </SidebarMenuButton>
+      ))}
+    </div>
   );
 };
 
