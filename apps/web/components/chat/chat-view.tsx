@@ -55,16 +55,7 @@ const ChatView: React.FC = () => {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
-        <ShareDropdown
-          links={[
-            {
-              id: "1",
-              url: "https://example.com",
-            },
-          ]}
-          onCreateNewLink={() => {}}
-          onDeleteLink={() => {}}
-        >
+        <ShareDropdown>
           <button
             className="p-2 rounded hover:bg-accent transition-colors duration-200"
             aria-label="Search"

@@ -39,6 +39,13 @@ export const askQuestion = async (
     return 404;
   }
   const redisKey = `chat:${cid}:isStreaming`;
+  await redis.set(
+    redisKey,
+    JSON.stringify({
+      questionId: chatQuestion.id,
+      data: "",
+    })
+  );
 
   if (1 !== 1) {
     const fakeResponse = getTempText();

@@ -120,7 +120,7 @@ export function UploadDialog({
           }
         },
       });
-      const res = await axios.post(`${BACKEND_URL}/create/attachment`, {
+      const res = await axios.post(`${BACKEND_URL}/api/v1/create/attachment`, {
         attachmentId: result.uploadId,
       });
 

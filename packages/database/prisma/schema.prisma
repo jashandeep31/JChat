@@ -103,7 +103,7 @@ model ChatQuestion {
   webSearch          Boolean              @default(false)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  chat               Chat                 @relation(fields: [chatId], references: [id])
+  chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
   attachment         Attachment?          @relation(fields: [attachmentId], references: [id])
   ChatQuestionAnswer ChatQuestionAnswer[]
 }
@@ -119,7 +119,7 @@ model ChatQuestionAnswer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chatQuestion ChatQuestion @relation(fields: [chatQuestionId], references: [id])
+  chatQuestion ChatQuestion @relation(fields: [chatQuestionId], references: [id], onDelete: Cascade)
   aiModel      AiModel      @relation(fields: [aiModelId], references: [id])
 }
 

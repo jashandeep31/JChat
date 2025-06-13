@@ -10,6 +10,11 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useContext } from "react";
 import { SelectAIModel } from "./select-ai-model";
 import { UploadDialog } from "./upload-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/tooltip";
 
 const ChatInputBox = ({
   isStreaming = false,
@@ -98,31 +103,54 @@ const ChatInputBox = ({
           />
         </div>
         <div className="flex gap-2 items-center">
-          <button
-            className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
-              isWebSearchEnabled ? " text-primary border-primary " : ""
-            }`}
-            onClick={() => setIsWebSearchEnabled(!isWebSearchEnabled)}
-            type="button"
-          >
-            <Globe className="w-4 h-4" /> Web Search
-          </button>
+          <Tooltip>
+            <TooltipTrigger>
+              <button
+                className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
+                  isWebSearchEnabled ? " text-primary border-primary " : ""
+                }`}
+                onClick={() => setIsWebSearchEnabled(!isWebSearchEnabled)}
+                type="button"
+              >
+                <Globe className="w-4 h-4" /> Web Search
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Enable web search to get information from the web</p>
+            </TooltipContent>
+          </Tooltip>
 
           {selectedModel?.imageAnalysis && (
             <div>
               {attachmentInfo ? (
-                <AttachmentInfoComponent
-                  attachmentInfo={attachmentInfo}
-                  setAttachmentInfo={setAttachmentInfo}
-                />
+                <Tooltip>
+                  <TooltipTrigger>
+                    <AttachmentInfoComponent
+                      attachmentInfo={attachmentInfo}
+                      setAttachmentInfo={setAttachmentInfo}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{attachmentInfo.filename} is linked</p>
+                  </TooltipContent>
+                </Tooltip>
               ) : (
-                <button
-                  className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2`}
-                  onClick={() => setIsAttachmentDialogOpen(true)}
-                  type="button"
-                >
-                  <Paperclip className="w-4 h-4" /> Attachment
-                </button>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <button
+                      className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2`}
+                      onClick={() => setIsAttachmentDialogOpen(true)}
+                      type="button"
+                    >
+                      <Paperclip className="w-4 h-4" /> Attachment
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      Upload files through the chat or other relevant sections.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
           )}

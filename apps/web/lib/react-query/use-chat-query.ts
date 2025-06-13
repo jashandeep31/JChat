@@ -1,6 +1,7 @@
-import { getChats } from "@/actions/chats";
+import { getChats, renameChat } from "@/actions/chats";
 import { Chat } from "@repo/db";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteChat } from "@/actions/chats";
 
 const useChatQuery = () => {
   const queryClient = useQueryClient();
@@ -43,7 +44,30 @@ const useChatQuery = () => {
     });
   };
 
-  return { chatsQuery, updateChatName, appendChat };
+  const deleteChatMutation = useMutation({
+    mutationFn: async (chatId: string) => {
+      return await deleteChat(chatId);
+    },
+    onSuccess: () => {
+      chatsQuery.refetch();
+    },
+  });
+
+  const renameChatMutation = useMutation({
+    mutationFn: async ({ chatId, name }: { chatId: string; name: string }) => {
+      return await renameChat(chatId, name);
+    },
+    onSuccess: () => {
+      chatsQuery.refetch();
+    },
+  });
+  return {
+    chatsQuery,
+    updateChatName,
+    appendChat,
+    deleteChatMutation,
+    renameChatMutation,
+  };
 };
 
 export default useChatQuery;

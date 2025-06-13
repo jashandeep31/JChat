@@ -13,40 +13,63 @@ import {
 import { Button } from "@repo/ui/components/button";
 import { Link2, Trash2, Copy, PlusCircle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-
-interface ShareLink {
-  id: string;
-  url: string;
-}
+import {
+  useChatShareLinksQuery,
+  useChatShareQuery,
+} from "@/lib/react-query/use-chatshare-query";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 
 interface ShareDropdownProps {
   children: React.ReactNode;
-  links: ShareLink[];
-  onCreateNewLink: () => void;
-  onDeleteLink: (linkId: string) => void;
 }
 
-export function ShareDropdown({
-  children,
-  links,
-  onCreateNewLink,
-  onDeleteLink,
-}: ShareDropdownProps) {
-  const handleCopyLink = async (url: string) => {
+export function ShareDropdown({ children }: ShareDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  let { cid } = useParams();
+  if (!cid) cid = "";
+
+  const { data: links = [], refetch } = useChatShareLinksQuery(cid as string);
+  const { createChatShareLinkMutation, deleteChatShareLinkMutation } =
+    useChatShareQuery(cid as string);
+
+  const onCreateNewLink = async (e?: React.MouseEvent) => {
+    e?.stopPropagation(); // Prevent dropdown close
     try {
-      await navigator.clipboard.writeText(url);
-      toast.success("Link Copied", {
-        description: "The shareable link has been copied to your clipboard.",
+      await createChatShareLinkMutation.mutateAsync(cid as string, {
+        onSuccess: () => {
+          refetch(); // Refresh the links list
+          toast.success("Share link created");
+        },
+        onError: () => {
+          toast.error("Failed to create share link");
+        },
       });
     } catch {
-      toast.error("Copy Failed", {
-        description: "Could not copy the link. Please try again.",
+      toast.error("Failed to create share link");
+    }
+  };
+
+  const onCopyLink = (linkId: string) => {
+    const url = `${window.location.origin}/share/${linkId}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link copied to clipboard");
+  };
+
+  const onDeleteLink = async (linkId: string) => {
+    try {
+      await deleteChatShareLinkMutation.mutateAsync(linkId, {
+        onSuccess: () => {
+          refetch();
+        },
       });
+    } catch (error) {
+      console.error("Error deleting share link:", error);
     }
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-80 md:w-96 p-0 custom-scrollbar"
@@ -57,7 +80,10 @@ export function ShareDropdown({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={onCreateNewLink}
+          onClick={(e) => {
+            e.preventDefault();
+            onCreateNewLink(e);
+          }}
           className="flex items-center gap-2 px-4 py-3 text-sm cursor-pointer hover:bg-accent"
         >
           <PlusCircle className="h-4 w-4 text-primary" />
@@ -70,41 +96,36 @@ export function ShareDropdown({
               Previously Created Links
             </DropdownMenuLabel>
             <DropdownMenuGroup className="max-h-72 overflow-y-auto custom-scrollbar">
-              {links.map((link, index) => (
+              {links.map((link) => (
                 <div key={link.id} className="px-2 py-1">
                   <div className="p-2 rounded-md hover:bg-accent">
                     <div className="flex justify-between items-start mb-1">
                       <span className="text-sm font-medium text-foreground truncate pr-2">
-                        Link {index + 1}
+                        Link {link.id.slice(0, 8)}...
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <a
-                        href={link.url}
+                        href={`/share/${link.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-primary hover:underline truncate flex items-center"
                         onClick={(e) => e.stopPropagation()} // Prevent dropdown close
                       >
-                        {link.url.replace(/^https?:\/\//, "").split("/")[0] +
-                          "/.../" +
-                          link.url.split("/").pop()}
+                        {`/share/${link.id}`}
                         <ExternalLink className="h-3 w-3 ml-1 flex-shrink-0" />
                       </a>
-                      <div className="flex items-center space-x-1 flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                      <div className="flex items-center justify-between w-full">
+                        <div
+                          className="flex items-center gap-2 cursor-pointer"
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent dropdown close
-                            handleCopyLink(link.url);
+                            e.stopPropagation();
+                            onCopyLink(link.id);
                           }}
-                          onSelect={(e) => e.preventDefault()} // Prevent dropdown close on select
                         >
-                          <Copy className="h-3.5 w-3.5" />
+                          <Copy className="h-4 w-4" />
                           <span className="sr-only">Copy link</span>
-                        </Button>
+                        </div>
                         <Button
                           variant="ghost"
                           size="icon"

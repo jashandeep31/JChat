@@ -32,7 +32,7 @@ const RootSideBar = () => {
           <SidebarChats />
         </SidebarContent>
         <SidebarFooter>
-          {session && (
+          {session?.user ? (
             <Link
               href={"/profile"}
               className="flex items-center gap-2 p-2 rounded-md hover:bg-accent"
@@ -50,6 +50,13 @@ const RootSideBar = () => {
                   </span>
                 </div>
               </div>
+            </Link>
+          ) : (
+            <Link
+              href={"/login"}
+              className="flex items-center gap-2 p-2 rounded-md hover:bg-accent text-center border justify-center"
+            >
+              Login
             </Link>
           )}
         </SidebarFooter>

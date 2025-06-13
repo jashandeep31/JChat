@@ -11,8 +11,8 @@ app.use(
   })
 );
 app.use(express.json());
-app.use("api/v1", generatePresignedUrlRoutes);
-app.use("api/v1", attachmentRoutes);
+app.use("/api/v1", generatePresignedUrlRoutes);
+app.use("/api/v1", attachmentRoutes);
 
 app.get("/delete", async (req, res) => {
   await db.chatQuestionAnswer.deleteMany();

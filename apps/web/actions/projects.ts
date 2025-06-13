@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 
 export const getProjects = async () => {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) return [];
   const projects = await db.project.findMany({
     where: {
       userId: session.user.id,

@@ -10,7 +10,6 @@ const layout = ({ children }: { children: React.ReactNode }) => {
       <SidebarProvider>
         <RootSideBar />
         <SideBarControls />
-
         <main className="w-full flex flex-col">{children}</main>
       </SidebarProvider>
     </div>

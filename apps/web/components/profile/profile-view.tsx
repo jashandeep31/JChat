@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { ArrowLeft, Sun } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import {
   Tabs,
   TabsContent,
@@ -16,9 +16,8 @@ import { KeyboardShortcutsCard } from "./keyboard-shortcuts-card";
 import { DangerZone } from "./danger-zone";
 import { AttachmentsTab } from "./attachments-tab";
 import { ApiKeysTab } from "./api-keys-tab";
-import { ApiKey } from "./types";
-import { toast } from "sonner";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { Button } from "@repo/ui/components/button";
 // Mock data
 
 const navItems = ["Account", "API Keys", "Attachments"];
@@ -49,15 +48,16 @@ export const ProfileView = () => {
             Back to Chat
           </Link>
           <div className="flex items-center gap-4">
-            <button className="hover:text-brand-pink">
-              <Sun className="w-5 h-5" />
-            </button>
-            <Link
-              href="#"
+            <Button
+              onClick={async () => {
+                await signOut({
+                  redirectTo: "/",
+                });
+              }}
               className="text-sm font-medium hover:text-brand-pink"
             >
               Sign out
-            </Link>
+            </Button>
           </div>
         </header>
 
