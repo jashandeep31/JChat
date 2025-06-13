@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
-import { Share2, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Share2, SlidersHorizontal } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 import { Button } from "@repo/ui/components/button";
@@ -24,6 +24,41 @@ const ChatView: React.FC = () => {
     useChatSocket(cid, {
       questions: [],
     });
+  const [showScrollDownButton, setShowScrollDownButton] = useState(false);
+  const [isFirstTimeScrolled, setIsFirstTimeScrolled] = useState(false);
+  const lastDivRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isFirstTimeScrolled && chatQuestions.length > 0) {
+      setIsFirstTimeScrolled(true);
+      lastDivRef.current?.scrollIntoView({ behavior: "instant" });
+    }
+  }, [chatQuestions, isFirstTimeScrolled]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          setShowScrollDownButton(true);
+        } else {
+          setShowScrollDownButton(false);
+        }
+      },
+      { threshold: 0.9 }
+    );
+
+    if (lastDivRef.current) {
+      observer.observe(lastDivRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleScrollDown = () => {
+    if (lastDivRef.current) {
+      lastDivRef.current.scrollIntoView({ behavior: "smooth" });
+      setShowScrollDownButton(false);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
@@ -83,14 +118,28 @@ const ChatView: React.FC = () => {
             </div>
           ))}
         </div>
+        <div ref={lastDivRef} className=""></div>
       </div>
 
-      <div className="sticky bottom-0 z-10 bg-background mt-6">
-        <div className="mx-auto lg:max-w-1/2 w-full bg-background">
-          <ChatInputBox
-            isStreaming={isStreaming}
-            setIsStreaming={setIsStreaming}
-          />
+      <div className="sticky bottom-0 z-10  mt-6">
+        <div className="flex justify-center mb-6 ">
+          {showScrollDownButton && (
+            <button
+              onClick={handleScrollDown}
+              className="flex text-sm font-medium gap-2 items-center border rounded-full px-2 py-1 hover:bg-accent transition-colors duration-200 bg-background"
+            >
+              <span>Scroll to bottom</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <div className="bg-background">
+          <div className="mx-auto lg:max-w-1/2 w-full bg-background">
+            <ChatInputBox
+              isStreaming={isStreaming}
+              setIsStreaming={setIsStreaming}
+            />
+          </div>
         </div>
       </div>
     </div>
