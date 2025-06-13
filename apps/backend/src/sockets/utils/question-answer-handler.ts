@@ -24,8 +24,10 @@ export const questionAnswerHandler = async ({
       io.to(`room:${cid}`).emit("error", "User not found");
       return;
     }
+
     const user = userRaw as User;
     const model = aiModels.find((model) => model.slug === modelSlug);
+
     if (!model) {
       io.to(`room:${cid}`).emit("error", "Model not found ");
       io.to(`room:${cid}`).emit("question_answered", {
@@ -53,6 +55,14 @@ export const questionAnswerHandler = async ({
       });
       return;
     }
+    let credits = 0;
+    credits = credits + model.credits;
+    if (chatQuestion.attachmentId) {
+      credits += 3;
+    }
+    if (chatQuestion.webSearch) {
+      credits += 3;
+    }
 
     const res = await askQuestion(chatQuestion, model.id, io, cid);
     if (res === 404) {
@@ -61,7 +71,7 @@ export const questionAnswerHandler = async ({
         cid,
         answer: {
           id: "",
-          credits: 0,
+          credits,
           createdAt: new Date(),
           updatedAt: new Date(),
           chatQuestionId: chatQuestion.id,
@@ -77,6 +87,7 @@ export const questionAnswerHandler = async ({
         chatQuestionId: chatQuestion.id,
         answer: res.text,
         base64Image: res.images,
+        credits,
       },
     });
 
