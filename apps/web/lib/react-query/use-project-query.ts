@@ -2,7 +2,9 @@ import { getChats } from "@/actions/chats";
 import {
   addInstructionToProject,
   createProject,
+  deleteProject,
   getProjects,
+  updateProjectName,
 } from "@/actions/projects";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -27,17 +29,44 @@ const useProjectQuery = () => {
   });
 
   const updateProjectMutation = useMutation({
-    mutationFn: async (project: { id: string; instruction: string }) => {
-      return await addInstructionToProject({
-        id: project.id,
-        instruction: project.instruction,
-      });
+    mutationFn: async (project: { 
+      id: string; 
+      instruction?: string;
+      name?: string;
+    }) => {
+      if (project.instruction !== undefined) {
+        return await addInstructionToProject({
+          id: project.id,
+          instruction: project.instruction,
+        });
+      } else if (project.name !== undefined) {
+        return await updateProjectName({
+          id: project.id,
+          name: project.name,
+        });
+      }
+      throw new Error("Either instruction or name must be provided");
     },
     onSuccess: () => {
       projectsQuery.refetch();
     },
   });
-  return { projectsQuery, createProjectMutation, updateProjectMutation };
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteProject(id);
+    },
+    onSuccess: () => {
+      projectsQuery.refetch();
+    },
+  });
+
+  return { 
+    projectsQuery, 
+    createProjectMutation, 
+    updateProjectMutation,
+    deleteProjectMutation,
+  };
 };
 
 export default useProjectQuery;

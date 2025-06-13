@@ -54,3 +54,51 @@ export const addInstructionToProject = async ({
   revalidatePath(`/project/${id}`);
   return project;
 };
+
+export const updateProjectName = async ({
+  id,
+  name,
+}: {
+  id: string;
+  name: string;
+}) => {
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+  if (!name) throw new Error("Project name is required");
+
+  const project = await db.project.update({
+    where: {
+      id,
+    },
+    data: {
+      name,
+    },
+  });
+  revalidatePath(`/project/${id}`);
+  return project;
+};
+
+export const deleteProject = async (id: string) => {
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+
+  // Delete all chats associated with this project
+  await db.chat.updateMany({
+    where: {
+      projectId: id,
+    },
+    data: {
+      projectId: null,
+    },
+  });
+
+  // Delete the project
+  const project = await db.project.delete({
+    where: {
+      id,
+    },
+  });
+
+  revalidatePath("/");
+  return project;
+};
