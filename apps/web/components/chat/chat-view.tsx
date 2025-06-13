@@ -133,13 +133,11 @@ const ChatView: React.FC = () => {
             </button>
           )}
         </div>
-        <div className="bg-background">
-          <div className="mx-auto lg:max-w-1/2 w-full bg-background">
-            <ChatInputBox
-              isStreaming={isStreaming}
-              setIsStreaming={setIsStreaming}
-            />
-          </div>
+        <div className="mx-auto lg:max-w-1/2 w-full bg-background">
+          <ChatInputBox
+            isStreaming={isStreaming}
+            setIsStreaming={setIsStreaming}
+          />
         </div>
       </div>
     </div>

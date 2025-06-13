@@ -5,7 +5,7 @@ import {
   useChatInputBox,
 } from "@/context/chat-input-box-context";
 import { Button } from "@repo/ui/components/button";
-import { ArrowUp, Globe, Loader, Paperclip, X } from "lucide-react";
+import { ArrowUp, CircleStop, Globe, Paperclip, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useContext } from "react";
 import { SelectAIModel } from "./select-ai-model";
@@ -154,9 +154,22 @@ const ChatInputBox = ({
               )}
             </div>
           )}
-          <Button onClick={onSubmit} disabled={isStreaming}>
-            {isStreaming ? <Loader className="animate-spin" /> : <ArrowUp />}
-          </Button>
+          {!isStreaming && (
+            <Button onClick={onSubmit} disabled={isStreaming}>
+              <ArrowUp />
+            </Button>
+          )}
+          {isStreaming && (
+            <Button
+              onClick={() => {
+                socket?.emit("stop_streaming", {
+                  cid: params.cid,
+                });
+              }}
+            >
+              <CircleStop />
+            </Button>
+          )}
         </div>
       </div>
       <UploadDialog
