@@ -1,15 +1,20 @@
-import { generateText, smoothStream, streamText } from "ai";
-import { groq } from "@ai-sdk/groq";
-import { AiModel, ChatQuestion } from "@repo/db";
+import { smoothStream, streamText } from "ai";
+import { createGroq } from "@ai-sdk/groq";
 import { webSearch } from "../../../services/web-search.js";
 import { ProviderFunctionParams } from "../../index.js";
+import { env } from "../../../lib/env.js";
 
 export const askGroqQuestion = async ({
   question,
   model,
+  apiKey,
   messages,
   onChunk,
 }: ProviderFunctionParams): Promise<{ text: string }> => {
+  const groq = createGroq({
+    apiKey: apiKey || env.GROQ_API_KEY,
+  });
+
   messages.push({
     role: "user",
     content: question.question,

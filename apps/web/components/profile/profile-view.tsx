@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import {
   Tabs,
@@ -19,11 +18,13 @@ import { ApiKeysTab } from "./api-keys-tab";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@repo/ui/components/button";
 import useUserQuery from "@/lib/react-query/use-user-query";
+import { useRouter } from "next/navigation";
 // Mock data
 
 const navItems = ["Account", "API Keys", "Attachments"];
 
 export const ProfileView = () => {
+  const router = useRouter();
   const session = useSession();
   const { userQuery } = useUserQuery();
   console.log(userQuery.data);
@@ -43,13 +44,16 @@ export const ProfileView = () => {
     <div className="bg-brand-background min-h-screen p-4 sm:p-6 md:p-8 text-foreground">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
-          <Link
-            href="/"
+          <Button
+            onClick={() => {
+              router.back();
+            }}
+            variant="link"
             className="flex items-center gap-2 text-sm font-medium hover:text-brand-pink"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Chat
-          </Link>
+          </Button>
           <div className="flex items-center gap-4">
             <Button
               onClick={async () => {

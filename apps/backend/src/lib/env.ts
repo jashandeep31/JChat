@@ -14,6 +14,7 @@ export const env = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string,
   S3_REGION: process.env.S3_REGION as string,
   S3_BUCKET: process.env.S3_BUCKET as string,
+  GROQ_API_KEY: process.env.GROQ_API_KEY as string,
 };
 
 for (const [key, value] of Object.entries(env)) {

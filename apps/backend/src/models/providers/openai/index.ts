@@ -6,8 +6,6 @@ import { getAttachment } from "../../../services/attachment-cache.js";
 import { webSearch } from "../../../services/web-search.js";
 import { ProviderFunctionParams } from "../../index.js";
 
-const openaiClient = new OpenAI({ apiKey: env.OPENAI_API_KEY });
-
 type OpenAITextContent = {
   type: "text";
   text: string;
@@ -24,11 +22,13 @@ type OpenAIContentItem = OpenAITextContent | OpenAIImageContent;
 
 export const askOpenAIQuestion = async ({
   question,
+  apiKey,
   model,
   messages,
   onChunk,
 }: ProviderFunctionParams): Promise<{ text: string; images: string }> => {
   try {
+    const openaiClient = new OpenAI({ apiKey: apiKey || env.OPENAI_API_KEY });
     let text = "";
     let attachment: Attachment | null = null;
 
