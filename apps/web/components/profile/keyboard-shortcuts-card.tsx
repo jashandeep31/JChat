@@ -8,17 +8,17 @@ export const KeyboardShortcutsCard = () => {
   ]
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-none shadow-sm">
+    <Card className="bg-background/80 backdrop-blur-sm border-none shadow-sm">
       <CardHeader>
         <CardTitle className="text-sm font-semibold">Keyboard Shortcuts</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {shortcuts.map((shortcut) => (
           <div key={shortcut.name} className="flex justify-between items-center">
-            <p className="text-sm text-slate-700">{shortcut.name}</p>
+            <p className="text-sm text-foreground">{shortcut.name}</p>
             <div className="flex gap-1">
               {shortcut.keys.map((key) => (
-                <kbd key={key} className="px-2 py-1 text-xs font-sans bg-slate-200 text-slate-600 rounded">
+                <kbd key={key} className="px-2 py-1 text-xs font-sans bg-muted text-muted-foreground rounded">
                   {key}
                 </kbd>
               ))}

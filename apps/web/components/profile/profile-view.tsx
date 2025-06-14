@@ -37,7 +37,7 @@ export const ProfileView = () => {
     return null;
   }
   return (
-    <div className="bg-brand-background min-h-screen p-4 sm:p-6 md:p-8 text-slate-800">
+    <div className="bg-brand-background min-h-screen p-4 sm:p-6 md:p-8 text-foreground">
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <Link
@@ -79,7 +79,7 @@ export const ProfileView = () => {
                   <TabsTrigger
                     key={item}
                     value={item}
-                    className="text-slate-600 data-[state=active]:bg-white data-[state=active]:text-slate-800 data-[state=active]:shadow-sm rounded-full px-3 py-1.5 text-sm sm:px-4 sm:py-2"
+                    className="text-muted-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-full px-3 py-1.5 text-sm sm:px-4 sm:py-2"
                   >
                     {item}
                   </TabsTrigger>

@@ -11,12 +11,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 const useProjectQuery = () => {
   const projectsQuery = useQuery({
     queryKey: ["projects"],
+    initialData: JSON.parse(localStorage.getItem("projects") || "[]"),
     queryFn: async () => {
-      return await getProjects();
+      const projects = await getProjects();
+      localStorage.setItem("projects", JSON.stringify(projects));
+      return projects;
     },
-    staleTime: 5 * 60 * 1000, //5min
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
   });
 
   const createProjectMutation = useMutation({

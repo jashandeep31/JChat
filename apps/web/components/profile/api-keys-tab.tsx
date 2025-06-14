@@ -94,9 +94,9 @@ export const ApiKeysTab = () => {
 
   return (
     <div className="space-y-8">
-      <Card className="bg-white/80 backdrop-blur-sm border-none shadow-sm">
+      <Card className="bg-background/80 backdrop-blur-sm border-none shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-slate-800">
+          <CardTitle className="text-xl font-semibold text-foreground">
             Add New API Key
           </CardTitle>
           <CardDescription>
@@ -164,10 +164,10 @@ export const ApiKeysTab = () => {
       </Card>
 
       <div>
-        <h3 className="text-xl font-semibold text-slate-800 mb-1">
+        <h3 className="text-xl font-semibold text-foreground mb-1">
           Your API Keys
         </h3>
-        <p className="text-sm text-slate-500 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           Manage your existing API key connections.
         </p>
         {apiKeysQuery.data?.length === 0 ? (
@@ -177,21 +177,21 @@ export const ApiKeysTab = () => {
             {apiKeysQuery.data?.map((apiKey) => (
               <Card
                 key={apiKey.id}
-                className="bg-white/80 backdrop-blur-sm border-none shadow-sm"
+                className=" backdrop-blur-sm border-none shadow-sm"
               >
                 <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div className="flex-grow">
-                    <p className="font-semibold text-slate-700">
+                    <p className="font-semibold text-foreground">
                       {apiKey.name}
                     </p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground">
                       Provider:{" "}
                       {companiesQuery.data?.find(
                         (model) => model.id === apiKey.companyId
                       )?.name || "Unknown"}
                     </p>
                     <div className="flex items-center mt-1">
-                      <p className="text-sm text-slate-500 font-mono mr-2">
+                      <p className="text-sm text-muted-foreground font-mono mr-2">
                         {showKeyMap[apiKey.id]
                           ? apiKey.key
                           : maskApiKey(apiKey.key)}
@@ -199,7 +199,7 @@ export const ApiKeysTab = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 text-slate-500 hover:text-brand-pink"
+                        className="h-6 w-6 text-muted-foreground hover:text-brand-pink"
                         onClick={() => toggleShowKey(apiKey.id)}
                       >
                         {showKeyMap[apiKey.id] ? (
@@ -209,7 +209,7 @@ export const ApiKeysTab = () => {
                         )}
                       </Button>
                     </div>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-muted-foreground/70">
                       Added: {formatDate(apiKey.createdAt.toString())}
                     </p>
                   </div>

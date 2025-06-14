@@ -26,10 +26,10 @@ import Link from "next/link";
 
 const getFileIcon = (fileType: AttachmentType) => {
   if (fileType === "IMAGE")
-    return <ImageIcon className="w-6 h-6 text-slate-500" />;
+    return <ImageIcon className="w-6 h-6 text-muted-foreground" />;
   if (fileType === "PDF")
-    return <VideoIcon className="w-6 h-6 text-slate-500" />;
-  return <FileQuestion className="w-6 h-6 text-slate-500" />;
+    return <VideoIcon className="w-6 h-6 text-muted-foreground" />;
+  return <FileQuestion className="w-6 h-6 text-muted-foreground" />;
 };
 
 const formatDate = (dateString: string) => {
@@ -45,8 +45,8 @@ export const AttachmentsTab = () => {
     useAttachmentQuery();
   if (getAttachmentsQuery.data?.length === 0) {
     return (
-      <div className="text-center py-10 text-slate-500">
-        <Paperclip className="mx-auto h-12 w-12 mb-4 text-slate-400" />
+      <div className="text-center py-10 text-muted-foreground">
+        <Paperclip className="mx-auto h-12 w-12 mb-4 text-muted-foreground/70" />
         <p className="text-lg">No attachments found.</p>
         <p className="text-sm">
           Upload files through the chat or other relevant sections.
@@ -76,10 +76,10 @@ export const AttachmentsTab = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-xl font-semibold text-slate-800 mb-1">
+        <h3 className="text-xl font-semibold text-foreground mb-1">
           Manage Attachments
         </h3>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           Review and delete your uploaded files.
         </p>
       </div>
@@ -87,18 +87,18 @@ export const AttachmentsTab = () => {
         {getAttachmentsQuery.data?.map((attachment) => (
           <Card
             key={attachment.id}
-            className="bg-white/80 backdrop-blur-sm border-none shadow-sm"
+            className="bg-background/80 backdrop-blur-sm border shadow-sm"
           >
             <CardContent className="p-4 flex items-center space-x-3">
               {getFileIcon(attachment.type)}
               <div className="flex-grow overflow-hidden">
                 <p
-                  className="text-sm font-medium text-slate-700 truncate"
+                  className="text-sm font-medium text-foreground truncate"
                   title={attachment.filename}
                 >
                   {attachment.filename}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   {formatDate(attachment.createdAt.toISOString())}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export const AttachmentsTab = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-slate-500 hover:text-red-600 flex-shrink-0"
+                    className="text-muted-foreground hover:text-red-600 flex-shrink-0"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

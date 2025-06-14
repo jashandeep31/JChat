@@ -14,7 +14,7 @@ import {
 export const DangerZone = () => (
   <div>
     <h2 className="text-xl font-bold text-red-600">Danger Zone</h2>
-    <p className="text-sm text-slate-600 mt-1 mb-4">
+    <p className="text-sm text-muted-foreground mt-1 mb-4">
       Permanently delete your account and all associated data.
     </p>
     <AlertDialog>
