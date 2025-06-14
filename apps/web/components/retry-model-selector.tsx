@@ -63,8 +63,11 @@ export function RetryModelSelector({
   const modelsByCompany = React.useMemo(() => {
     if (!modelsQuery.data) return {} as Record<string, ExtendedAiModel[]>;
 
-    return modelsQuery.data.reduce<Record<string, ExtendedAiModel[]>>(
-      (acc, model) => {
+    return modelsQuery.data.reduce(
+      (
+        acc: Record<string, ExtendedAiModel[]>,
+        model: AiModel & { company: Company }
+      ) => {
         const companyId = model.company?.id;
         if (!companyId) return acc;
 
@@ -97,15 +100,17 @@ export function RetryModelSelector({
     if (!companiesQuery.data) return [];
 
     return companiesQuery.data
-      .map((company) => {
+      .map((company: Company) => {
         const companyWithModels: CompanyWithModels = {
           ...company,
           models: modelsByCompany[company.id] || [],
         };
         return companyWithModels;
       })
-      .filter((company) => company.models.length > 0) // Only show companies with models
-      .sort((a, b) => a.name.localeCompare(b.name)); // Sort companies by name
+      .filter((company: CompanyWithModels) => company.models.length > 0) // Only show companies with models
+      .sort((a: CompanyWithModels, b: CompanyWithModels) =>
+        a.name.localeCompare(b.name)
+      ); // Sort companies by name
   }, [companiesQuery.data, modelsByCompany]);
 
   const handleModelSelect = (model: ExtendedAiModel) => {
