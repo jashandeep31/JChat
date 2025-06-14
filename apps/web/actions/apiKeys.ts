@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, redis } from "@/lib/db";
 import { redirect } from "next/navigation";
 
 export const getApiKeys = async () => {
@@ -37,17 +37,21 @@ export const createApiKey = async ({
       name,
     },
   });
+  const apiKeyKey = `api:${companyId}:${session.user.id}`;
+  await redis.del(apiKeyKey);
   return apiKey;
 };
 
 export const deleteApiKey = async (id: string) => {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  await db.apiKey.delete({
+  const apiKey = await db.apiKey.delete({
     where: {
       id,
       userId: session.user.id,
     },
   });
+  const apiKeyKey = `api:${apiKey.companyId}:${apiKey.userId}`;
+  await redis.del(apiKeyKey);
   return;
 };

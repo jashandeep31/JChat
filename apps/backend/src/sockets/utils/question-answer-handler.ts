@@ -3,8 +3,9 @@ import { Server } from "socket.io";
 import { db, redis } from "../../lib/db.js";
 import { askQuestion } from "../../models/index.js";
 import { getUser } from "../../services/user-cache.js";
-
+import { getApi } from "../../services/api-cache.js";
 const aiModels = await db.aiModel.findMany();
+
 export const questionAnswerHandler = async ({
   chatQuestion,
   modelSlug,
@@ -36,7 +37,8 @@ export const questionAnswerHandler = async ({
       });
       return;
     }
-    if (model.credits > user.credits) {
+    const apiKey = (await getApi(model.companyId, user.id))?.key || null;
+    if (model.credits > user.credits && !apiKey) {
       io.to(`room:${cid}`).emit("error", "Not enough credits");
       io.to(`room:${cid}`).emit("question_answered", {
         cid,
@@ -66,7 +68,6 @@ export const questionAnswerHandler = async ({
     if (chatQuestion.webSearch) {
       credits += 3;
     }
-
     const res = await askQuestion(chatQuestion, model.id, io, cid);
     if (res === 404) {
       io.to(`room:${cid}`).emit("error", "Model not found");
@@ -82,7 +83,7 @@ export const questionAnswerHandler = async ({
         chatQuestionId: chatQuestion.id,
         answer: res.text,
         base64Image: res.images,
-        credits,
+        credits: apiKey ? credits - model.credits : credits,
       },
     });
 

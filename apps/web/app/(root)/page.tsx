@@ -11,7 +11,7 @@ const page = () => {
         </div>
       </div>
       <div className="flex justify-center  ">
-        <div className="lg:w-1/2 flex-1 w-full">
+        <div className="lg:max-w-[800px] flex-1 w-full ">
           <ChatInputBox />
         </div>
       </div>

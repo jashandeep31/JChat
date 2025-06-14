@@ -2,14 +2,14 @@ import { generateText, smoothStream, streamText } from "ai";
 import { groq } from "@ai-sdk/groq";
 import { AiModel, ChatQuestion } from "@repo/db";
 import { webSearch } from "../../../services/web-search.js";
+import { ProviderFunctionParams } from "../../index.js";
 
-export const askGroqQuestion = async (
-  question: ChatQuestion,
-  model: AiModel,
-  messages: { role: "user" | "system" | "assistant"; content: string }[],
-  onChunk: (chunk: string) => void
-): Promise<{ text: string }> => {
-  // Add the user question to messages
+export const askGroqQuestion = async ({
+  question,
+  model,
+  messages,
+  onChunk,
+}: ProviderFunctionParams): Promise<{ text: string }> => {
   messages.push({
     role: "user",
     content: question.question,
@@ -29,7 +29,7 @@ export const askGroqQuestion = async (
 
   try {
     const res = streamText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      model: groq(model.slug),
       providerOptions: {},
       messages: messages as any,
       experimental_transform: smoothStream({

@@ -1,20 +1,26 @@
 import { smoothStream, streamText } from "ai";
-import { google } from "@ai-sdk/google";
-import { AiModel, Attachment, ChatQuestion } from "@repo/db";
+import { Attachment } from "@repo/db";
 import { getAttachment } from "../../../services/attachment-cache.js";
 import { getBase64OfImage } from "../../utils/converters.js";
+import { ProviderFunctionParams } from "../../index.js";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { env } from "../../../lib/env.js";
 
 type ContentItem =
   | { type: "text"; text: string }
   | { type: "image"; image: string; mimeType: string };
 
-export const askGeminiQuestion = async (
-  question: ChatQuestion,
-  model: AiModel,
-  messages: { role: "user" | "system" | "assistant"; content: string }[],
-  onChunk: (chunk: string) => void,
-  onImageChunk: (chunk: string) => void
-): Promise<{ text: string; images: string }> => {
+export const askGeminiQuestion = async ({
+  question,
+  model,
+  apiKey,
+  messages,
+  onChunk,
+  onImageChunk,
+}: ProviderFunctionParams): Promise<{ text: string; images: string }> => {
+  const google = createGoogleGenerativeAI({
+    apiKey: apiKey || env.GOOGLE_GENERATIVE_AI_API_KEY,
+  });
   if (model.type === "IMAGE_GENERATION") {
     messages = [];
   }
@@ -34,10 +40,7 @@ export const askGeminiQuestion = async (
           mimeType: "image/jpeg",
         });
       }
-    } catch (error) {
-      console.error("Failed to process attachment:", error);
-      // Continue with text-only query if attachment processing fails
-    }
+    } catch {}
   }
 
   if (userContent.length) {
@@ -65,7 +68,7 @@ export const askGeminiQuestion = async (
 
   try {
     const { fullStream } = streamText({
-      model: google(model.slug, modelOptions),
+      model: google(model.slug, { ...modelOptions }),
       providerOptions,
       messages: messages as any,
       experimental_transform: smoothStream({

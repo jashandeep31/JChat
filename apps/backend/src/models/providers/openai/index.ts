@@ -4,6 +4,7 @@ import type { ChatCompletionTool } from "openai/resources/chat";
 import { env } from "../../../lib/env.js";
 import { getAttachment } from "../../../services/attachment-cache.js";
 import { webSearch } from "../../../services/web-search.js";
+import { ProviderFunctionParams } from "../../index.js";
 
 const openaiClient = new OpenAI({ apiKey: env.OPENAI_API_KEY });
 
@@ -21,15 +22,12 @@ type OpenAIImageContent = {
 
 type OpenAIContentItem = OpenAITextContent | OpenAIImageContent;
 
-export const askOpenAIQuestion = async (
-  question: ChatQuestion,
-  model: AiModel,
-  messages: {
-    role: "user" | "system" | "assistant" | "tool";
-    content: string;
-  }[],
-  onChunk: (chunk: string) => void
-): Promise<{ text: string; images: string }> => {
+export const askOpenAIQuestion = async ({
+  question,
+  model,
+  messages,
+  onChunk,
+}: ProviderFunctionParams): Promise<{ text: string; images: string }> => {
   try {
     let text = "";
     let attachment: Attachment | null = null;
