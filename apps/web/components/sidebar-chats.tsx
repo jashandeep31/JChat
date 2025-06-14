@@ -32,6 +32,7 @@ import DeleteDialog from "./delete-dialog";
 import RenameDialog from "./rename-dialog";
 import MoveToProjectDialog from "./move-to-project-dialog";
 import ShareDialog from "./share-dialog";
+import { Chat } from "@repo/db";
 
 const SidebarChats = () => {
   const params = useParams();
@@ -176,7 +177,7 @@ const SidebarChats = () => {
       <SidebarGroup>
         <SidebarGroupLabel>Chats</SidebarGroupLabel>
         <SidebarMenu>
-          {chatsQuery.data?.map((chat) => (
+          {chatsQuery.data?.map((chat: Chat) => (
             <SidebarMenuItem
               key={chat.id}
               className={`hover:bg-accent rounded-md ${

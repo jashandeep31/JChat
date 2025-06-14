@@ -43,20 +43,21 @@ export default Layout;
 
 const SideBarControls = () => {
   const router = useRouter();
-  const { open, setOpen } = useSidebar();
+  const { open, toggleSidebar } = useSidebar();
+
   const { setOpen: setSearchOpen } = useContext(SearchDialogContext);
   return (
     <div
       className={`fixed top-4 left-4 z-20 transition-all  ease-in-out ${
         open
-          ? "opacity-0 pointer-events-none duration-75"
-          : "opacity-100 duration-600"
+          ? "md:opacity-0 md:pointer-events-none duration-75"
+          : "md:opacity-100 md:duration-600"
       }`}
     >
       <div className="flex gap-2 items-center bg-sidebar border p-1.5 rounded-lg">
         <button
           className="p-2 rounded hover:bg-sidebar-accent transition-colors duration-200"
-          onClick={() => setOpen(!open)}
+          onClick={() => toggleSidebar()}
           aria-label="Open sidebar"
         >
           <PanelLeft className="w-4 h-4" />

@@ -109,7 +109,7 @@ const ChatInputBox = ({
           {userQuery.data?.credits <= 15 && (
             <Tooltip>
               <TooltipTrigger>
-                <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full">
+                <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full hidden md:block">
                   Low Credits
                 </Badge>
               </TooltipTrigger>
@@ -130,7 +130,8 @@ const ChatInputBox = ({
                 onClick={() => setIsWebSearchEnabled(!isWebSearchEnabled)}
                 type="button"
               >
-                <Globe className="w-4 h-4" /> Web Search
+                <Globe className="w-4 h-4" />{" "}
+                <span className="hidden md:block">Web Search</span>
               </button>
             </TooltipTrigger>
             <TooltipContent>
@@ -165,7 +166,8 @@ const ChatInputBox = ({
                       type="button"
                       disabled={!session.data?.user?.proUser}
                     >
-                      <Paperclip className="w-4 h-4" /> Attachment
+                      <Paperclip className="w-4 h-4" />{" "}
+                      <span className="hidden md:block">Attachment</span>
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>

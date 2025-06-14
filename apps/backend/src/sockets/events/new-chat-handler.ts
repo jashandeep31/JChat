@@ -8,7 +8,7 @@ import { getAttachment } from "../../services/attachment-cache.js";
 import { getUser } from "../../services/user-cache.js";
 
 const newChatSchema = z.object({
-  question: z.string(),
+  question: z.string().min(10),
   modelSlug: z.string(),
   isWebSearchEnabled: z.boolean(),
   attachmentId: z.string().optional(),

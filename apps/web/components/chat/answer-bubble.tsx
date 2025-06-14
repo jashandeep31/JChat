@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import MarkdownRenderer from "../markdown-renderer";
 import { FullChatQuestion } from "@/hooks/use-chat-socket";
 import { Button } from "@repo/ui/components/button";
@@ -34,6 +34,16 @@ const AnswerBubble = ({
   const socket = useContext(SocketContext);
   const answers = question.ChatQuestionAnswer;
   const [activeAnswer, setActiveAnswer] = useState(answers[answers.length - 1]);
+
+  // Reset activeAnswer when question changes
+  useEffect(() => {
+    if (
+      answers.length > 0 &&
+      (!activeAnswer || answers.indexOf(activeAnswer) === -1)
+    ) {
+      setActiveAnswer(answers[answers.length - 1]);
+    }
+  }, [question, answers, activeAnswer]);
 
   const [isCopied, setIsCopied] = useState(false);
 
@@ -185,7 +195,10 @@ const AnswerNavigation = ({
         </button>
       </CustomTooltip>
       <p className="text-xs">
-        {answers.indexOf(activeAnswer) + 1} of {answers.length}
+        {answers.indexOf(activeAnswer) !== -1
+          ? answers.indexOf(activeAnswer) + 1
+          : 1}{" "}
+        of {answers.length}
       </p>
       <CustomTooltip content="Next Answer">
         <button

@@ -125,7 +125,7 @@ const DummyQuestions = () => {
           onValueChange={handleTabChange}
           className="mb-12 sm:mb-16"
         >
-          <TabsList className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 h-auto bg-transparent">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 h-auto w-full   bg-transparent">
             {categories.map((category) => (
               <TabsTrigger
                 key={category.id}

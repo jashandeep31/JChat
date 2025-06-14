@@ -4,6 +4,7 @@ import useModelsQuery from "@/lib/react-query/use-models-query";
 import { Socket } from "socket.io-client";
 import { useParams } from "next/navigation";
 import { AiModel } from "@repo/db";
+import { toast } from "sonner";
 export type AttachmentInfo = {
   uploadId: string;
   fileType: "IMAGE" | "PDF";
@@ -62,7 +63,14 @@ export const ChatInputBoxProvider = ({
     params: ReturnType<typeof useParams>;
   }) => {
     if (!socket) return;
-
+    if (question.length < 10) {
+      toast.error("Question must be at least 10 characters long");
+      return;
+    }
+    if (!selectedModel) {
+      toast.error("Please select a model");
+      return;
+    }
     // Set streaming to true when starting the request
 
     setIsStreaming?.(true);

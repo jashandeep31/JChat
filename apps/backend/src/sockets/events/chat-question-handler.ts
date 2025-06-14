@@ -5,7 +5,7 @@ import { questionAnswerHandler } from "../utils/question-answer-handler.js";
 import { getAttachment } from "../../services/attachment-cache.js";
 import { getUser } from "../../services/user-cache.js";
 const chatQuestionSchema = z.object({
-  question: z.string(),
+  question: z.string().min(10),
   cid: z.string(),
   modelSlug: z.string(),
   isWebSearchEnabled: z.boolean(),
@@ -20,7 +20,6 @@ export const chatQuestionHandler = async ({
   try {
     const user = await getUser(socket.userId);
     const parsedData = JSON.parse(data);
-    console.log(parsedData);
     const result = chatQuestionSchema.safeParse(parsedData);
     if (!result.success) {
       socket.emit("error", result.error.message);
