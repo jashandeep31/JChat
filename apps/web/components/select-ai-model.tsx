@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/dropdown-menu";
 import { Brain, ChevronDown, Eye, FileText, Globe } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 interface SelectAIModelProps {
@@ -21,6 +22,7 @@ export const SelectAIModel = ({
   models,
 }: SelectAIModelProps) => {
   const [open, setOpen] = useState(false);
+  const session = useSession();
   useEffect(() => {
     const selectedModelSlug = localStorage.getItem("selectedModel");
     if (!selectedModelSlug) return;
@@ -58,9 +60,10 @@ export const SelectAIModel = ({
                 setSelectedModel(model);
                 setOpen(false);
               }}
+              disabled={!session.data?.user?.proUser && model.requiresPro}
               className={`flex items-center p-2 gap-2 min-h-[50px] min-w-[400px] justify-between hover:bg-accent ${
                 selectedModel?.slug === model.slug ? "bg-accent" : ""
-              }`}
+              } ${!session.data?.user?.proUser && model.requiresPro ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <div className="flex items-center gap-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -72,7 +75,7 @@ export const SelectAIModel = ({
                   className="w-3 h-3"
                 />
                 <span>
-                  {model.name}{" "}
+                  {model.name} {model.requiresPro && "(Pro)"}
                   <span className="text-xs text-muted-foreground">
                     {model.credits} Credits
                   </span>

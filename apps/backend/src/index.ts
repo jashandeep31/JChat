@@ -4,10 +4,11 @@ import { Server } from "socket.io";
 import { createServer } from "node:http";
 import { socketHandler } from "./sockets/index.js";
 import { initializeQueues } from "./queues/index.js";
+import { redis } from "./lib/db.js";
 
 const PORT = env.PORT;
 const server = createServer(app);
-
+redis.flushall();
 // Initialize Socket.IO
 export const io = new Server(server, {
   cors: {

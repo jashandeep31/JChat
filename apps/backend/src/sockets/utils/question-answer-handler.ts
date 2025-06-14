@@ -32,15 +32,15 @@ export const questionAnswerHandler = async ({
       io.to(`room:${cid}`).emit("error", "Model not found ");
       io.to(`room:${cid}`).emit("question_answered", {
         cid,
-        answer: {
-          id: "",
-          credits: 0,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          chatQuestionId: chatQuestion.id,
-          answer: "Model not found",
-          aiModelId: "",
-        },
+        answer: sendDummyAnswer("Model not found", chatQuestion.id),
+      });
+      return;
+    }
+    if (model.credits > user.credits) {
+      io.to(`room:${cid}`).emit("error", "Not enough credits");
+      io.to(`room:${cid}`).emit("question_answered", {
+        cid,
+        answer: sendDummyAnswer("Not enough credits", chatQuestion.id),
       });
       return;
     }
@@ -51,7 +51,10 @@ export const questionAnswerHandler = async ({
       );
       io.to(`room:${cid}`).emit("question_answered", {
         cid,
-        answer: "Subscription is required to use the model",
+        answer: sendDummyAnswer(
+          "Subscription is required to use the model",
+          chatQuestion.id
+        ),
       });
       return;
     }
@@ -69,15 +72,7 @@ export const questionAnswerHandler = async ({
       io.to(`room:${cid}`).emit("error", "Model not found");
       io.to(`room:${cid}`).emit("question_answered", {
         cid,
-        answer: {
-          id: "",
-          credits,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          chatQuestionId: chatQuestion.id,
-          answer: "Model not found",
-          aiModelId: model.id,
-        },
+        answer: sendDummyAnswer("Model not found", chatQuestion.id),
       });
       return;
     }
@@ -99,4 +94,16 @@ export const questionAnswerHandler = async ({
     console.log(error);
     io.to(`room:${cid}`).emit("error", "Something went wrong");
   }
+};
+
+const sendDummyAnswer = (answer: string, chatQuestionId: string) => {
+  return {
+    id: "",
+    credits: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    chatQuestionId,
+    answer,
+    aiModelId: "",
+  };
 };

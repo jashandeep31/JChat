@@ -15,6 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
+import { useSession } from "next-auth/react";
 
 const ChatInputBox = ({
   isStreaming = false,
@@ -23,6 +24,7 @@ const ChatInputBox = ({
   isStreaming?: boolean;
   setIsStreaming?: (value: boolean) => void;
 }) => {
+  const session = useSession();
   const params = useParams();
   const socket = useContext(SocketContext);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -109,6 +111,7 @@ const ChatInputBox = ({
                 className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
                   isWebSearchEnabled ? " text-primary border-primary " : ""
                 }`}
+                disabled={!session.data?.user?.proUser}
                 onClick={() => setIsWebSearchEnabled(!isWebSearchEnabled)}
                 type="button"
               >
@@ -116,7 +119,11 @@ const ChatInputBox = ({
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Enable web search to get information from the web</p>
+              {session.data?.user?.proUser ? (
+                <p>Enable web search to get information from the web</p>
+              ) : (
+                <p>Upgrade to Pro to enable web search</p>
+              )}
             </TooltipContent>
           </Tooltip>
 
@@ -141,14 +148,20 @@ const ChatInputBox = ({
                       className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2`}
                       onClick={() => setIsAttachmentDialogOpen(true)}
                       type="button"
+                      disabled={!session.data?.user?.proUser}
                     >
                       <Paperclip className="w-4 h-4" /> Attachment
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      Upload files through the chat or other relevant sections.
-                    </p>
+                    {session.data?.user?.proUser ? (
+                      <p>
+                        Upload files through the chat or other relevant
+                        sections.
+                      </p>
+                    ) : (
+                      <p>Upgrade to Pro to enable attachments</p>
+                    )}
                   </TooltipContent>
                 </Tooltip>
               )}

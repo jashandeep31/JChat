@@ -9,7 +9,7 @@ interface UserProfileProps {
 
 export const UserProfile = ({ name, email, plan }: UserProfileProps) => (
   <div className="flex flex-col items-center text-center">
-    <Avatar className="w-28 h-28 mb-4 border-4 border-background shadow-md">
+    <Avatar className="w-28 h-28 mb-4 border-4 border-background shadow-md bg-primary">
       <div className="w-full h-full rounded-full bg-brand-purple flex items-center justify-center">
         <span className="text-5xl font-bold text-background">
           {name.charAt(0).toUpperCase()}

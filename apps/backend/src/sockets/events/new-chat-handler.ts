@@ -46,7 +46,9 @@ export const newChatHandler = async ({
     data: {
       chatId: chat.id,
       question: result.data.question,
-      ...(attachmentData ? { attachmentId: attachmentData.id } : {}),
+      ...(attachmentData && user?.proUser
+        ? { attachmentId: attachmentData.id }
+        : {}),
       webSearch: result.data.isWebSearchEnabled && user?.proUser,
     },
   });

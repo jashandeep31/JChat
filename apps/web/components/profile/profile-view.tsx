@@ -18,12 +18,15 @@ import { AttachmentsTab } from "./attachments-tab";
 import { ApiKeysTab } from "./api-keys-tab";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@repo/ui/components/button";
+import useUserQuery from "@/lib/react-query/use-user-query";
 // Mock data
 
 const navItems = ["Account", "API Keys", "Attachments"];
 
 export const ProfileView = () => {
   const session = useSession();
+  const { userQuery } = useUserQuery();
+  console.log(userQuery.data);
 
   if (session.status === "loading") {
     return null;
@@ -64,11 +67,14 @@ export const ProfileView = () => {
         <main className="grid lg:grid-cols-12 gap-8">
           <aside className="lg:col-span-3 space-y-6">
             <UserProfile
-              name={session.data?.user?.name || "unknown"}
-              email={session.data?.user?.email || "unknown"}
-              plan={session.data?.user.proUser ? "Pro" : "Free"}
+              name={userQuery.data?.name || "unknown"}
+              email={userQuery.data?.email || "unknown"}
+              plan={userQuery.data?.proUser ? "Pro" : "Free"}
             />
-            <UsageCard used={5} total={20} />
+            <UsageCard
+              used={userQuery.data?.credits || 0}
+              total={userQuery.data?.totalCredits}
+            />
             <KeyboardShortcutsCard />
           </aside>
 
