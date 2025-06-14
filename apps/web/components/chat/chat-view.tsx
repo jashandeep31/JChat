@@ -160,7 +160,7 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
           {showScrollDownButton && (
             <button
               onClick={handleScrollDown}
-              className="flex text-sm font-medium gap-2 items-center border rounded-full px-2 py-1 hover:bg-accent transition-colors duration-200 bg-background"
+              className="flex text-sm font-medium gap-2 items-center border border-accent rounded-full px-2 py-1 hover:bg-accent transition-colors duration-200 bg-background"
             >
               <span>Scroll to bottom</span>
               <ChevronDown className="w-4 h-4" />

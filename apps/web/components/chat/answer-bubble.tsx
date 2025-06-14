@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Copy,
+  Download,
   RotateCcw,
   Split,
 } from "lucide-react";
@@ -55,13 +56,28 @@ const AnswerBubble = ({
     <div>
       <MarkdownRenderer content={activeAnswer.answer} />
       {activeAnswer.base64Image && (
-        <div className="mt-6 max-w-[500px]">
+        <div className="mt-6 max-w-[500px] relative">
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="rounded-md"
             src={"data:image/png;base64," + activeAnswer.base64Image}
             alt=""
           />
+          <Button
+            variant="outline"
+            size="sm"
+            className="absolute z-10 bottom-2 right-2 "
+            onClick={() => {
+              const link = document.createElement("a");
+              link.href = "data:image/png;base64," + activeAnswer.base64Image;
+              link.download = `jchat-image-${new Date().getTime()}.png`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+          >
+            <Download className="w-4 h-4" />
+          </Button>
         </div>
       )}
 

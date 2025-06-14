@@ -14,12 +14,18 @@ const useChatQuery = () => {
 
   const chatsQuery = useQuery({
     queryKey: ["chats"],
-    queryFn: async () => {
-      return await getChats();
+    initialData: () => {
+      const chats = localStorage.getItem("chats");
+      if (chats) return JSON.parse(chats);
+      return [];
     },
-    staleTime: 5 * 60 * 1000, //5min
+    queryFn: async () => {
+      const chats = await getChats();
+      localStorage.setItem("chats", JSON.stringify(chats));
+      return chats;
+    },
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
   });
 
   const updateChatName = (chat: Chat) => {
