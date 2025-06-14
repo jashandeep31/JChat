@@ -39,7 +39,6 @@ export const askGroqQuestion = async (
     });
 
     for await (const part of res.fullStream) {
-      console.log(part);
       if (part.type === "text-delta") {
         text += part.textDelta;
         onChunk(part.textDelta);
