@@ -1,8 +1,9 @@
 import * as z from "zod";
 import { db } from "../../lib/db.js";
-import { SocketFunctionParams } from "src/models/types.js";
+import { SocketFunctionParams } from "../../models/types.js";
 import { questionAnswerHandler } from "../utils/question-answer-handler.js";
 import { getAttachment } from "../../services/attachment-cache.js";
+import { getUser } from "../../services/user-cache.js";
 const chatQuestionSchema = z.object({
   question: z.string(),
   cid: z.string(),
@@ -17,6 +18,7 @@ export const chatQuestionHandler = async ({
   data,
 }: SocketFunctionParams) => {
   try {
+    const user = await getUser(socket.userId);
     const parsedData = JSON.parse(data);
     console.log(parsedData);
     const result = chatQuestionSchema.safeParse(parsedData);
@@ -35,7 +37,7 @@ export const chatQuestionHandler = async ({
         chatId: cid,
         question,
         ...(attachmentData ? { attachmentId: attachmentData.id } : {}),
-        webSearch: isWebSearchEnabled,
+        webSearch: isWebSearchEnabled && user?.proUser,
       },
     });
     io.to(`room:${cid}`).emit("question_created", {

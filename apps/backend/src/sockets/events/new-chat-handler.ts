@@ -5,6 +5,7 @@ import { renameChatQueue } from "../../queues/rename-chat-queue.js";
 import { redis } from "../../lib/db.js";
 import { questionAnswerHandler } from "../utils/question-answer-handler.js";
 import { getAttachment } from "../../services/attachment-cache.js";
+import { getUser } from "../../services/user-cache.js";
 
 const newChatSchema = z.object({
   question: z.string(),
@@ -21,6 +22,7 @@ export const newChatHandler = async ({
 }: SocketFunctionParams) => {
   const parsedData = JSON.parse(data);
   const result = newChatSchema.safeParse(parsedData);
+  const user = await getUser(socket.userId);
 
   if (!result.success) {
     socket.emit("error", result.error.message);
@@ -45,6 +47,7 @@ export const newChatHandler = async ({
       chatId: chat.id,
       question: result.data.question,
       ...(attachmentData ? { attachmentId: attachmentData.id } : {}),
+      webSearch: result.data.isWebSearchEnabled && user?.proUser,
     },
   });
 
