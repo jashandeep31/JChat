@@ -10,7 +10,6 @@ const useModelsQuery = () => {
       localStorage.setItem("models", JSON.stringify(models));
       return models;
     },
-    staleTime: 5 * 60 * 1000, //5min
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });

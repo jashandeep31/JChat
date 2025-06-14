@@ -1,68 +1,79 @@
-import { streamText } from "ai";
-import { openai } from "@ai-sdk/openai";
 import { AiModel, Attachment, ChatQuestion } from "@repo/db";
+import OpenAI from "openai";
+import { env } from "../../../lib/env.js";
 import { getAttachment } from "../../../services/attachment-cache.js";
+
+const openaiClient = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+
+type OpenAITextContent = {
+  type: "text";
+  text: string;
+};
+
+type OpenAIImageContent = {
+  type: "image_url";
+  image_url: {
+    url: string;
+  };
+};
+
+type OpenAIContentItem = OpenAITextContent | OpenAIImageContent;
 
 export const askOpenAIQuestion = async (
   question: ChatQuestion,
   model: AiModel,
-  onChunk: (chunk: string) => void,
-  onImageChunk: (chunk: string) => void
+  messages: {
+    role: "user" | "system" | "assistant" | "tool";
+    content: string;
+  }[],
+  onChunk: (chunk: string) => void
 ): Promise<{ text: string; images: string }> => {
-  const embedAttachment = async () => {
-    if (!question.attachmentId) return;
+  try {
+    let text = "";
+    let attachment: Attachment | null = null;
 
-    const attachment: Attachment = await getAttachment(question.attachmentId);
-    if (!attachment) return;
-    return {
-      type: "image",
-      image: new URL(attachment.publicUrl),
-      mimeType: "image/jpeg",
-    };
-  };
-  const attachment = await embedAttachment();
-  const content = [];
-  content.push({
-    type: "text",
-    text: question.question,
-  });
-  if (attachment) {
-    content.push(attachment);
-  }
-
-  const { fullStream } = streamText({
-    model: openai(model.slug),
-    providerOptions: {
-      google: {
-        responseModalities: [
-          "TEXT",
-          model.type == "IMAGE_GENERATION" ? "IMAGE" : null,
-        ].filter(Boolean),
-      },
-    },
-    messages: [
-      {
-        role: "user",
-        content: [...content] as any,
-      },
-    ],
-  });
-  let text = "";
-  let images = "";
-
-  for await (const part of fullStream) {
-    switch (part.type) {
-      case "text-delta":
-        console.log(part.textDelta);
-        text += part.textDelta;
-        onChunk(part.textDelta);
-        break;
-      case "file":
-        images += part.base64;
-        onImageChunk(part.base64);
-        break;
+    if (question.attachmentId) {
+      attachment = await getAttachment(question.attachmentId);
     }
-  }
 
-  return { text, images };
+    const messageContent: OpenAIContentItem[] = [
+      {
+        type: "text",
+        text: question.question,
+      },
+    ];
+
+    if (attachment && attachment.type === "IMAGE") {
+      messageContent.push({
+        type: "image_url",
+        image_url: {
+          url: attachment.publicUrl,
+        },
+      });
+    }
+
+    const stream = await openaiClient.chat.completions.create({
+      model: model.slug,
+      messages: [
+        ...(messages as any),
+        {
+          role: "user",
+          content: messageContent,
+        },
+      ],
+      stream: true,
+    });
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      if (content) {
+        text += content;
+        onChunk(content);
+      }
+    }
+
+    return { text, images: "" };
+  } catch (error) {
+    console.error("OpenAI error:", error);
+    return { text: "Error in OpenAI stream", images: "" };
+  }
 };

@@ -5,6 +5,8 @@ import { Server } from "socket.io";
 import { AiModel, ChatQuestion } from "@repo/db";
 import { db } from "../lib/db.js";
 import { askOpenAIQuestion } from "./providers/openai/index.js";
+import { getChatQACache } from "../services/chat-qa-cache.js";
+import { getChat } from "../services/chat-cache.js";
 
 const aiModels = await db.aiModel.findMany({
   include: {
@@ -23,6 +25,7 @@ export const askQuestion = async (
   io: Server,
   cid: string
 ): Promise<404 | { text: string; images: string }> => {
+  const chat = await getChat(chatQuestion.chatId, null, true);
   const model = aiModels.find((model) => model.id === modelId);
   if (!model || !model.company) {
     throw new Error(`Model not found: ${modelId}`);
@@ -30,6 +33,7 @@ export const askQuestion = async (
   const provider: (
     question: ChatQuestion,
     model: AiModel,
+    messages: { role: "user" | "system" | "assistant"; content: string }[],
     onChunk: (chunk: string) => void,
     onImageChunk: (chunk: string) => void
   ) => Promise<{ text: string; images: string }> =
@@ -47,75 +51,59 @@ export const askQuestion = async (
     })
   );
 
-  if (1 !== 1) {
-    const fakeResponse = getTempText();
-    const fakeChunks = fakeResponse.match(/.{1,100}/g) || [];
-    let answer = "";
-    for (const chunk of fakeChunks) {
+  const messages = await buildSystemContext(cid);
+  if (chat?.instruction) {
+    messages.push({
+      role: "system",
+      content: chat.instruction,
+    });
+  }
+  const { text, images } = await provider(
+    chatQuestion,
+    model,
+    messages,
+    async (chunk) => {
       io.to(`room:${cid}`).emit(
         "question_response_chunk",
         JSON.stringify({ data: chunk, cid, questionId: chatQuestion.id })
       );
-      answer += chunk;
       await redis.set(
         redisKey,
         JSON.stringify({
-          data: answer,
+          data: chunk,
           questionId: chatQuestion.id,
         })
       );
-      await new Promise((res) => setTimeout(res, 300));
+    },
+    async (base64) => {
+      io.to(`room:${cid}`).emit(
+        "question_response_image_chunk",
+        JSON.stringify({ data: base64, cid, questionId: chatQuestion.id })
+      );
     }
-    await redis.del(redisKey);
-    return { text: answer, images: "" };
-  } else {
-    const { text, images } = await provider(
-      chatQuestion,
-      model,
-      async (chunk) => {
-        io.to(`room:${cid}`).emit(
-          "question_response_chunk",
-          JSON.stringify({ data: chunk, cid, questionId: chatQuestion.id })
-        );
-        await redis.set(
-          redisKey,
-          JSON.stringify({
-            data: chunk,
-            questionId: chatQuestion.id,
-          })
-        );
-      },
-      async (base64) => {
-        io.to(`room:${cid}`).emit(
-          "question_response_image_chunk",
-          JSON.stringify({ data: base64, cid, questionId: chatQuestion.id })
-        );
-      }
-    );
+  );
 
-    await redis.del(redisKey);
-    return { text, images };
+  await redis.del(redisKey);
+  return { text, images };
+};
+async function buildSystemContext(cid: string) {
+  const messages: { role: "system"; content: string }[] = [];
+  const chatQA = await getChatQACache(cid);
+
+  if (chatQA && chatQA.length) {
+    for (const { question, ChatQuestionAnswer } of chatQA) {
+      const lastAnswer = ChatQuestionAnswer.at(-1)?.answer ?? "";
+      messages.push({
+        role: "system",
+        content: `User asked: "${question}"\nAI responded: "${lastAnswer}"`,
+      });
+    }
+    messages.push({
+      role: "system",
+      content:
+        "Use the above conversation context to answer the next question.",
+    });
   }
-};
 
-const getTempText = () => {
-  return `Here’s a demonstration of a hypothetical React component named SampleComponent. It imports React from the 'react' package and uses the useState hook to manage an internal count state, with an initial value of zero. A button triggers an increment function when clicked, updating the state and re-rendering the component with the new count displayed. We also show how props can be passed in for additional flexibility. Below is a simple React component example:
-  
-  import React, { useState } from 'react';
-  
-  const SampleComponent = ({ initialCount = 0 }) => {
-    const [count, setCount] = useState(initialCount);
-    const increment = () => setCount(prev => prev + 1);
-  
-    return (
-      <div style={{ padding: '1rem', border: '1px solid #ccc' }}>
-        <h1>Count: {count}</h1>
-        <button onClick={increment}>Increment</button>
-      </div>
-    );
-  };
-  
-  export default SampleComponent;
-  
-  This code snippet demonstrates state management, event handling, and functional component syntax. After the component definition, we export it so it can be imported elsewhere. This concludes the code demonstration. In addition, this fake stream includes commentary interleaved with code. It simulates chunked streaming over a WebSocket connection: each chunk represents part of the narrative or code. Small delays between chunks mimic real AI streaming behavior. Accumulating the chunks reconstructs the full response before returning it. This approach lets front-end UIs render partial responses as they arrive, improving perceived performance. You can customize chunk sizes, tweak delays, or include simulated logs of network calls, errors, or warnings. By combining narrative text and code, the stream feels realistic and supports both conceptual explanations and practical implementation. Ultimately, this stub serves as a reliable placeholder until real streaming responses are available.`;
-};
+  return messages;
+}
