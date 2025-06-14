@@ -7,17 +7,24 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from "@repo/ui/components/dialog";
 import { Button } from "@repo/ui/components/button";
 import { Progress } from "@repo/ui/components/progress";
-import { UploadCloud, FileIcon, X, ImageIcon, FileText } from "lucide-react";
+import {
+  UploadCloud,
+  FileIcon,
+  X,
+  ImageIcon,
+  FileText,
+  History,
+} from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { cn } from "@repo/ui/lib/utils";
 import { BACKEND_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import { AttachmentInfo } from "@/context/chat-input-box-context";
 import { Attachment } from "@repo/db";
+import { SelectAttachmentDialog } from "./select-attachment-dialog";
 
 interface UploadDialogProps {
   isOpen: boolean;
@@ -34,6 +41,7 @@ export function UploadDialog({
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSelectDialogOpen, setIsSelectDialogOpen] = useState(false);
 
   const getPresignedUrl = async () => {
     const response = await fetch(
@@ -159,6 +167,14 @@ export function UploadDialog({
     }, 300);
   };
 
+  const handleOpenSelectDialog = () => {
+    setIsSelectDialogOpen(true);
+  };
+
+  const handleAttachmentSelected = () => {
+    handleClose();
+  };
+
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -180,6 +196,12 @@ export function UploadDialog({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[480px] bg-white rounded-xl shadow-2xl">
+        <SelectAttachmentDialog
+          isOpen={isSelectDialogOpen}
+          onOpenChange={setIsSelectDialogOpen}
+          setAttachmentInfo={setAttachmentInfo}
+          onAttachmentSelected={handleAttachmentSelected}
+        />
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold text-slate-800">
             Upload a File
@@ -245,19 +267,20 @@ export function UploadDialog({
             </div>
           )}
         </div>
-        <DialogFooter className="sm:justify-between gap-2">
-          <DialogClose asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
-              Cancel
+        <DialogFooter className="sm:justify-end gap-2">
+          <div className="flex items-center gap-2">
+            <Button variant={"outline"} onClick={handleOpenSelectDialog}>
+              <History className="h-3.5 w-3.5 mr-1" />
+              Previous Uploads
             </Button>
-          </DialogClose>
-          <Button
-            onClick={handleUpload}
-            disabled={!file || isUploading}
-            className="w-full sm:w-auto bg-primary hover:bg-primary/80"
-          >
-            {isUploading ? "Uploading..." : "Upload File"}
-          </Button>
+            <Button
+              onClick={handleUpload}
+              disabled={!file || isUploading}
+              className="w-full sm:w-auto bg-primary hover:bg-primary/80"
+            >
+              {isUploading ? "Uploading..." : "Upload File"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
