@@ -23,6 +23,11 @@ async function main() {
       slug: "anthropic",
       logo: "https://img.icons8.com/fluent/512/claude.png",
     },
+    {
+      name: "Groq",
+      slug: "groq",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1A7gaDDexpewHghrUhXhUUw-RFxR4uIIbKf209FNVERmz0ov-BiEHige7skkVLzF40cA&usqp=CAU",
+    },
   ];
 
   for (const company of companies) {
@@ -63,7 +68,7 @@ async function main() {
     },
     {
       name: "Gemini 2.5 Pro",
-      slug: "gemini-2.5-pro",
+      slug: "gemini-2.5-pro-preview-05-06",
       logo: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.transparentpng.com%2Fcats%2Fgoogle-logo-2025.html&psig=AOvVaw3o2Se7Wh1FwpMFjrrOFjdk&ust=1749661581950000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNCgpbqr540DFQAAAAAdAAAAABAL",
       tag: "Pro",
       requiresPro: true,
@@ -76,7 +81,7 @@ async function main() {
     },
     {
       name: "Chat GPT 4o Mini",
-      slug: "chat-gpt-4o-mini",
+      slug: "gpt-4o-mini",
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/ChatGPT-Logo.svg/1024px-ChatGPT-Logo.svg.png",
       tag: "Mini",
       credits: 0.25,
@@ -99,6 +104,19 @@ async function main() {
       webAnalysis: false,
       reasoning: false,
       companyId: "cmbqry1470001puke7yf8vd06",
+    },
+    {
+      name: "Groq Llama 4 Scout",
+      slug: "meta-llama/llama-4-scout-17b-16e-instruct",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1A7gaDDexpewHghrUhXhUUw-RFxR4uIIbKf209FNVERmz0ov-BiEHige7skkVLzF40cA&usqp=CAU",
+      tag: "Pro",
+      requiresPro: true,
+      credits: 4,
+      pdfAnalysis: false,
+      imageAnalysis: false,
+      webAnalysis: false,
+      reasoning: false,
+      companyId: "cmbwbtl4s0003pu0qe245678l",
     },
   ];
 

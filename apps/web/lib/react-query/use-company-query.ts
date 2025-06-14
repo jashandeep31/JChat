@@ -4,12 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 const useCompanyQuery = () => {
   const companiesQuery = useQuery({
     queryKey: ["companies"],
+    initialData: JSON.parse(localStorage.getItem("companies") || "[]"),
     queryFn: async () => {
-      return await getCompanies();
+      const companies = await getCompanies();
+      localStorage.setItem("companies", JSON.stringify(companies));
+      return companies;
     },
-    staleTime: 5 * 60 * 1000, //5min
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
   });
   return { companiesQuery };
 };

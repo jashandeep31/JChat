@@ -7,6 +7,7 @@ import { db } from "../lib/db.js";
 import { askOpenAIQuestion } from "./providers/openai/index.js";
 import { getChatQACache } from "../services/chat-qa-cache.js";
 import { getChat } from "../services/chat-cache.js";
+import { askGroqQuestion } from "./providers/groq/index.js";
 
 const aiModels = await db.aiModel.findMany({
   include: {
@@ -18,6 +19,7 @@ const providers: Record<string, any | undefined> = {
   ollama: askOllamaQuestion,
   google: askGeminiQuestion,
   openai: askOpenAIQuestion,
+  groq: askGroqQuestion,
 };
 export const askQuestion = async (
   chatQuestion: ChatQuestion,
