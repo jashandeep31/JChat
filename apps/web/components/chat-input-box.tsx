@@ -120,28 +120,30 @@ const ChatInputBox = ({
           )}
         </div>
         <div className="flex gap-2 items-center">
-          <Tooltip>
-            <TooltipTrigger>
-              <button
-                className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
-                  isWebSearchEnabled ? " text-primary border-primary " : ""
-                }`}
-                disabled={!session.data?.user?.proUser}
-                onClick={() => setIsWebSearchEnabled(!isWebSearchEnabled)}
-                type="button"
-              >
-                <Globe className="w-4 h-4" />{" "}
-                <span className="hidden md:block">Web Search</span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {session.data?.user?.proUser ? (
-                <p>Enable web search to get information from the web</p>
-              ) : (
-                <p>Upgrade to Pro to enable web search</p>
-              )}
-            </TooltipContent>
-          </Tooltip>
+          {selectedModel?.webAnalysis && (
+            <Tooltip>
+              <TooltipTrigger>
+                <button
+                  className={`flex items-center gap-2 text-xs text-muted-foreground border rounded-full py-1 px-2 ${
+                    isWebSearchEnabled ? " text-primary border-primary " : ""
+                  }`}
+                  disabled={!session.data?.user?.proUser}
+                  onClick={() => setIsWebSearchEnabled(!isWebSearchEnabled)}
+                  type="button"
+                >
+                  <Globe className="w-4 h-4" />{" "}
+                  <span className="hidden md:block">Web Search</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {session.data?.user?.proUser ? (
+                  <p>Enable web search to get information from the web</p>
+                ) : (
+                  <p>Upgrade to Pro to enable web search</p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          )}
 
           {selectedModel?.imageAnalysis && (
             <div>
