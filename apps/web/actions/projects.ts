@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, redis } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -52,6 +52,8 @@ export const addInstructionToProject = async ({
     },
   });
   revalidatePath(`/project/${id}`);
+  await redis.del(`project:${id}`);
+  await redis.set(`project:${id}`, JSON.stringify(project), "EX", 20 * 60);
   return project;
 };
 

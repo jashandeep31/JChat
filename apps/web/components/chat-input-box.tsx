@@ -230,7 +230,10 @@ const AttachmentInfoComponent = ({
           onClick={() => setAttachmentInfo(null)}
           className="flex items-center gap-2 text-xs border rounded-full py-1 px-2 border-primary text-primary"
         >
-          {attachmentInfo.filename} <X className="w-4 h-4" />
+          {attachmentInfo.filename.length > 20
+            ? attachmentInfo.filename.slice(0, 20) + "..."
+            : attachmentInfo.filename}{" "}
+          <X className="w-4 h-4" />
         </button>
       )}
     </div>

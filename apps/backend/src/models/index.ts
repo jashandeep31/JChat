@@ -8,6 +8,7 @@ import { askOpenAIQuestion } from "./providers/openai/index.js";
 import { getChatQACache } from "../services/chat-qa-cache.js";
 import { getChat } from "../services/chat-cache.js";
 import { askGroqQuestion } from "./providers/groq/index.js";
+import { getProject } from "../services/project-cache.js";
 
 const aiModels = await db.aiModel.findMany({
   include: {
@@ -54,6 +55,15 @@ export const askQuestion = async (
   );
 
   const messages = await buildSystemContext(cid);
+  if (chat?.projectId) {
+    const project = await getProject(chat.projectId);
+    if (project?.instruction) {
+      messages.push({
+        role: "system",
+        content: project.instruction,
+      });
+    }
+  }
   if (chat?.instruction) {
     messages.push({
       role: "system",

@@ -91,12 +91,7 @@ export function UploadDialog({
     onDrop,
     multiple: false,
     accept: {
-      "image/*": [".png", ".gif", ".jpeg", ".jpg"],
-      "application/pdf": [".pdf"],
-      "video/*": [".mp4", ".mov"],
-      "audio/*": [".mp3", ".wav"],
-      "application/zip": [".zip"],
-      "application/x-rar-compressed": [".rar"],
+      "image/*": [".png", ".gif", ".jpeg", ".jpg", ".webp"],
     },
   });
 
