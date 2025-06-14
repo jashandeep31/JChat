@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -7,14 +7,17 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
-import { buttonVariants } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
 import SidebarProjects from "./sidebar-projects";
 import SidebarChats from "./sidebar-chats";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { Search } from "lucide-react";
+import { SearchDialogContext } from "@/context/search-dialog-context";
 
 const RootSideBar = () => {
   const { data: session } = useSession();
+  const { setOpen } = useContext(SearchDialogContext);
   return (
     <div>
       <Sidebar>
@@ -23,10 +26,22 @@ const RootSideBar = () => {
           <h2 className="flex-1 font-semibold text-center">JChat</h2>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className="p-3">
+          <SidebarGroup className="p-3 space-y-2">
             <Link href={"/"} className={buttonVariants()}>
               New Chat
             </Link>
+            <Button
+              variant={"outline"}
+              onClick={() => setOpen(true)}
+              className="flex items-center gap-2 justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <Search /> Search
+              </span>
+              <span className="text-xs text-muted-foreground cursor-pointer">
+                Ctrl + K
+              </span>
+            </Button>
           </SidebarGroup>
           <SidebarProjects />
           <SidebarChats />

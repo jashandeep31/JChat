@@ -5,11 +5,13 @@ import { SocketProvider } from "@/context/socket-context";
 import { ChatInputBoxProvider } from "@/context/chat-input-box-context";
 import { SessionProvider } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { SearchDialogContextProvider } from "@/context/search-dialog-context";
 
 const queryClient = new QueryClient();
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
+
   useEffect(() => {
     window.addEventListener("keydown", (e) => {
       if (e.key === "O" && e.ctrlKey && e.shiftKey) {
@@ -19,7 +21,7 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => {
-      window.removeEventListener("keypress", (e) => {
+      window.removeEventListener("keydown", (e) => {
         if (e.key === "o" && e.ctrlKey && e.shiftKey) {
           console.log("Open sidebar");
         }
@@ -28,11 +30,13 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
   }, [router]);
   return (
     <SessionProvider>
-      <QueryClientProvider client={queryClient}>
-        <ChatInputBoxProvider>
-          <SocketProvider>{children}</SocketProvider>
-        </ChatInputBoxProvider>
-      </QueryClientProvider>
+      <SearchDialogContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <ChatInputBoxProvider>
+            <SocketProvider>{children}</SocketProvider>
+          </ChatInputBoxProvider>
+        </QueryClientProvider>
+      </SearchDialogContextProvider>
     </SessionProvider>
   );
 };
