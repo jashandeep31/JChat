@@ -5,7 +5,7 @@ import {
   useChatInputBox,
 } from "@/context/chat-input-box-context";
 import { Button } from "@repo/ui/components/button";
-import { ArrowUp, CircleStop, Globe, Paperclip, X } from "lucide-react";
+import { ArrowUp, Globe, Loader2, Paperclip, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useContext } from "react";
 import { SelectAIModel } from "./select-ai-model";
@@ -107,9 +107,16 @@ const ChatInputBox = ({
             models={models}
           />
           {userQuery.data?.credits <= 15 && (
-            <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full">
-              Low Credits
-            </Badge>
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full">
+                  Low Credits
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Upgrade or buy more credits</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
         <div className="flex gap-2 items-center">
@@ -185,13 +192,15 @@ const ChatInputBox = ({
           )}
           {isStreaming && (
             <Button
+              variant="outline"
+              disabled={isStreaming}
               onClick={() => {
                 socket?.emit("stop_streaming", {
                   cid: params.cid,
                 });
               }}
             >
-              <CircleStop />
+              <Loader2 className="animate-spin" />
             </Button>
           )}
         </div>
