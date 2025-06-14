@@ -16,6 +16,8 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
 import { useSession } from "next-auth/react";
+import useUserQuery from "@/lib/react-query/use-user-query";
+import { Badge } from "@repo/ui/components/badge";
 
 const ChatInputBox = ({
   isStreaming = false,
@@ -29,6 +31,7 @@ const ChatInputBox = ({
   const socket = useContext(SocketContext);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parentDivRef = useRef<HTMLDivElement>(null);
+  const { userQuery } = useUserQuery();
 
   const {
     question,
@@ -103,6 +106,11 @@ const ChatInputBox = ({
             setSelectedModel={setSelectedModel}
             models={models}
           />
+          {userQuery.data?.credits <= 15 && (
+            <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full">
+              Low Credits
+            </Badge>
+          )}
         </div>
         <div className="flex gap-2 items-center">
           <Tooltip>
@@ -168,7 +176,10 @@ const ChatInputBox = ({
             </div>
           )}
           {!isStreaming && (
-            <Button onClick={onSubmit} disabled={isStreaming}>
+            <Button
+              disabled={userQuery.data?.credits <= 0 || isStreaming}
+              onClick={onSubmit}
+            >
               <ArrowUp />
             </Button>
           )}

@@ -15,6 +15,9 @@ export const askGeminiQuestion = async (
   onChunk: (chunk: string) => void,
   onImageChunk: (chunk: string) => void
 ): Promise<{ text: string; images: string }> => {
+  if (model.type === "IMAGE_GENERATION") {
+    messages = [];
+  }
   const userContent: ContentItem[] = [
     { type: "text", text: question.question },
   ];

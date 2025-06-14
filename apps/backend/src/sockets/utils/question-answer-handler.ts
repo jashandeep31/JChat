@@ -1,6 +1,6 @@
 import { ChatQuestion, User } from "@repo/db";
 import { Server } from "socket.io";
-import { db } from "../../lib/db.js";
+import { db, redis } from "../../lib/db.js";
 import { askQuestion } from "../../models/index.js";
 import { getUser } from "../../services/user-cache.js";
 
@@ -90,6 +90,24 @@ export const questionAnswerHandler = async ({
       cid,
       answer: chatQuestionAnswer,
     });
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        credits: {
+          decrement: credits,
+        },
+      },
+    });
+    await redis.del(`user:${user.id}`);
+    await redis.set(
+      `user:${user.id}`,
+      JSON.stringify(updatedUser),
+      "EX",
+      20 * 60
+    );
   } catch (error) {
     console.log(error);
     io.to(`room:${cid}`).emit("error", "Something went wrong");

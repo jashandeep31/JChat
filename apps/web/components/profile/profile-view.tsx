@@ -72,7 +72,7 @@ export const ProfileView = () => {
               plan={userQuery.data?.proUser ? "Pro" : "Free"}
             />
             <UsageCard
-              used={userQuery.data?.credits || 0}
+              used={userQuery.data.totalCredits - userQuery.data.credits}
               total={userQuery.data?.totalCredits}
             />
             <KeyboardShortcutsCard />
