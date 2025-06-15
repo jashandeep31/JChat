@@ -129,14 +129,14 @@ export function RetryModelSelector({
   if (modelsQuery.isLoading || companiesQuery.isLoading) {
     return (
       <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (modelsQuery.error || companiesQuery.error) {
     return (
-      <div className="p-4 text-sm text-red-500">
+      <div className="p-4 text-sm text-destructive">
         Error loading models. Please try again.
       </div>
     );
@@ -144,7 +144,7 @@ export function RetryModelSelector({
 
   if (!companiesWithModels.length) {
     return (
-      <div className="p-4 text-sm text-slate-500">No models available.</div>
+      <div className="p-4 text-sm text-muted-foreground">No models available.</div>
     );
   }
 
@@ -152,10 +152,10 @@ export function RetryModelSelector({
     <TooltipProvider delayDuration={100}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-        <DropdownMenuContent className="w-64 p-2 bg-white shadow-xl rounded-lg border border-slate-200">
+        <DropdownMenuContent className="w-64 p-2 bg-background shadow-xl rounded-lg border border-border">
           {companiesWithModels.map((company: CompanyWithModels) => (
             <DropdownMenuSub key={company.id}>
-              <DropdownMenuSubTrigger className="flex items-center justify-between w-full px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-100 rounded-md cursor-pointer data-[state=open]:bg-slate-100">
+              <DropdownMenuSubTrigger className="flex items-center justify-between w-full px-3 py-2.5 text-sm text-foreground hover:bg-accent rounded-md cursor-pointer data-[state=open]:bg-accent">
                 <div className="flex items-center gap-2">
                   {company.logo ? (
                     <div className="relative h-4 w-4">
@@ -163,36 +163,36 @@ export function RetryModelSelector({
                       <img src={company.logo} alt={company.name} sizes="16px" />
                     </div>
                   ) : (
-                    <WandSparkles className="h-4 w-4 text-slate-400" />
+                    <WandSparkles className="h-4 w-4 text-muted-foreground" />
                   )}
                   <span>{company.name}</span>
                 </div>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
-                <DropdownMenuSubContent className="w-80 p-2 bg-white shadow-xl rounded-lg border border-slate-200 ml-2">
+                <DropdownMenuSubContent className="w-80 p-2 bg-background shadow-xl rounded-lg border border-border ml-2">
                   {company.models.map((model) => (
                     <DropdownMenuItem
                       key={model.id}
                       onClick={() => handleModelSelect(model)}
-                      className="flex items-center justify-between w-full px-3 py-2.5 text-sm text-slate-700 hover:bg-brand-purple rounded-md cursor-pointer group"
+                      className="flex items-center justify-between w-full px-3 py-2.5 text-sm text-foreground hover:bg-accent rounded-md cursor-pointer group"
                     >
                       <div className="flex items-center gap-2">
                         {model.icon ? (
-                          <model.icon className="h-4 w-4 text-brand-text-pink" />
+                          <model.icon className="h-4 w-4 text-primary" />
                         ) : (
-                          <WandSparkles className="h-4 w-4 text-brand-text-pink" />
+                          <WandSparkles className="h-4 w-4 text-primary" />
                         )}
-                        <span className="group-hover:text-slate-800">
+                        <span className="group-hover:text-foreground">
                           {model.name}
                         </span>
                         {model.info && (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Info className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-500 ml-1" />
+                              <Info className="h-3.5 w-3.5 text-muted-foreground group-hover:text-muted ml-1" />
                             </TooltipTrigger>
                             <TooltipContent
                               side="top"
-                              className="bg-slate-800 text-white text-xs p-2 rounded"
+                              className="bg-popover text-popover-foreground text-xs p-2 rounded"
                             >
                               <p>{model.info}</p>
                             </TooltipContent>
@@ -211,14 +211,14 @@ export function RetryModelSelector({
                                       `Action: ${action.tooltip} for ${model.name}`
                                     );
                                   }}
-                                  className="p-1 rounded-full bg-brand-icon-bg hover:bg-sky-200"
+                                  className="p-1 rounded-full bg-secondary hover:bg-secondary/80"
                                 >
-                                  <action.icon className="h-3.5 w-3.5 text-brand-icon-fg" />
+                                  <action.icon className="h-3.5 w-3.5 text-secondary-foreground" />
                                 </button>
                               </TooltipTrigger>
                               <TooltipContent
                                 side="top"
-                                className="bg-slate-800 text-white text-xs p-2 rounded"
+                                className="bg-popover text-popover-foreground text-xs p-2 rounded"
                               >
                                 <p>{action.tooltip}</p>
                               </TooltipContent>

@@ -141,22 +141,22 @@ export const SelectAIModel = ({
                 <div className="flex items-center gap-2">
                   {model.imageAnalysis && (
                     <span>
-                      <Eye className="text-orange-800 w-4 h-4" />
+                      <Eye className="text-primary w-4 h-4 opacity-80" />
                     </span>
                   )}
                   {model.pdfAnalysis && (
                     <span>
-                      <FileText className="text-green-800 w-4 h-4" />
+                      <FileText className="text-primary w-4 h-4 opacity-80" />
                     </span>
                   )}
                   {model.webAnalysis && (
                     <span>
-                      <Globe className="text-blue-800 w-4 h-4" />
+                      <Globe className="text-primary w-4 h-4 opacity-80" />
                     </span>
                   )}
                   {model.reasoning && (
                     <span>
-                      <Brain className="text-black w-4 h-4" />
+                      <Brain className="text-foreground w-4 h-4" />
                     </span>
                   )}
                 </div>
@@ -175,13 +175,13 @@ export const SelectAIModel = ({
                       <img src={company.logo} alt={company.name} sizes="16px" />
                     </div>
                   ) : (
-                    <WandSparkles className="h-4 w-4 text-slate-400" />
+                    <WandSparkles className="h-4 w-4 text-muted-foreground" />
                   )}
                   <span>{company.name}</span>
                 </div>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
-                <DropdownMenuSubContent className="w-[420px] p-2 bg-white shadow-xl rounded-lg border border-slate-200 ml-2">
+                <DropdownMenuSubContent className="w-[420px] p-2 bg-background shadow-xl rounded-lg border border-border ml-2">
                   {company.models.map((model) => (
                     <DropdownMenuItem key={model.slug} asChild>
                       <button
@@ -216,22 +216,22 @@ export const SelectAIModel = ({
                         <div className="flex items-center gap-2">
                           {model.imageAnalysis && (
                             <span>
-                              <Eye className="text-orange-800 w-4 h-4" />
+                              <Eye className="text-primary w-4 h-4 opacity-80" />
                             </span>
                           )}
                           {model.pdfAnalysis && (
                             <span>
-                              <FileText className="text-green-800 w-4 h-4" />
+                              <FileText className="text-primary w-4 h-4 opacity-80" />
                             </span>
                           )}
                           {model.webAnalysis && (
                             <span>
-                              <Globe className="text-blue-800 w-4 h-4" />
+                              <Globe className="text-primary w-4 h-4 opacity-80" />
                             </span>
                           )}
                           {model.reasoning && (
                             <span>
-                              <Brain className="text-black w-4 h-4" />
+                              <Brain className="text-foreground w-4 h-4" />
                             </span>
                           )}
                         </div>

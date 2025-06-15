@@ -1,6 +1,7 @@
+import { Attachment } from "@repo/db";
 import { db, redis } from "../lib/db.js";
 
-export const getAttachment = async (id: string) => {
+export const getAttachment = async (id: string): Promise<Attachment | null> => {
   const key = `attachment:${id}`;
   try {
     const hit = await redis.get(key);

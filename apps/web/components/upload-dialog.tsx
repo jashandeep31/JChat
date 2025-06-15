@@ -17,6 +17,7 @@ import {
   ImageIcon,
   FileText,
   History,
+  Terminal,
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { cn } from "@repo/ui/lib/utils";
@@ -25,6 +26,7 @@ import { toast } from "sonner";
 import { AttachmentInfo } from "@/context/chat-input-box-context";
 import { Attachment } from "@repo/db";
 import { SelectAttachmentDialog } from "./select-attachment-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
 
 interface UploadDialogProps {
   isOpen: boolean;
@@ -204,7 +206,14 @@ export function UploadDialog({
             Upload a File
           </DialogTitle>
         </DialogHeader>
-        <div className="py-6">
+        <Alert variant="default">
+          <Terminal />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            Images and PDFs both are supported.
+          </AlertDescription>
+        </Alert>
+        <div className="py-3">
           {!file ? (
             <div
               {...getRootProps()}
@@ -262,6 +271,7 @@ export function UploadDialog({
             </div>
           )}
         </div>
+
         <DialogFooter className="sm:justify-end gap-2">
           <div className="flex items-center gap-2">
             <Button variant={"outline"} onClick={handleOpenSelectDialog}>
