@@ -176,7 +176,7 @@ model WebSearch {
   title                String
   url                  String
   chatQuestionAnswerId String
-  answer               ChatQuestionAnswer @relation(fields: [chatQuestionAnswerId], references: [id])
+  answer               ChatQuestionAnswer @relation(fields: [chatQuestionAnswerId], references: [id], onDelete: Cascade)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 }
