@@ -39,7 +39,6 @@ export const askGeminiQuestion = async ({
     const googeAi = new GoogleGenAI({
       apiKey: apiKey || env.GOOGLE_GENERATIVE_AI_API_KEY,
     });
-    console.log(JSON.stringify(systemContents));
 
     if (model.type === "TEXT_GENERATION") {
       const response = await repsonseTextStream({
@@ -53,6 +52,10 @@ export const askGeminiQuestion = async ({
       for await (const chunk of response) {
         text += chunk.text || "";
         onChunk(chunk.text || "");
+        const groundingMetadata = chunk.candidates?.[0].groundingMetadata;
+        if (groundingMetadata) {
+          console.log(JSON.stringify(groundingMetadata));
+        }
       }
 
       return { text, images };
@@ -64,7 +67,6 @@ export const askGeminiQuestion = async ({
         systemContents: systemContents,
         question: question,
       });
-      console.log(response);
       if (response.generatedImages) {
         const firstImage = response.generatedImages[0];
         if (!firstImage.image?.imageBytes) {
@@ -130,7 +132,6 @@ const repsonseTextStream = async ({
     const fileContent = createPartFromUri(file.uri, file.mimeType);
     content.push(fileContent);
   }
-  console.log(question.webSearch);
   return googleAi.models.generateContentStream({
     model: model.slug,
     contents: [...content],
@@ -157,7 +158,6 @@ const responseImageStream = ({
     prompt: question.question,
     config: {
       numberOfImages: 1,
-      ...(question.webSearch ? { googleSearch: {} } : {}),
     },
   });
 };
