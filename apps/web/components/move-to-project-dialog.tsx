@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Button } from "@repo/ui/components/button";
+import { Project } from "@repo/db";
 
 export interface MoveToProjectDialogProps {
   open: boolean;
@@ -52,7 +53,7 @@ const MoveToProjectDialog = ({
               <SelectValue placeholder="Select a project" />
             </SelectTrigger>
             <SelectContent>
-              {projectsQuery.data?.map((project) => (
+              {projectsQuery.data?.map((project: Project) => (
                 <SelectItem key={project.id} value={project.id}>
                   {project.name}
                 </SelectItem>

@@ -1,3 +1,4 @@
+"use client";
 import { getChats } from "@/actions/chats";
 import {
   addInstructionToProject,
@@ -11,10 +12,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 const useProjectQuery = () => {
   const projectsQuery = useQuery({
     queryKey: ["projects"],
-    initialData: JSON.parse(localStorage.getItem("projects") || "[]"),
     queryFn: async () => {
       const projects = await getProjects();
-      localStorage.setItem("projects", JSON.stringify(projects));
       return projects;
     },
     refetchOnWindowFocus: false,

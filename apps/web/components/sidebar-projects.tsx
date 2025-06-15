@@ -28,6 +28,7 @@ import useProjectQuery, {
   useProjectChats,
 } from "@/lib/react-query/use-project-query";
 import { useRouter, useParams } from "next/navigation";
+import { Project } from "@repo/db";
 
 const SidebarProjects = () => {
   const router = useRouter();
@@ -88,7 +89,7 @@ const SidebarProjects = () => {
       };
 
       // Check each project one by one
-      projectsQuery.data.forEach((project) => {
+      projectsQuery.data.forEach((project: Project) => {
         checkProject(project.id);
       });
     }
@@ -119,7 +120,7 @@ const SidebarProjects = () => {
             <FolderPen /> <span> New Project</span>
           </SidebarMenuButton>
 
-          {projectsQuery.data?.map((project) => (
+          {projectsQuery.data?.map((project: Project) => (
             <div key={project.id} className="flex flex-col">
               <SidebarMenuButton
                 className="flex items-center justify-between pr-2"

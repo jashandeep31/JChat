@@ -186,9 +186,11 @@ export const ApiKeysTab = () => {
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Provider:{" "}
-                      {companiesQuery.data?.find(
-                        (model) => model.id === apiKey.companyId
-                      )?.name || "Unknown"}
+                      {(companiesQuery.data &&
+                        companiesQuery.data?.find(
+                          (model) => model.id === apiKey.companyId
+                        )?.name) ||
+                        "Unknown"}
                     </p>
                     <div className="flex items-center mt-1">
                       <p className="text-sm text-muted-foreground font-mono mr-2">

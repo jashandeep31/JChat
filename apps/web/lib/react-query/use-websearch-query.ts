@@ -1,3 +1,4 @@
+"use client";
 import { getWebSearches } from "@/actions/websearch";
 import { useQuery } from "@tanstack/react-query";
 

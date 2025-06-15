@@ -1,3 +1,4 @@
+"use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createApiKey, deleteApiKey, getApiKeys } from "@/actions/apiKeys";
 const useApiKeyQuery = () => {

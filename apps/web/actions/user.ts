@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { db, redis } from "@/lib/db";
-import { User } from "next-auth";
+import { User } from "@repo/db";
 import { redirect } from "next/navigation";
 
 export const getUser = async (): Promise<User | null> => {

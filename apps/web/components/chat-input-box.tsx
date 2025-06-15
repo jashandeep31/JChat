@@ -106,7 +106,7 @@ const ChatInputBox = ({
             setSelectedModel={setSelectedModel}
             models={models}
           />
-          {userQuery.data?.credits <= 15 && (
+          {userQuery.data?.credits && userQuery.data?.credits <= 15 && (
             <Tooltip>
               <TooltipTrigger>
                 <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full hidden md:block">
@@ -188,7 +188,11 @@ const ChatInputBox = ({
           )}
           {!isStreaming && (
             <Button
-              disabled={userQuery.data?.credits <= 0 || isStreaming}
+              disabled={
+                userQuery.data?.credits
+                  ? userQuery.data?.credits <= 0
+                  : false || isStreaming
+              }
               onClick={onSubmit}
             >
               <ArrowUp />

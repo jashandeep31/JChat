@@ -1,3 +1,4 @@
+"use client";
 import {
   addChatInstruction,
   getChat,
@@ -14,14 +15,8 @@ const useChatQuery = () => {
 
   const chatsQuery = useQuery({
     queryKey: ["chats"],
-    initialData: () => {
-      const chats = localStorage.getItem("chats");
-      if (chats) return JSON.parse(chats);
-      return [];
-    },
     queryFn: async () => {
       const chats = await getChats();
-      localStorage.setItem("chats", JSON.stringify(chats));
       return chats;
     },
     refetchOnWindowFocus: false,

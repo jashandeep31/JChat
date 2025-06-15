@@ -1,3 +1,4 @@
+"use client";
 import { AiModel, Company } from "@repo/db";
 import {
   DropdownMenu,
@@ -42,7 +43,8 @@ export const SelectAIModel = ({
   const { companiesQuery } = useCompanyQuery();
 
   useEffect(() => {
-    const selectedModelSlug = localStorage.getItem("selectedModel");
+    // const selectedModelSlug = localStorage.getItem("selectedModel");
+    const selectedModelSlug = "";
     if (!selectedModelSlug) return;
     const model = models.find((model) => model.slug === selectedModelSlug);
     if (model) {
@@ -113,7 +115,7 @@ export const SelectAIModel = ({
             <DropdownMenuItem key={model.slug} asChild>
               <button
                 onClick={() => {
-                  localStorage.setItem("selectedModel", model.slug);
+                  // localStorage.setItem("selectedModel", model.slug);
                   setSelectedModel(model);
                   setOpen(false);
                 }}
@@ -186,7 +188,7 @@ export const SelectAIModel = ({
                     <DropdownMenuItem key={model.slug} asChild>
                       <button
                         onClick={() => {
-                          localStorage.setItem("selectedModel", model.slug);
+                          // localStorage.setItem("selectedModel", model.slug);
                           setSelectedModel(model);
                           setOpen(false);
                         }}
