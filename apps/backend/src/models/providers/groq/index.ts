@@ -10,7 +10,9 @@ export const askGroqQuestion = async ({
   apiKey,
   messages,
   onChunk,
+  onWebSearchChunk,
 }: ProviderFunctionParams): Promise<ProviderResponse> => {
+  let webSearches: { title: string; url: string }[] = [];
   const groq = createGroq({
     apiKey: apiKey || env.GROQ_API_KEY,
   });
@@ -29,6 +31,13 @@ export const askGroqQuestion = async ({
         role: "assistant",
         content: `Here is the web search result: ${JSON.stringify(res)}`,
       });
+      res.map((result) => {
+        webSearches.push({
+          title: result.title,
+          url: result.link,
+        });
+      });
+      onWebSearchChunk(webSearches);
     }
   }
 
@@ -56,5 +65,5 @@ export const askGroqQuestion = async ({
     text = failureMessage;
   }
 
-  return { text, images: "", webSearches: [] };
+  return { text, images: "", webSearches };
 };

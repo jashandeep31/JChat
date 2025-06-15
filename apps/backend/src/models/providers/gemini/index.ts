@@ -59,7 +59,6 @@ export const askGeminiQuestion = async ({
         if (groundingMetadata) {
           groundingMetadata.groundingChunks?.forEach((gchunk) => {
             const web = gchunk.web;
-            console.log(web);
             if (web?.uri && web?.title && !seenUrls.has(web.uri)) {
               webSearches.push({
                 title: web.title,

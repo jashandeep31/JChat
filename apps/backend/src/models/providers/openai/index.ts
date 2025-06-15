@@ -33,6 +33,7 @@ export const askOpenAIQuestion = async ({
   model,
   messages,
   onChunk,
+  onWebSearchChunk,
 }: ProviderFunctionParams): Promise<ProviderResponse> => {
   try {
     const openaiClient = new OpenAI({ apiKey: apiKey || env.OPENAI_API_KEY });
@@ -69,7 +70,6 @@ export const askOpenAIQuestion = async ({
             purpose: "user_data",
           });
           if (file) {
-            console.log(file);
             messageContent.push({
               type: "file",
               file: {
@@ -77,11 +77,8 @@ export const askOpenAIQuestion = async ({
               },
             } as any);
           } else {
-            console.log("file not created");
           }
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
       }
     }
 
@@ -125,7 +122,6 @@ export const askOpenAIQuestion = async ({
     let searchResults = [];
     if (needsWebSearch && question.webSearch) {
       try {
-        console.log(`search is called`);
         searchResults = await webSearch(question.question);
         if (searchResults.length > 0) {
           const formattedResults = searchResults
@@ -135,6 +131,13 @@ export const askOpenAIQuestion = async ({
             )
             .join("\n\n");
 
+          searchResults.map((result) => {
+            webSearches.push({
+              title: result.title,
+              url: result.link,
+            });
+          });
+          onWebSearchChunk(webSearches);
           const toolCallId = "search_" + Date.now();
           finalMessages.push({
             role: "assistant",

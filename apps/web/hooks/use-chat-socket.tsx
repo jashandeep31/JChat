@@ -93,7 +93,7 @@ export const useChatSocket = (
         cid: string;
         questionId: string;
       } = JSON.parse(chunkData);
-      console.log(`strema chunk ${JSON.stringify(parsed.data.text)}`);
+
       setStreamingResponse(() => ({
         questionId: parsed.questionId,
         data: {
