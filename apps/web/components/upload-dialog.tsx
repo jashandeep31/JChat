@@ -192,7 +192,7 @@ export function UploadDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[480px] bg-white rounded-xl shadow-2xl">
+      <DialogContent className="sm:max-w-[480px] rounded-xl shadow-2xl">
         <SelectAttachmentDialog
           isOpen={isSelectDialogOpen}
           onOpenChange={setIsSelectDialogOpen}
@@ -200,7 +200,7 @@ export function UploadDialog({
           onAttachmentSelected={handleAttachmentSelected}
         />
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold text-slate-800">
+          <DialogTitle className="text-2xl font-semibold">
             Upload a File
           </DialogTitle>
         </DialogHeader>
@@ -209,41 +209,39 @@ export function UploadDialog({
             <div
               {...getRootProps()}
               className={cn(
-                "relative block w-full rounded-lg border-2 border-dashed border-slate-300 p-12 text-center hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200 ease-in-out",
+                "relative block w-full rounded-lg border-2 border-dashed p-12 text-center hover:border-opacity-70 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200 ease-in-out",
                 { "border-primary bg-primary/20": isDragActive },
                 { "border-green-500 bg-green-50": isDragAccept },
                 { "border-red-500 bg-red-50": isDragReject }
               )}
             >
               <input {...getInputProps()} />
-              <UploadCloud className="mx-auto h-12 w-12 text-slate-400" />
-              <p className="mt-2 block text-sm font-medium text-slate-700">
+              <UploadCloud className="mx-auto h-12 w-12 opacity-60" />
+              <p className="mt-2 block text-sm font-medium">
                 {isDragActive
                   ? "Drop the file here ..."
                   : "Drag & drop a file here, or click to select"}
               </p>
-              <p className="mt-1 block text-xs text-slate-500">
+              <p className="mt-1 block text-xs text-muted-foreground">
                 Supports images and PDFs.
               </p>
             </div>
           ) : (
-            <div className="w-full rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="w-full rounded-lg border p-4 bg-muted/30">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
-                    <FileTypeIcon className="h-10 w-10 text-slate-500" />
+                    <FileTypeIcon className="h-10 w-10 text-muted-foreground" />
                   </div>
                   <div className="flex-grow">
-                    <p className="text-sm font-medium text-slate-800 break-all">
-                      {file.name}
-                    </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm font-medium break-all">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">
                       {formatFileSize(file.size)}
                     </p>
                     {isUploading && (
                       <div className="mt-2 w-full">
                         <Progress value={uploadProgress} className="h-2" />
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {uploadProgress}% complete
                         </p>
                       </div>
@@ -253,7 +251,7 @@ export function UploadDialog({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 flex-shrink-0 text-slate-500 hover:text-slate-700"
+                  className="h-8 w-8 flex-shrink-0 text-muted-foreground hover:text-foreground"
                   onClick={handleRemoveFile}
                   disabled={isUploading}
                 >
@@ -273,7 +271,7 @@ export function UploadDialog({
             <Button
               onClick={handleUpload}
               disabled={!file || isUploading}
-              className="w-full sm:w-auto bg-primary hover:bg-primary/80"
+              className="w-full sm:w-auto"
             >
               {isUploading ? "Uploading..." : "Upload File"}
             </Button>

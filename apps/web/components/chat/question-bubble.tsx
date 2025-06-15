@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@repo/ui/components/button";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, File } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -27,11 +27,8 @@ const QuestionBubble = ({ question }: { question: ChatQuestion }) => {
 
   return (
     <div className="flex mb-4 flex-col items-end group">
-      <div className="bg-accent p-3 rounded-md lg:max-w-2/3">
-        {question.question}
-      </div>
       {question.attachmentId && attachment && (
-        <div className="mt-3">
+        <div className="mb-3">
           {attachment.type === "IMAGE" ? (
             <Image
               className="w-24 h-24 object-contain rounded-md  border"
@@ -41,12 +38,17 @@ const QuestionBubble = ({ question }: { question: ChatQuestion }) => {
               height={100}
             />
           ) : (
-            <div className="border p-2 rounded-md">
+            <div className="border p-2 rounded-md inline-flex gap-2 items-center shadow">
+              <File className="w-4 h-4" />
               <p>{attachment.filename}</p>
             </div>
           )}
         </div>
       )}
+      <div className="bg-accent p-3 rounded-md lg:max-w-2/3">
+        {question.question}
+      </div>
+
       <div className="flex items-center">
         <CustomTooltip content="Copy">
           <Button
