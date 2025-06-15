@@ -65,7 +65,7 @@ const AnswerBubble = ({
   };
 
   return (
-    <div>
+    <div className="group">
       <div className={activeAnswer?.WebSearch?.length > 0 ? "" : "hidden"}>
         <h3 className="text-sm font-semibold">Sources</h3>
         <div className="overflow-x-auto flex mt-2 gap-4">
@@ -131,7 +131,7 @@ const AnswerBubble = ({
         </div>
       )}
 
-      <div className="flex mt-6 items-center gap-2">
+      <div className="flex mt-6 items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:duration-100">
         <CustomTooltip content="Copy">
           <Button
             variant={"ghost"}

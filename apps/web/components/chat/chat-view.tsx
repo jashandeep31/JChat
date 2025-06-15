@@ -48,7 +48,7 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
           setShowScrollDownButton(false);
         }
       },
-      { threshold: 0.9 }
+      { threshold: 0.1 }
     );
 
     if (lastDivRef.current) {
@@ -156,11 +156,11 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
       </div>
 
       <div className="sticky bottom-0 z-10  mt-6">
-        <div className="flex justify-center mb-6 ">
+        <div className="flex justify-center ">
           {showScrollDownButton && (
             <button
               onClick={handleScrollDown}
-              className="flex text-sm font-medium gap-2 items-center border border-accent rounded-full px-2 py-1 hover:bg-accent transition-colors duration-200 bg-background"
+              className="flex text-sm font-medium gap-2 items-center border border-accent rounded-full px-2 py-1 hover:bg-accent transition-colors duration-200 bg-background absolute top-[-40px] "
             >
               <span>Scroll to bottom</span>
               <ChevronDown className="w-4 h-4" />
