@@ -17,13 +17,15 @@ const StreamBubble = ({
 
   const reasoningRef = useRef<HTMLDivElement>(null);
   const reasoningEndRef = useRef<HTMLDivElement>(null);
-  // Auto-scroll the reasoning section to bottom whenever content changes with smooth animation
+  // Auto-scroll the reasoning section to bottom whenever content changes without affecting main page scroll
   useEffect(() => {
-    if (reasoningEndRef.current && streamData.reasoning) {
-      reasoningEndRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      });
+    if (reasoningRef.current && streamData.reasoning) {
+      // Use setTimeout to ensure this happens after the DOM update
+      setTimeout(() => {
+        if (reasoningRef.current) {
+          reasoningRef.current.scrollTop = reasoningRef.current.scrollHeight;
+        }
+      }, 0);
     }
   }, [streamData.reasoning]);
 
