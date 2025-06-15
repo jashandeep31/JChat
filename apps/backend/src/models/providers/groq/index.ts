@@ -1,7 +1,7 @@
 import { smoothStream, streamText } from "ai";
 import { createGroq } from "@ai-sdk/groq";
 import { webSearch } from "../../../services/web-search.js";
-import { ProviderFunctionParams } from "../../index.js";
+import { ProviderFunctionParams, ProviderResponse } from "../../index.js";
 import { env } from "../../../lib/env.js";
 
 export const askGroqQuestion = async ({
@@ -10,7 +10,7 @@ export const askGroqQuestion = async ({
   apiKey,
   messages,
   onChunk,
-}: ProviderFunctionParams): Promise<{ text: string }> => {
+}: ProviderFunctionParams): Promise<ProviderResponse> => {
   const groq = createGroq({
     apiKey: apiKey || env.GROQ_API_KEY,
   });
@@ -56,5 +56,5 @@ export const askGroqQuestion = async ({
     text = failureMessage;
   }
 
-  return { text };
+  return { text, images: "", webSearches: [] };
 };

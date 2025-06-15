@@ -18,7 +18,14 @@ export interface ProviderFunctionParams {
   messages: { role: "user" | "system" | "assistant"; content: string }[];
   onChunk: (chunk: string) => void;
   onImageChunk: (chunk: string) => void;
+  onWebSearchChunk: (chunk: { title: string; url: string }[]) => void;
 }
+
+export type ProviderResponse = {
+  text: string;
+  images: string;
+  webSearches: { title: string; url: string }[];
+};
 
 const aiModels = await db.aiModel.findMany({
   include: {
@@ -37,7 +44,7 @@ export const askQuestion = async (
   modelId: string,
   io: Server,
   cid: string
-): Promise<404 | { text: string; images: string }> => {
+): Promise<404 | ProviderResponse> => {
   const chat = await getChat(chatQuestion.chatId, null, true);
   if (!chat) {
     throw new Error(`Chat not found: ${chatQuestion.chatId}`);
@@ -46,9 +53,11 @@ export const askQuestion = async (
   if (!model || !model.company) {
     throw new Error(`Model not found: ${modelId}`);
   }
-  const provider: (
-    params: ProviderFunctionParams
-  ) => Promise<{ text: string; images: string }> =
+  const provider: (params: ProviderFunctionParams) => Promise<{
+    text: string;
+    images: string;
+    webSearches: { title: string; url: string }[];
+  }> =
     providers[model.company.slug.split("-").join("") as keyof typeof providers];
   if (!provider) {
     return 404;
@@ -79,8 +88,7 @@ export const askQuestion = async (
     });
   }
   const apiKey = (await getApi(model.companyId, chat?.userId))?.key || null;
-  console.log(apiKey, "api key is");
-  const { text, images } = await provider({
+  const { text, images, webSearches } = await provider({
     question: chatQuestion,
     apiKey,
     model,
@@ -104,10 +112,16 @@ export const askQuestion = async (
         JSON.stringify({ data: base64, cid, questionId: chatQuestion.id })
       );
     },
+    onWebSearchChunk: async (webSearches: { title: string; url: string }[]) => {
+      io.to(`room:${cid}`).emit(
+        "question_response_web_search_chunk",
+        JSON.stringify({ data: webSearches, cid, questionId: chatQuestion.id })
+      );
+    },
   });
 
   await redis.del(redisKey);
-  return { text, images };
+  return { text, images, webSearches };
 };
 async function buildSystemContext(cid: string) {
   const messages: { role: "system"; content: string }[] = [];

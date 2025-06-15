@@ -1,4 +1,4 @@
-import { ChatQuestion, User } from "@repo/db";
+import { ChatQuestion, User, WebSearch } from "@repo/db";
 import { Server } from "socket.io";
 import { db, redis } from "../../lib/db.js";
 import { askQuestion } from "../../models/index.js";
@@ -86,10 +86,26 @@ export const questionAnswerHandler = async ({
         credits: apiKey ? credits - model.credits : credits,
       },
     });
+    let dbWebSearch: WebSearch[] = [];
+    if (res.webSearches.length) {
+      await db.webSearch.createMany({
+        data: res.webSearches.map((webSearch) => ({
+          chatQuestionAnswerId: chatQuestionAnswer.id,
+          title: webSearch.title,
+          url: webSearch.url,
+        })),
+      });
+
+      dbWebSearch = await db.webSearch.findMany({
+        where: {
+          chatQuestionAnswerId: chatQuestionAnswer.id,
+        },
+      });
+    }
 
     io.to(`room:${cid}`).emit("question_answered", {
       cid,
-      answer: chatQuestionAnswer,
+      answer: { ...chatQuestionAnswer, WebSearch: dbWebSearch },
     });
 
     const updatedUser = await db.user.update({
@@ -124,5 +140,6 @@ const sendDummyAnswer = (answer: string, chatQuestionId: string) => {
     chatQuestionId,
     answer,
     aiModelId: "",
+    WebSearch: [],
   };
 };

@@ -16,7 +16,6 @@ const QuestionBubble = ({ question }: { question: ChatQuestion }) => {
   const { data: attachment } = getAttachmentQuery(
     question.attachmentId || null
   );
-  console.log(attachment);
   const copyToClipboard = () => {
     navigator.clipboard.writeText(question.question);
     setIsCopied(true);

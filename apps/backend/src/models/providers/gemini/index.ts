@@ -1,4 +1,4 @@
-import { ProviderFunctionParams } from "../../index.js";
+import { ProviderFunctionParams, ProviderResponse } from "../../index.js";
 import {
   ContentListUnion,
   createPartFromUri,
@@ -18,10 +18,12 @@ export const askGeminiQuestion = async ({
   messages,
   onChunk,
   onImageChunk,
-}: ProviderFunctionParams): Promise<{ text: string; images: string }> => {
+}: ProviderFunctionParams): Promise<ProviderResponse> => {
   try {
     let text = "";
     let images = "";
+    let webSearches: { title: string; url: string }[] = [];
+    const seenUrls = new Set<string>();
     const systemContents: string[] = [];
     const otherMessages: Content[] = [];
 
@@ -54,11 +56,21 @@ export const askGeminiQuestion = async ({
         onChunk(chunk.text || "");
         const groundingMetadata = chunk.candidates?.[0].groundingMetadata;
         if (groundingMetadata) {
-          console.log(JSON.stringify(groundingMetadata));
+          groundingMetadata.groundingChunks?.forEach((gchunk) => {
+            const web = gchunk.web;
+            console.log(web);
+            if (web?.uri && web?.title && !seenUrls.has(web.uri)) {
+              webSearches.push({
+                title: web.title,
+                url: web.uri,
+              });
+              seenUrls.add(web.uri);
+            }
+          });
         }
       }
 
-      return { text, images };
+      return { text, images, webSearches };
     } else {
       const response = await responseImageStream({
         googleAi: googeAi,
@@ -72,19 +84,19 @@ export const askGeminiQuestion = async ({
         if (!firstImage.image?.imageBytes) {
           text = "Failed to generate image";
           onChunk("Failed to generate image");
-          return { text, images };
+          return { text, images, webSearches };
         }
         images = firstImage.image?.imageBytes || "";
         onImageChunk(images);
-        return { text, images };
+        return { text, images, webSearches };
       }
-      return { text, images };
+      return { text, images, webSearches };
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const failureMessage = `Failed to generate response: ${errorMessage}`;
     onChunk(failureMessage);
-    return { text: failureMessage, images: "" };
+    return { text: failureMessage, images: "", webSearches: [] };
   }
 };
 

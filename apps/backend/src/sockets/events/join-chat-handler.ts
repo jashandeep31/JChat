@@ -22,7 +22,14 @@ export const joinChatHandler = async ({
   const qaPairs = await db.chatQuestion.findMany({
     where: { chatId: cid },
     orderBy: { createdAt: "asc" },
-    include: { ChatQuestionAnswer: { orderBy: { createdAt: "asc" } } },
+    include: {
+      ChatQuestionAnswer: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          WebSearch: true,
+        },
+      },
+    },
   });
   io.to(`room:${chat.id}`).emit("qa_pairs", { cid: cid, qaPairs });
 };

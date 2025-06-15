@@ -4,10 +4,8 @@ import type { ChatCompletionTool } from "openai/resources/chat";
 import { env } from "../../../lib/env.js";
 import { getAttachment } from "../../../services/attachment-cache.js";
 import { webSearch } from "../../../services/web-search.js";
-import { ProviderFunctionParams } from "../../index.js";
-import fs from "fs";
-import path from "path";
-import os from "os";
+import { ProviderFunctionParams, ProviderResponse } from "../../index.js";
+
 type OpenAITextContent = {
   type: "text";
   text: string;
@@ -35,12 +33,13 @@ export const askOpenAIQuestion = async ({
   model,
   messages,
   onChunk,
-}: ProviderFunctionParams): Promise<{ text: string; images: string }> => {
+}: ProviderFunctionParams): Promise<ProviderResponse> => {
   try {
     const openaiClient = new OpenAI({ apiKey: apiKey || env.OPENAI_API_KEY });
 
     let text = "";
     let attachment: Attachment | null = null;
+    let webSearches: { title: string; url: string }[] = [];
 
     if (question.attachmentId) {
       attachment = await getAttachment(question.attachmentId);
@@ -177,9 +176,9 @@ export const askOpenAIQuestion = async ({
       }
     }
 
-    return { text, images: "" };
+    return { text, images: "", webSearches };
   } catch (error) {
     console.error("OpenAI error:", error);
-    return { text: "Error in OpenAI stream", images: "" };
+    return { text: "Error in OpenAI stream", images: "", webSearches: [] };
   }
 };

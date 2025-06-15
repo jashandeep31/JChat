@@ -2,10 +2,12 @@
 
 import { useContext, useEffect, useState, useCallback } from "react";
 import { SocketContext } from "@/context/socket-context";
-import { ChatQuestion, ChatQuestionAnswer } from "@repo/db";
+import { ChatQuestion, ChatQuestionAnswer, WebSearch } from "@repo/db";
 
 export interface FullChatQuestion extends ChatQuestion {
-  ChatQuestionAnswer: ChatQuestionAnswer[];
+  ChatQuestionAnswer: (ChatQuestionAnswer & {
+    WebSearch: WebSearch[];
+  })[];
 }
 
 export interface ChatSocketState {
@@ -84,14 +86,20 @@ export const useChatSocket = (
 
     const handleQuestionAnswered = (raw: {
       cid: string;
-      answer: ChatQuestionAnswer;
+      answer: ChatQuestionAnswer & {
+        WebSearch: WebSearch[];
+      };
     }) => {
+      console.log(raw.answer);
       setChatQuestions((prev) => {
         return prev.map((q) => {
           if (q.id === raw.answer.chatQuestionId) {
             return {
               ...q,
-              ChatQuestionAnswer: [...q.ChatQuestionAnswer, raw.answer],
+              ChatQuestionAnswer: [
+                ...q.ChatQuestionAnswer,
+                { ...raw.answer, WebSearch: [...raw.answer.WebSearch] },
+              ],
             };
           }
           return q;

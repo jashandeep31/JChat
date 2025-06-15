@@ -20,6 +20,7 @@ import { SocketContext } from "@/context/socket-context";
 import useModelsQuery from "@/lib/react-query/use-models-query";
 import { RetryModelSelector } from "../retry-model-selector";
 import { AiModel } from "@repo/db";
+import Link from "next/link";
 
 const AnswerBubble = ({
   question,
@@ -34,8 +35,8 @@ const AnswerBubble = ({
   const socket = useContext(SocketContext);
   const answers = question.ChatQuestionAnswer;
   const [activeAnswer, setActiveAnswer] = useState(answers[answers.length - 1]);
+  const [isCopied, setIsCopied] = useState(false);
 
-  // Reset activeAnswer when question changes
   useEffect(() => {
     if (
       answers.length > 0 &&
@@ -44,8 +45,6 @@ const AnswerBubble = ({
       setActiveAnswer(answers[answers.length - 1]);
     }
   }, [question, answers, activeAnswer]);
-
-  const [isCopied, setIsCopied] = useState(false);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(activeAnswer.answer);
@@ -64,6 +63,24 @@ const AnswerBubble = ({
 
   return (
     <div>
+      <div className={activeAnswer?.WebSearch?.length > 0 ? "" : "hidden"}>
+        <h3 className="text-sm font-semibold">Sources</h3>
+        <div className="overflow-x-auto flex mt-2 gap-4">
+          {activeAnswer.WebSearch.map((webSearch) => (
+            <Link
+              href={webSearch.url}
+              target="_blank"
+              key={webSearch.id}
+              className="max-w-36 border rounded-md p-2 bg-accent hover:border-primary transition-colors border-accent"
+            >
+              <p className="text-sm font-semibold truncate">
+                {webSearch.title}
+              </p>
+              <p className="text-xs truncate">{webSearch.url}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
       <MarkdownRenderer content={activeAnswer.answer} />
       {activeAnswer.base64Image && (
         <div className="mt-6 max-w-[500px] relative">

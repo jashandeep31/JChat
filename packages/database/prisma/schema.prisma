@@ -122,6 +122,7 @@ model ChatQuestionAnswer {
 
   chatQuestion ChatQuestion @relation(fields: [chatQuestionId], references: [id], onDelete: Cascade)
   aiModel      AiModel      @relation(fields: [aiModelId], references: [id])
+  WebSearch    WebSearch[]
 }
 
 model Attachment {
@@ -167,4 +168,14 @@ model ApiKey {
   company Company @relation(fields: [companyId], references: [id])
 
   @@unique([userId, companyId])
+}
+
+model WebSearch {
+  id                   String             @id @default(uuid())
+  title                String
+  url                  String
+  chatQuestionAnswerId String
+  answer               ChatQuestionAnswer @relation(fields: [chatQuestionAnswerId], references: [id])
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 }
