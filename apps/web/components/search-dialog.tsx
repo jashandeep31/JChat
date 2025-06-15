@@ -14,6 +14,7 @@ import { Clock } from "lucide-react";
 import useChatQuery from "@/lib/react-query/use-chat-query";
 import { useContext } from "react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
+import { Chat } from "@repo/db";
 
 export function SearchDialog() {
   const { open, setOpen } = useContext(SearchDialogContext);
@@ -35,7 +36,7 @@ export function SearchDialog() {
     }
   }, [open]);
 
-  const handleSelect = (chat: { id: string; name: string }) => {
+  const handleSelect = (chat: Chat) => {
     setOpen(false);
     router.push(`/chat/${chat.id}`);
   };
@@ -72,12 +73,12 @@ export function SearchDialog() {
             <Clock className="mr-2 h-4 w-4" />
             Recent Chats
           </div>
-          {chatsQuery.data?.map((chat) => (
+          {chatsQuery.data?.map((chat: Chat) => (
             <CommandItem
               key={chat.id}
-              value={chat.name}
+              value={chat.name + chat.id}
               onSelect={() => handleSelect(chat)}
-              className="p-3 my-1 text-base rounded-md cursor-pointer aria-selected:bg-brand-button-bg-light-pink"
+              className="p-3 my-1 text-ase rounded-md cursor-pointer aria-selected:bg-brand-button-bg-light-pink"
             >
               {chat.name}
             </CommandItem>
