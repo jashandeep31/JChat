@@ -41,6 +41,7 @@ export function SelectAttachmentDialog({
   const handleConfirmSelection = () => {
     if (selectedAttachment) {
       setAttachmentInfo({
+        id: selectedAttachment.id,
         uploadId: selectedAttachment.uploadId,
         fileType: selectedAttachment.type,
         filename: selectedAttachment.filename,

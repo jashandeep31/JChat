@@ -137,7 +137,7 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
         <div className="mx-auto lg:max-w-1/2 w-full">
           {chatQuestions.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
-              <QuestionBubble content={chatQuestion.question} />
+              <QuestionBubble question={chatQuestion} />
               {chatQuestion.ChatQuestionAnswer.length > 0 &&
                 streamingResponse?.questionId !== chatQuestion.id && (
                   <AnswerBubble

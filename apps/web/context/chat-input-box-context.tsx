@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { AiModel } from "@repo/db";
 import { toast } from "sonner";
 export type AttachmentInfo = {
+  id: string;
   uploadId: string;
   fileType: "IMAGE" | "PDF";
   filename: string;
@@ -85,7 +86,7 @@ export const ChatInputBoxProvider = ({
             question,
             modelSlug: selectedModel?.slug,
             isWebSearchEnabled,
-            attachmentId: attachmentInfo?.uploadId,
+            attachmentId: attachmentInfo?.id,
           })
         );
       } else if (params?.pid) {
@@ -95,7 +96,7 @@ export const ChatInputBoxProvider = ({
             question,
             modelSlug: selectedModel?.slug,
             isWebSearchEnabled,
-            attachmentId: attachmentInfo?.uploadId,
+            attachmentId: attachmentInfo?.id,
             projectId: params.pid,
           })
         );

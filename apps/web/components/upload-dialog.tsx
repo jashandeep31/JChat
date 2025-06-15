@@ -92,6 +92,7 @@ export function UploadDialog({
     multiple: false,
     accept: {
       "image/*": [".png", ".gif", ".jpeg", ".jpg", ".webp"],
+      "application/pdf": [".pdf"],
     },
   });
 
@@ -133,6 +134,7 @@ export function UploadDialog({
       }
       const attachment: Attachment = res.data.attachment;
       setAttachmentInfo({
+        id: attachment.id,
         uploadId: attachment.uploadId,
         fileType: attachment.type,
         filename: attachment.filename,

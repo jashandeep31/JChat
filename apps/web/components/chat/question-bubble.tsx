@@ -7,12 +7,18 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/tooltip";
 import { useState } from "react";
+import { ChatQuestion } from "@repo/db";
+import { getAttachmentQuery } from "@/lib/react-query/use-attachment-query";
+import Image from "next/image";
 
-const QuestionBubble = ({ content }: { content: string }) => {
+const QuestionBubble = ({ question }: { question: ChatQuestion }) => {
   const [isCopied, setIsCopied] = useState(false);
-
+  const { data: attachment } = getAttachmentQuery(
+    question.attachmentId || null
+  );
+  console.log(attachment);
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(content);
+    navigator.clipboard.writeText(question.question);
     setIsCopied(true);
     setTimeout(() => {
       setIsCopied(false);
@@ -21,7 +27,26 @@ const QuestionBubble = ({ content }: { content: string }) => {
 
   return (
     <div className="flex mb-4 flex-col items-end group">
-      <div className="bg-accent p-3 rounded-md lg:max-w-2/3">{content}</div>
+      <div className="bg-accent p-3 rounded-md lg:max-w-2/3">
+        {question.question}
+      </div>
+      {question.attachmentId && attachment && (
+        <div className="mt-3">
+          {attachment.type === "IMAGE" ? (
+            <Image
+              className="w-24 h-24 object-contain rounded-md  border"
+              src={attachment.publicUrl}
+              alt=""
+              width={100}
+              height={100}
+            />
+          ) : (
+            <div className="border p-2 rounded-md">
+              <p>{attachment.filename}</p>
+            </div>
+          )}
+        </div>
+      )}
       <div className="flex items-center">
         <CustomTooltip content="Copy">
           <Button

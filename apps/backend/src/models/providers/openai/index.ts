@@ -5,7 +5,9 @@ import { env } from "../../../lib/env.js";
 import { getAttachment } from "../../../services/attachment-cache.js";
 import { webSearch } from "../../../services/web-search.js";
 import { ProviderFunctionParams } from "../../index.js";
-
+import fs from "fs";
+import path from "path";
+import os from "os";
 type OpenAITextContent = {
   type: "text";
   text: string;
@@ -18,7 +20,14 @@ type OpenAIImageContent = {
   };
 };
 
-type OpenAIContentItem = OpenAITextContent | OpenAIImageContent;
+type OpenAIInputFileContent = {
+  type: "input_file";
+  file_id: string;
+};
+type OpenAIContentItem =
+  | OpenAITextContent
+  | OpenAIImageContent
+  | OpenAIInputFileContent;
 
 export const askOpenAIQuestion = async ({
   question,
@@ -29,6 +38,7 @@ export const askOpenAIQuestion = async ({
 }: ProviderFunctionParams): Promise<{ text: string; images: string }> => {
   try {
     const openaiClient = new OpenAI({ apiKey: apiKey || env.OPENAI_API_KEY });
+
     let text = "";
     let attachment: Attachment | null = null;
 
@@ -51,6 +61,31 @@ export const askOpenAIQuestion = async ({
         },
       });
     }
+    if (attachment && attachment.type === "PDF") {
+      const response = await fetch(attachment.publicUrl);
+      if (response.ok) {
+        try {
+          const file = await openaiClient.files.create({
+            file: response,
+            purpose: "user_data",
+          });
+          if (file) {
+            console.log(file);
+            messageContent.push({
+              type: "file",
+              file: {
+                file_id: file.id,
+              },
+            } as any);
+          } else {
+            console.log("file not created");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+
     const tools: ChatCompletionTool[] = [
       {
         type: "function",
@@ -70,7 +105,7 @@ export const askOpenAIQuestion = async ({
         },
       },
     ];
-    const initialMessages = [
+    const finalMessages = [
       ...(messages as any),
       {
         role: "system",
@@ -102,7 +137,7 @@ export const askOpenAIQuestion = async ({
             .join("\n\n");
 
           const toolCallId = "search_" + Date.now();
-          initialMessages.push({
+          finalMessages.push({
             role: "assistant",
             content: null,
             tool_calls: [
@@ -117,7 +152,7 @@ export const askOpenAIQuestion = async ({
             ],
           });
 
-          initialMessages.push({
+          finalMessages.push({
             role: "tool",
             tool_call_id: toolCallId,
             content: formattedResults || "No results found",
@@ -130,7 +165,7 @@ export const askOpenAIQuestion = async ({
 
     const stream = await openaiClient.chat.completions.create({
       model: model.slug,
-      messages: initialMessages,
+      messages: [...finalMessages],
       tools: needsWebSearch && question.webSearch ? tools : undefined,
       stream: true,
     });
