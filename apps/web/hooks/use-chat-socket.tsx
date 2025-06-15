@@ -15,7 +15,11 @@ export interface ChatSocketState {
   isStreaming: boolean;
   streamingResponse: {
     questionId: string;
-    data: string;
+    data: {
+      text: string;
+      images: string;
+      webSearches: { title: string; url: string }[];
+    };
   } | null;
   setIsStreaming: (value: boolean) => void;
 }
@@ -39,7 +43,11 @@ export const useChatSocket = (
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingResponse, setStreamingResponse] = useState<{
     questionId: string;
-    data: string;
+    data: {
+      text: string;
+      images: string;
+      webSearches: { title: string; url: string }[];
+    };
   } | null>(null);
 
   const askQuestion = useCallback(
@@ -67,19 +75,32 @@ export const useChatSocket = (
       );
       setStreamingResponse({
         questionId: question.id,
-        data: "",
+        data: {
+          text: "",
+          images: "",
+          webSearches: [],
+        },
       });
     };
 
     const handleResponseChunk = (chunkData: string) => {
       const parsed: {
-        data: string;
+        data: {
+          text: string;
+          images: string;
+          webSearches: { title: string; url: string }[];
+        };
         cid: string;
         questionId: string;
       } = JSON.parse(chunkData);
-      setStreamingResponse((prev) => ({
+      console.log(`strema chunk ${JSON.stringify(parsed.data.text)}`);
+      setStreamingResponse(() => ({
         questionId: parsed.questionId,
-        data: (prev?.data ?? "") + parsed.data,
+        data: {
+          text: parsed.data.text,
+          images: parsed.data.images,
+          webSearches: parsed.data.webSearches,
+        },
       }));
       setIsStreaming(true);
     };
@@ -90,7 +111,6 @@ export const useChatSocket = (
         WebSearch: WebSearch[];
       };
     }) => {
-      console.log(raw.answer);
       setChatQuestions((prev) => {
         return prev.map((q) => {
           if (q.id === raw.answer.chatQuestionId) {

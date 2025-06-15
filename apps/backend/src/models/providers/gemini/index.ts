@@ -18,6 +18,7 @@ export const askGeminiQuestion = async ({
   messages,
   onChunk,
   onImageChunk,
+  onWebSearchChunk,
 }: ProviderFunctionParams): Promise<ProviderResponse> => {
   try {
     let text = "";
@@ -66,6 +67,7 @@ export const askGeminiQuestion = async ({
               });
               seenUrls.add(web.uri);
             }
+            onWebSearchChunk(webSearches);
           });
         }
       }

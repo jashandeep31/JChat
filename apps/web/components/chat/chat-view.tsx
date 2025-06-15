@@ -147,7 +147,7 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
                   />
                 )}
               {streamingResponse?.questionId === chatQuestion.id && (
-                <StreamBubble content={streamingResponse.data} />
+                <StreamBubble streamData={streamingResponse.data} />
               )}
             </div>
           ))}

@@ -67,7 +67,12 @@ export const askQuestion = async (
     redisKey,
     JSON.stringify({
       questionId: chatQuestion.id,
-      data: "",
+
+      data: {
+        text: "",
+        images: "",
+        webSearches: [],
+      },
     })
   );
 
@@ -88,35 +93,53 @@ export const askQuestion = async (
     });
   }
   const apiKey = (await getApi(model.companyId, chat?.userId))?.key || null;
+
+  const resultStore: ProviderResponse = {
+    text: "",
+    images: "",
+    webSearches: [],
+  };
+  const emitUpdate = async () => {
+    io.to(`room:${cid}`).emit(
+      "question_response_chunk",
+      JSON.stringify({
+        data: {
+          text: resultStore.text,
+          images: resultStore.images,
+          webSearches: resultStore.webSearches,
+        },
+        questionId: chatQuestion.id,
+      })
+    );
+    await redis.set(
+      redisKey,
+      JSON.stringify({
+        data: {
+          text: resultStore.text,
+          images: resultStore.images,
+          webSearches: resultStore.webSearches,
+        },
+        questionId: chatQuestion.id,
+      })
+    );
+  };
+
   const { text, images, webSearches } = await provider({
     question: chatQuestion,
     apiKey,
     model,
     messages,
     onChunk: async (chunk) => {
-      io.to(`room:${cid}`).emit(
-        "question_response_chunk",
-        JSON.stringify({ data: chunk, cid, questionId: chatQuestion.id })
-      );
-      await redis.set(
-        redisKey,
-        JSON.stringify({
-          data: chunk,
-          questionId: chatQuestion.id,
-        })
-      );
+      resultStore.text += chunk;
+      await emitUpdate();
     },
     onImageChunk: async (base64) => {
-      io.to(`room:${cid}`).emit(
-        "question_response_image_chunk",
-        JSON.stringify({ data: base64, cid, questionId: chatQuestion.id })
-      );
+      resultStore.images += base64;
+      await emitUpdate();
     },
     onWebSearchChunk: async (webSearches: { title: string; url: string }[]) => {
-      io.to(`room:${cid}`).emit(
-        "question_response_web_search_chunk",
-        JSON.stringify({ data: webSearches, cid, questionId: chatQuestion.id })
-      );
+      resultStore.webSearches = webSearches;
+      await emitUpdate();
     },
   });
 
