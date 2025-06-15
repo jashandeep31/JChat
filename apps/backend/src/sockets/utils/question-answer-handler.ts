@@ -82,6 +82,7 @@ export const questionAnswerHandler = async ({
         aiModelId: model.id,
         chatQuestionId: chatQuestion.id,
         answer: res.text,
+        reasoning: res.reasoning.length > 0 ? res.reasoning : null,
         base64Image: res.images,
         credits: apiKey ? credits - model.credits : credits,
       },
@@ -139,6 +140,7 @@ const sendDummyAnswer = (answer: string, chatQuestionId: string) => {
     updatedAt: new Date(),
     chatQuestionId,
     answer,
+    reasoning: "",
     aiModelId: "",
     WebSearch: [],
   };

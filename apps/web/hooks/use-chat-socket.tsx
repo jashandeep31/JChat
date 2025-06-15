@@ -18,6 +18,7 @@ export interface ChatSocketState {
     data: {
       text: string;
       images: string;
+      reasoning: string;
       webSearches: { title: string; url: string }[];
     };
   } | null;
@@ -46,6 +47,7 @@ export const useChatSocket = (
     data: {
       text: string;
       images: string;
+      reasoning: string;
       webSearches: { title: string; url: string }[];
     };
   } | null>(null);
@@ -78,6 +80,7 @@ export const useChatSocket = (
         data: {
           text: "",
           images: "",
+          reasoning: "",
           webSearches: [],
         },
       });
@@ -88,6 +91,7 @@ export const useChatSocket = (
         data: {
           text: string;
           images: string;
+          reasoning: string;
           webSearches: { title: string; url: string }[];
         };
         cid: string;
@@ -99,6 +103,7 @@ export const useChatSocket = (
         data: {
           text: parsed.data.text,
           images: parsed.data.images,
+          reasoning: parsed.data.reasoning,
           webSearches: parsed.data.webSearches,
         },
       }));

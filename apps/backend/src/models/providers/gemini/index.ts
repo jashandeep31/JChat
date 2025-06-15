@@ -19,10 +19,12 @@ export const askGeminiQuestion = async ({
   onChunk,
   onImageChunk,
   onWebSearchChunk,
+  onReasoningChunk,
 }: ProviderFunctionParams): Promise<ProviderResponse> => {
   try {
     let text = "";
     let images = "";
+    let reasoning = "";
     let webSearches: { title: string; url: string }[] = [];
     const seenUrls = new Set<string>();
     const systemContents: string[] = [];
@@ -53,8 +55,17 @@ export const askGeminiQuestion = async ({
       });
 
       for await (const chunk of response) {
+        console.log(JSON.stringify(chunk));
         text += chunk.text || "";
         onChunk(chunk.text || "");
+        const candidate = chunk.candidates?.[0];
+        const contentParts = candidate?.content?.parts;
+        const currentThought = contentParts?.[0]?.thought;
+        const thoughtText = contentParts?.[0]?.text || "";
+        if (currentThought) {
+          reasoning += thoughtText || "";
+          onReasoningChunk(thoughtText || "");
+        }
         const groundingMetadata = chunk.candidates?.[0].groundingMetadata;
         if (groundingMetadata) {
           groundingMetadata.groundingChunks?.forEach((gchunk) => {
@@ -71,7 +82,7 @@ export const askGeminiQuestion = async ({
         }
       }
 
-      return { text, images, webSearches };
+      return { text, images, webSearches, reasoning };
     } else {
       const response = await responseImageStream({
         googleAi: googeAi,
@@ -85,19 +96,19 @@ export const askGeminiQuestion = async ({
         if (!firstImage.image?.imageBytes) {
           text = "Failed to generate image";
           onChunk("Failed to generate image");
-          return { text, images, webSearches };
+          return { text, images, webSearches, reasoning };
         }
         images = firstImage.image?.imageBytes || "";
         onImageChunk(images);
-        return { text, images, webSearches };
+        return { text, images, webSearches, reasoning };
       }
-      return { text, images, webSearches };
+      return { text, images, webSearches, reasoning };
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const failureMessage = `Failed to generate response: ${errorMessage}`;
     onChunk(failureMessage);
-    return { text: failureMessage, images: "", webSearches: [] };
+    return { text: failureMessage, images: "", webSearches: [], reasoning: "" };
   }
 };
 
@@ -151,6 +162,9 @@ const repsonseTextStream = async ({
     config: {
       systemInstruction: systemContents.join("\n\n"),
       tools: question.webSearch ? [{ googleSearch: {} }] : [],
+      thinkingConfig: {
+        includeThoughts: true,
+      },
     },
   });
 };

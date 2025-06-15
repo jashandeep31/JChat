@@ -37,7 +37,7 @@ export const askOpenAIQuestion = async ({
 }: ProviderFunctionParams): Promise<ProviderResponse> => {
   try {
     const openaiClient = new OpenAI({ apiKey: apiKey || env.OPENAI_API_KEY });
-
+    let reasoning = "";
     let text = "";
     let attachment: Attachment | null = null;
     let webSearches: { title: string; url: string }[] = [];
@@ -179,9 +179,14 @@ export const askOpenAIQuestion = async ({
       }
     }
 
-    return { text, images: "", webSearches };
+    return { text, images: "", webSearches, reasoning };
   } catch (error) {
     console.error("OpenAI error:", error);
-    return { text: "Error in OpenAI stream", images: "", webSearches: [] };
+    return {
+      text: "Error in OpenAI stream",
+      images: "",
+      webSearches: [],
+      reasoning: "",
+    };
   }
 };

@@ -114,6 +114,7 @@ model ChatQuestionAnswer {
   chatQuestionId String
   base64Image    String?
   answer         String
+  reasoning      String?
   credits        Float   @default(0)
   aiModelId      String
 

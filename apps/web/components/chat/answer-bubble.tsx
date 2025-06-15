@@ -4,8 +4,10 @@ import { FullChatQuestion } from "@/hooks/use-chat-socket";
 import { Button } from "@repo/ui/components/button";
 import {
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Copy,
   Download,
   RotateCcw,
@@ -36,6 +38,7 @@ const AnswerBubble = ({
   const answers = question.ChatQuestionAnswer;
   const [activeAnswer, setActiveAnswer] = useState(answers[answers.length - 1]);
   const [isCopied, setIsCopied] = useState(false);
+  const [isReasoningOpen, setIsReasoningOpen] = useState(false);
 
   useEffect(() => {
     if (
@@ -81,6 +84,26 @@ const AnswerBubble = ({
           ))}
         </div>
       </div>
+      {activeAnswer.reasoning && (
+        <div>
+          <button
+            onClick={() => setIsReasoningOpen(!isReasoningOpen)}
+            className="flex items-center gap-2 font-medium hover:bg-accent p-2 rounded"
+          >
+            Reasoning{" "}
+            {isReasoningOpen ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}{" "}
+          </button>
+          {isReasoningOpen && (
+            <div className="mt-2 border p-2 rounded bg-accent px-3">
+              <MarkdownRenderer content={activeAnswer.reasoning} />
+            </div>
+          )}
+        </div>
+      )}
       <MarkdownRenderer content={activeAnswer.answer} />
       {activeAnswer.base64Image && (
         <div className="mt-6 max-w-[500px] relative">

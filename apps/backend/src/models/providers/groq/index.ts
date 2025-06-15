@@ -23,6 +23,7 @@ export const askGroqQuestion = async ({
   });
 
   let text = "";
+  let reasoning = "";
 
   if (question.webSearch) {
     const res = await webSearch(question.question);
@@ -65,5 +66,5 @@ export const askGroqQuestion = async ({
     text = failureMessage;
   }
 
-  return { text, images: "", webSearches };
+  return { text, images: "", webSearches, reasoning };
 };

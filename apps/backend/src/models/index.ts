@@ -19,11 +19,13 @@ export interface ProviderFunctionParams {
   onChunk: (chunk: string) => void;
   onImageChunk: (chunk: string) => void;
   onWebSearchChunk: (chunk: { title: string; url: string }[]) => void;
+  onReasoningChunk: (chunk: string) => void;
 }
 
 export type ProviderResponse = {
   text: string;
   images: string;
+  reasoning: string;
   webSearches: { title: string; url: string }[];
 };
 
@@ -56,6 +58,7 @@ export const askQuestion = async (
   const provider: (params: ProviderFunctionParams) => Promise<{
     text: string;
     images: string;
+    reasoning: string;
     webSearches: { title: string; url: string }[];
   }> =
     providers[model.company.slug.split("-").join("") as keyof typeof providers];
@@ -71,6 +74,7 @@ export const askQuestion = async (
       data: {
         text: "",
         images: "",
+        reasoning: "",
         webSearches: [],
       },
     })
@@ -97,6 +101,7 @@ export const askQuestion = async (
   const resultStore: ProviderResponse = {
     text: "",
     images: "",
+    reasoning: "",
     webSearches: [],
   };
   const emitUpdate = async () => {
@@ -106,6 +111,7 @@ export const askQuestion = async (
         data: {
           text: resultStore.text,
           images: resultStore.images,
+          reasoning: resultStore.reasoning,
           webSearches: resultStore.webSearches,
         },
         questionId: chatQuestion.id,
@@ -117,6 +123,7 @@ export const askQuestion = async (
         data: {
           text: resultStore.text,
           images: resultStore.images,
+          reasoning: resultStore.reasoning,
           webSearches: resultStore.webSearches,
         },
         questionId: chatQuestion.id,
@@ -124,7 +131,7 @@ export const askQuestion = async (
     );
   };
 
-  const { text, images, webSearches } = await provider({
+  const { text, images, webSearches, reasoning } = await provider({
     question: chatQuestion,
     apiKey,
     model,
@@ -141,10 +148,14 @@ export const askQuestion = async (
       resultStore.webSearches = webSearches;
       await emitUpdate();
     },
+    onReasoningChunk: async (reasoning) => {
+      resultStore.reasoning += reasoning;
+      await emitUpdate();
+    },
   });
 
   await redis.del(redisKey);
-  return { text, images, webSearches };
+  return { text, images, webSearches, reasoning };
 };
 async function buildSystemContext(cid: string) {
   const messages: { role: "system"; content: string }[] = [];
