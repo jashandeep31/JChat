@@ -1,6 +1,5 @@
-import { AiModel, Attachment, ChatQuestion } from "@repo/db";
+import { Attachment } from "@repo/db";
 import OpenAI from "openai";
-import type { ChatCompletionTool } from "openai/resources/chat";
 import { env } from "../../../lib/env.js";
 import { getAttachment } from "../../../services/attachment-cache.js";
 import { webSearch } from "../../../services/web-search.js";
@@ -34,6 +33,7 @@ export const askOpenAIQuestion = async ({
   messages,
   onChunk,
   onWebSearchChunk,
+  onReasoningChunk,
 }: ProviderFunctionParams): Promise<ProviderResponse> => {
   try {
     const openaiClient = new OpenAI({ apiKey: apiKey || env.OPENAI_API_KEY });
@@ -46,19 +46,17 @@ export const askOpenAIQuestion = async ({
       attachment = await getAttachment(question.attachmentId);
     }
 
-    const messageContent: OpenAIContentItem[] = [
+    const messageContent: any[] = [
       {
-        type: "text",
+        type: "input_text",
         text: question.question,
       },
     ];
 
     if (attachment && attachment.type === "IMAGE") {
       messageContent.push({
-        type: "image_url",
-        image_url: {
-          url: attachment.publicUrl,
-        },
+        type: "input_image",
+        image_url: attachment.publicUrl,
       });
     }
     if (attachment && attachment.type === "PDF") {
@@ -71,10 +69,8 @@ export const askOpenAIQuestion = async ({
           });
           if (file) {
             messageContent.push({
-              type: "file",
-              file: {
-                file_id: file.id,
-              },
+              type: "input_file",
+              file_id: file.id,
             } as any);
           } else {
           }
@@ -82,103 +78,36 @@ export const askOpenAIQuestion = async ({
       }
     }
 
-    const tools: ChatCompletionTool[] = [
-      {
-        type: "function",
-        function: {
-          name: "web_search",
-          description: "Search the web for current information",
-          parameters: {
-            type: "object",
-            properties: {
-              query: {
-                type: "string",
-                description: "The search query",
-              },
-            },
-            required: ["query"],
-          },
-        },
-      },
-    ];
     const finalMessages = [
       ...(messages as any),
-      {
-        role: "system",
-        content:
-          "You are a helpful assistant. If the user asks about current events or information that might be outdated in your knowledge, use the web_search tool to find the most up-to-date information.",
-      },
       {
         role: "user",
         content: messageContent,
       },
     ];
 
-    const needsWebSearch =
-      /news|current|latest|recent|today|weather|stock|price|score|date|time|event|update|trend/i.test(
-        question.question
-      );
-
-    let searchResults = [];
-    if (needsWebSearch && question.webSearch) {
-      try {
-        searchResults = await webSearch(question.question);
-        if (searchResults.length > 0) {
-          const formattedResults = searchResults
-            .map(
-              (result) =>
-                `Title: ${result.title}\nURL: ${result.link}\nSummary: ${result.snippet}`
-            )
-            .join("\n\n");
-
-          searchResults.map((result) => {
-            webSearches.push({
-              title: result.title,
-              url: result.link,
-            });
-          });
-          onWebSearchChunk(webSearches);
-          const toolCallId = "search_" + Date.now();
-          finalMessages.push({
-            role: "assistant",
-            content: null,
-            tool_calls: [
-              {
-                id: toolCallId,
-                type: "function",
-                function: {
-                  name: "web_search",
-                  arguments: JSON.stringify({ query: question.question }),
-                },
-              },
-            ],
-          });
-
-          finalMessages.push({
-            role: "tool",
-            tool_call_id: toolCallId,
-            content: formattedResults || "No results found",
-          });
-        }
-      } catch (error) {
-        console.error("Error during web search:", error);
-      }
-    }
-
-    const stream = await openaiClient.chat.completions.create({
+    const respStream = await openaiClient.responses.create({
       model: model.slug,
-      messages: [...finalMessages],
-      tools: needsWebSearch && question.webSearch ? tools : undefined,
+      input: finalMessages,
+      ...(model.reasoning
+        ? { reasoning: { effort: "medium", summary: "detailed" } }
+        : {}),
       stream: true,
+      tools: question.webSearch ? [{ type: "web_search_preview" }] : [],
     });
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || "";
-      if (content) {
-        text += content;
-        onChunk(content);
+    for await (const chunk of respStream) {
+      console.log(JSON.stringify(chunk));
+      if (chunk.type === "response.reasoning_summary_text.delta") {
+        reasoning += chunk.delta;
+        onReasoningChunk(chunk.delta as string);
+        continue;
+      }
+      if (chunk.type === "response.output_text.delta") {
+        text += chunk.delta;
+        onChunk(chunk.delta as string);
+        continue;
       }
     }
-
     return { text, images: "", webSearches, reasoning };
   } catch (error) {
     console.error("OpenAI error:", error);

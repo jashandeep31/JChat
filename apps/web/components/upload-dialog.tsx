@@ -273,7 +273,7 @@ export function UploadDialog({
         </div>
 
         <DialogFooter className="sm:justify-end gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-end">
             <Button variant={"outline"} onClick={handleOpenSelectDialog}>
               <History className="h-3.5 w-3.5 mr-1" />
               Previous Uploads
@@ -281,7 +281,7 @@ export function UploadDialog({
             <Button
               onClick={handleUpload}
               disabled={!file || isUploading}
-              className="w-full sm:w-auto"
+              className=" sm:w-auto"
             >
               {isUploading ? "Uploading..." : "Upload File"}
             </Button>
