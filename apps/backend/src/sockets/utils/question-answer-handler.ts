@@ -4,6 +4,7 @@ import { db, redis } from "../../lib/db.js";
 import { askQuestion } from "../../models/index.js";
 import { getUser } from "../../services/user-cache.js";
 import { getApi } from "../../services/api-cache.js";
+import { refreshChatQACache } from "../../services/chat-qa-cache.js";
 const aiModels = await db.aiModel.findMany();
 
 export const questionAnswerHandler = async ({
@@ -108,7 +109,7 @@ export const questionAnswerHandler = async ({
       cid,
       answer: { ...chatQuestionAnswer, WebSearch: dbWebSearch },
     });
-
+    refreshChatQACache(cid);
     const updatedUser = await db.user.update({
       where: {
         id: user.id,

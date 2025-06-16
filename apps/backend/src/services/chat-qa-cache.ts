@@ -22,9 +22,9 @@ export async function getChatQACache(
         ChatQuestionAnswer: true,
       },
       orderBy: {
-        createdAt: "desc", // Get most recent questions
+        createdAt: "desc",
       },
-      take: 2, // Limit to 10 questions
+      take: 2,
     });
 
     if (chatQA.length === 0) return null;
@@ -33,7 +33,7 @@ export async function getChatQACache(
     return chatQA;
   } catch (err) {
     console.error(`Error fetching chat QA cache for ${cid}:`, err);
-    return null; // Return null instead of throwing to prevent app crashes
+    return null;
   }
 }
 

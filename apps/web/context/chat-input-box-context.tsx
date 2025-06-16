@@ -48,11 +48,29 @@ export const ChatInputBoxProvider = ({
   const [attachmentInfo, setAttachmentInfo] = useState<AttachmentInfo>(null);
   // Set default model when models are loaded
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const selectedModelSlug = localStorage.getItem("selectedModel");
+
+    if (selectedModelSlug && modelsQuery.data) {
+      const model = modelsQuery.data.find(
+        (model) => model.slug === selectedModelSlug
+      );
+      if (model) {
+        setSelectedModel(model);
+        return;
+      }
+    }
+
     if (selectedModel === null && modelsQuery.data?.length) {
       setSelectedModel(modelsQuery.data[0]);
     }
   }, [modelsQuery.data, selectedModel]);
-
+  const handleModelChange = (model: AiModel) => {
+    setSelectedModel(model);
+    if (typeof window === "undefined") return;
+    localStorage.setItem("selectedModel", model.slug);
+  };
   const handleSubmit = ({
     setIsStreaming,
     socket,
@@ -126,7 +144,7 @@ export const ChatInputBoxProvider = ({
         isWebSearchEnabled,
         setIsWebSearchEnabled,
         selectedModel,
-        setSelectedModel,
+        setSelectedModel: handleModelChange,
         handleSubmit,
         models: modelsQuery.data || [],
         isAttachmentDialogOpen,

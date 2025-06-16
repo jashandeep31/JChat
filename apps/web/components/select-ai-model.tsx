@@ -20,7 +20,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import useCompanyQuery from "@/lib/react-query/use-company-query";
 
 interface SelectAIModelProps {
@@ -42,16 +42,10 @@ export const SelectAIModel = ({
   const session = useSession();
   const { companiesQuery } = useCompanyQuery();
 
-  useEffect(() => {
-    // const selectedModelSlug = localStorage.getItem("selectedModel");
-    const selectedModelSlug = "";
-    if (!selectedModelSlug) return;
-    const model = models.find((model) => model.slug === selectedModelSlug);
-    if (model) {
-      setSelectedModel(model);
-    }
-  }, [models, selectedModel, setSelectedModel]);
-
+  const handleModleChange = (model: AiModel) => {
+    setSelectedModel(model);
+    setOpen(false);
+  };
   // Group models by company ID
   const modelsByCompany = useMemo(() => {
     const result: Record<string, AiModel[]> = {};
@@ -114,11 +108,7 @@ export const SelectAIModel = ({
           models?.map((model) => (
             <DropdownMenuItem key={model.slug} asChild>
               <button
-                onClick={() => {
-                  // localStorage.setItem("selectedModel", model.slug);
-                  setSelectedModel(model);
-                  setOpen(false);
-                }}
+                onClick={() => handleModleChange(model)}
                 disabled={!session.data?.user?.proUser && model.requiresPro}
                 className={`flex items-center p-2 gap-2 min-h-[50px] min-w-[400px] justify-between hover:bg-accent ${
                   selectedModel?.slug === model.slug ? "bg-accent" : ""
