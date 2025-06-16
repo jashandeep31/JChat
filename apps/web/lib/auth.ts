@@ -83,7 +83,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             {
               expiresIn: "7d",
             }
-          )
+          ),
+          {
+            domain: ".jashan.dev",
+            path: "/",
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60,
+          }
         );
         token.user = {
           id: dbUser.id,
