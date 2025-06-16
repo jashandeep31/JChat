@@ -65,7 +65,7 @@ const AnswerBubble = ({
   };
 
   return (
-    <div className="group">
+    <div className="">
       <div className={activeAnswer?.WebSearch?.length > 0 ? "" : "hidden"}>
         <h3 className="text-sm font-semibold">Sources</h3>
         <div className="overflow-x-auto flex mt-2 gap-4">
@@ -131,7 +131,7 @@ const AnswerBubble = ({
         </div>
       )}
 
-      <div className="flex mt-6 items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:duration-100">
+      <div className="flex mt-6 items-center gap-2 ">
         <CustomTooltip content="Copy">
           <Button
             variant={"ghost"}
@@ -167,14 +167,26 @@ const AnswerBubble = ({
         </CustomTooltip>
         <div className="md:hidden hidden lg:block">
           <CustomTooltip content="Model used / Credits used">
-            <p className="text-xs">
-              {
-                modelsQuery.data?.find(
-                  (model: AiModel) => model.id === activeAnswer.aiModelId
-                )?.name
-              }{" "}
-              / {activeAnswer.credits}
-            </p>
+            <div className="flex items-center gap-2">
+              {/*  eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={
+                  modelsQuery.data?.find(
+                    (model: AiModel) => model.id === activeAnswer.aiModelId
+                  )?.logo || ""
+                }
+                className="w-4 h-4 rounded-full "
+                alt=""
+              />
+              <p className="text-xs">
+                {
+                  modelsQuery.data?.find(
+                    (model: AiModel) => model.id === activeAnswer.aiModelId
+                  )?.name
+                }{" "}
+                / {activeAnswer.credits}
+              </p>
+            </div>
           </CustomTooltip>
         </div>
         <div className="flex items-center gap-2 ml-auto">

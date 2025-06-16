@@ -19,6 +19,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Button } from "@repo/ui/components/button";
 import useUserQuery from "@/lib/react-query/use-user-query";
 import { useRouter } from "next/navigation";
+import { ThemeToggler } from "../theme-toggler";
 // Mock data
 
 const navItems = ["Account", "API Keys", "Attachments"];
@@ -55,6 +56,7 @@ export const ProfileView = () => {
             Back to Chat
           </Button>
           <div className="flex items-center gap-4">
+            <ThemeToggler />
             <Button
               onClick={async () => {
                 await signOut({

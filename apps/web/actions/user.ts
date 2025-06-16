@@ -3,11 +3,10 @@
 import { auth } from "@/lib/auth";
 import { db, redis } from "@/lib/db";
 import { User } from "@repo/db";
-import { redirect } from "next/navigation";
 
 export const getUser = async (): Promise<User | null> => {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) return null;
   const key = `user:${session.user.id}`;
   const hit = await redis.get(key);
   if (hit) return JSON.parse(hit);

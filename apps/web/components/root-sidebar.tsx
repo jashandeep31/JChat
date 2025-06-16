@@ -1,3 +1,4 @@
+"use client";
 import React, { useContext } from "react";
 import {
   Sidebar,
@@ -14,6 +15,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Search } from "lucide-react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
+import { ThemeToggler } from "./theme-toggler";
 
 const RootSideBar = () => {
   const { data: session } = useSession();
@@ -22,8 +24,9 @@ const RootSideBar = () => {
     <div>
       <Sidebar>
         <SidebarHeader className="flex items-center gap-2 flex-row relative px-4 pt-3">
-          <SidebarTrigger className="absolute left-2" />
+          <SidebarTrigger className="" />
           <h2 className="flex-1 font-semibold text-center">JChat</h2>
+          <ThemeToggler className="border-0 p-1 shadow-none " size="sm" />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="p-3 space-y-2">

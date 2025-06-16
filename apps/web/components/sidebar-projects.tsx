@@ -29,10 +29,12 @@ import useProjectQuery, {
 } from "@/lib/react-query/use-project-query";
 import { useRouter, useParams } from "next/navigation";
 import { Project } from "@repo/db";
+import { useSession } from "next-auth/react";
 
 const SidebarProjects = () => {
   const router = useRouter();
   const params = useParams();
+  const session = useSession();
   const [createProjectDialogState, setCreateProjectDialogState] =
     useState(false);
   const { projectsQuery } = useProjectQuery();
@@ -106,6 +108,9 @@ const SidebarProjects = () => {
   const handleProjectClick = (projectId: string) => {
     router.push(`/project/${projectId}`);
   };
+  if (!session.data) {
+    return null;
+  }
   return (
     <>
       <SidebarGroup>
