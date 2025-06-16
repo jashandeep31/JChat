@@ -10,7 +10,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./dist/index.js"
   },
   "keywords": [],
   "author": "",
