@@ -114,9 +114,6 @@ importers:
       '@ai-sdk/react':
         specifier: ^1.2.12
         version: 1.2.12(react@19.1.0)(zod@3.25.56)
-      '@prisma/client':
-        specifier: ^6.8.2
-        version: 6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2)
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/database
