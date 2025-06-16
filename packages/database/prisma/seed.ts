@@ -1,35 +1,12 @@
 import { PrismaClient } from "@prisma/client";
+import { companies, companySlugs } from "./companies";
+import { openaiModels } from "./openai";
+import { googleModels } from "./gemini";
+import { groqModels } from "./groq";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const companies: {
-    name: string;
-    slug: string;
-    logo: string;
-  }[] = [
-    {
-      name: "Open AI",
-      slug: "open-ai",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/ChatGPT-Logo.svg/1024px-ChatGPT-Logo.svg.png",
-    },
-    {
-      name: "Google",
-      slug: "google",
-      logo: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.transparentpng.com%2Fcats%2Fgoogle-logo-2025.html&psig=AOvVaw3o2Se7Wh1FwpMFjrrOFjdk&ust=1749661581950000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNCgpbqr540DFQAAAAAdAAAAABAL",
-    },
-    {
-      name: "Anthropic",
-      slug: "anthropic",
-      logo: "https://img.icons8.com/fluent/512/claude.png",
-    },
-    {
-      name: "Groq",
-      slug: "groq",
-      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1A7gaDDexpewHghrUhXhUUw-RFxR4uIIbKf209FNVERmz0ov-BiEHige7skkVLzF40cA&usqp=CAU",
-    },
-  ];
-
   for (const company of companies) {
     await prisma.company.upsert({
       where: {
@@ -40,87 +17,16 @@ async function main() {
     });
   }
 
-  const models: {
-    name: string;
-    slug: string;
-    logo: string;
-    tag?: string;
-    requiresPro?: boolean;
-    credits?: number;
-    pdfAnalysis?: boolean;
-    imageAnalysis?: boolean;
-    companyId: string;
-    webAnalysis?: boolean;
-    reasoning?: boolean;
-  }[] = [
-    {
-      name: "Gemini 2.0 Flash",
-      slug: "gemini-2.0-flash",
-      logo: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.transparentpng.com%2Fcats%2Fgoogle-logo-2025.html&psig=AOvVaw3o2Se7Wh1FwpMFjrrOFjdk&ust=1749661581950000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNCgpbqr540DFQAAAAAdAAAAABAL",
-      tag: "Fast",
-      requiresPro: true,
-      credits: 1,
-      pdfAnalysis: true,
-      imageAnalysis: true,
-      webAnalysis: true,
-      reasoning: true,
-      companyId: "cmbqry1470001puke7yf8vd06",
-    },
-    {
-      name: "Gemini 2.5 Pro",
-      slug: "gemini-2.5-pro-preview-05-06",
-      logo: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.transparentpng.com%2Fcats%2Fgoogle-logo-2025.html&psig=AOvVaw3o2Se7Wh1FwpMFjrrOFjdk&ust=1749661581950000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNCgpbqr540DFQAAAAAdAAAAABAL",
-      tag: "Pro",
-      requiresPro: true,
-      credits: 2,
-      pdfAnalysis: true,
-      imageAnalysis: true,
-      webAnalysis: true,
-      reasoning: true,
-      companyId: "cmbqry1470001puke7yf8vd06",
-    },
-    {
-      name: "Chat GPT 4o Mini",
-      slug: "gpt-4o-mini",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/ChatGPT-Logo.svg/1024px-ChatGPT-Logo.svg.png",
-      tag: "Mini",
-      credits: 0.25,
-      requiresPro: false,
-      pdfAnalysis: false,
-      imageAnalysis: false,
-      webAnalysis: false,
-      reasoning: false,
-      companyId: "cmbqry13y0000pukes6vvnpqn",
-    },
-    {
-      name: "Gemini 2.0 Flash Image Generation",
-      slug: "gemini-2.0-flash-preview-image-generation",
-      logo: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.transparentpng.com%2Fcats%2Fgoogle-logo-2025.html&psig=AOvVaw3o2Se7Wh1FwpMFjrrOFjdk&ust=1749661581950000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNCgpbqr540DFQAAAAAdAAAAABAL",
-      tag: "Image",
-      requiresPro: false,
-      credits: 2,
-      pdfAnalysis: false,
-      imageAnalysis: false,
-      webAnalysis: false,
-      reasoning: false,
-      companyId: "cmbqry1470001puke7yf8vd06",
-    },
-    {
-      name: "Groq Llama 4 Scout",
-      slug: "meta-llama/llama-4-scout-17b-16e-instruct",
-      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1A7gaDDexpewHghrUhXhUUw-RFxR4uIIbKf209FNVERmz0ov-BiEHige7skkVLzF40cA&usqp=CAU",
-      tag: "Pro",
-      requiresPro: true,
-      credits: 4,
-      pdfAnalysis: false,
-      imageAnalysis: false,
-      webAnalysis: false,
-      reasoning: false,
-      companyId: "cmbwbtl4s0003pu0qe245678l",
-    },
-  ];
-
-  for (const model of models) {
+  const models = [...openaiModels, ...googleModels, ...groqModels];
+  for (const { companySlug, ...model } of models) {
+    const company = await prisma.company.findUnique({
+      where: {
+        slug: companySlug,
+      },
+    });
+    if (!company) {
+      throw new Error(`Company ${companySlug} not found`);
+    }
     await prisma.aiModel.upsert({
       where: {
         slug: model.slug,
@@ -128,6 +34,7 @@ async function main() {
       update: {},
       create: {
         ...model,
+        companyId: company.id,
       },
     });
   }
@@ -137,3 +44,18 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
+
+export interface Model {
+  name: string;
+  slug: string;
+  logo: string;
+  tag?: string;
+  requiresPro?: boolean;
+  credits?: number;
+  type: "TEXT_GENERATION" | "IMAGE_GENERATION";
+  pdfAnalysis?: boolean;
+  imageAnalysis?: boolean;
+  webAnalysis?: boolean;
+  reasoning?: boolean;
+  companySlug: (typeof companySlugs)[number];
+}

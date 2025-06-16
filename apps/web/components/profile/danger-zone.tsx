@@ -21,7 +21,7 @@ export const DangerZone = () => (
       <AlertDialogTrigger asChild>
         <Button
           variant="destructive"
-          className="bg-red-100 text-red-700 hover:bg-red-200 border border-red-200"
+          className="bg-red-100 dark:bg-red-100 text-red-700 hover:bg-red-200 border border-red-200"
         >
           Delete Account
         </Button>

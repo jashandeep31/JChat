@@ -9,21 +9,13 @@ import { Progress } from "@repo/ui/components/progress";
 interface UsageCardProps {
   used?: number;
   total?: number;
-  resetTime?: string;
 }
 
-export const UsageCard = ({
-  used = 0,
-  total = 20,
-  resetTime = "5:30 AM",
-}: UsageCardProps) => (
+export const UsageCard = ({ used = 0, total = 20 }: UsageCardProps) => (
   <Card className="bg-background/80 backdrop-blur-sm border-none shadow-sm">
     <CardHeader className="pb-2">
       <div className="flex justify-between items-baseline">
         <CardTitle className="text-sm font-semibold">Message Usage</CardTitle>
-        <p className="text-xs text-muted-foreground">
-          Resets tomorrow at {resetTime}
-        </p>
       </div>
     </CardHeader>
     <CardContent>

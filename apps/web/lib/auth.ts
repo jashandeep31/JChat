@@ -70,6 +70,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: user.name || user.email.split("@")[0],
             avatar: user.image,
             credits: 10,
+            totalCredits: 10,
             proUser: false,
           },
           update: {},
