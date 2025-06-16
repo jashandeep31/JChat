@@ -9,9 +9,10 @@ import { useParams } from "next/navigation";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 import StreamBubble from "./stream-bubble";
 import { ShareDropdown } from "./share-dropdown";
+import { Chat } from "@repo/db";
 import InstructionCard from "./instruction-card";
 
-const ChatView: React.FC = () => {
+const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
   const { cid } = useParams<{ cid: string }>();
   const { chatQuestions, isStreaming, streamingResponse, setIsStreaming } =
     useChatSocket(cid, {
@@ -56,7 +57,10 @@ const ChatView: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
       <div className="fixed  top-4 right-4 z-10 flex gap-2 bg-sidebar border rounded-lg p-1.5">
-        <InstructionCard chatId={cid} />
+        <InstructionCard
+          chatId={cid}
+          initialInstruction={chat.instruction || ""}
+        />
         <ShareDropdown>
           <button
             className="p-2 rounded hover:bg-accent transition-colors duration-200"

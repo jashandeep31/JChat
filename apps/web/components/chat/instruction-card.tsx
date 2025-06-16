@@ -15,10 +15,14 @@ import { toast } from "sonner";
 
 interface InstructionCardProps {
   chatId: string;
+  initialInstruction: string;
 }
 
-const InstructionCard: React.FC<InstructionCardProps> = ({ chatId }) => {
-  const [instruction, setInstruction] = useState("");
+const InstructionCard: React.FC<InstructionCardProps> = ({
+  chatId,
+  initialInstruction,
+}) => {
+  const [instruction, setInstruction] = useState(initialInstruction || "");
   const { addChatIntructionMutation } = useChatQuery();
 
   const handleSave = () => {
@@ -39,6 +43,10 @@ const InstructionCard: React.FC<InstructionCardProps> = ({ chatId }) => {
         },
       }
     );
+  };
+
+  const handleCancel = () => {
+    setInstruction(initialInstruction || "");
   };
 
   return (
@@ -62,6 +70,9 @@ const InstructionCard: React.FC<InstructionCardProps> = ({ chatId }) => {
               placeholder="Example: Answer the question in 2 sentences"
             />
             <div className="mt-3 flex justify-end gap-2">
+              <Button size={"sm"} variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
               <Button
                 disabled={addChatIntructionMutation.isPending}
                 size={"sm"}
