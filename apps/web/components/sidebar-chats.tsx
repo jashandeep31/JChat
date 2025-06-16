@@ -26,17 +26,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import DeleteDialog from "./delete-dialog";
 import RenameDialog from "./rename-dialog";
 import MoveToProjectDialog from "./move-to-project-dialog";
 import ShareDialog from "./share-dialog";
 import { Chat } from "@repo/db";
+import { useCurrentChat } from "@/context/current-chat-context";
 
 const SidebarChats = () => {
   const params = useParams();
-  const router = useRouter();
+  const { startNewChat } = useCurrentChat();
   const { isMobile } = useSidebar();
   const {
     chatsQuery,
@@ -75,7 +75,7 @@ const SidebarChats = () => {
     if (!currentChat) return;
 
     if (params.cid === currentChat.id) {
-      router.push("/");
+      startNewChat();
     }
 
     const toastId = toast.loading("Deleting chat...");
