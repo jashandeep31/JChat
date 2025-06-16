@@ -1,35 +1,50 @@
 import { getChat } from "../../services/chat-cache.js";
 import { db, redis } from "../../lib/db.js";
 import { SocketFunctionParams } from "../../models/types.js";
+
 export const joinChatHandler = async ({
   socket,
   io,
   data,
 }: SocketFunctionParams) => {
   const cid = data;
-  const chat = await getChat(cid, socket.userId);
-  if (!chat) {
-    socket.emit("error", "Chat not found");
-    return;
-  }
-  socket.join(`room:${chat.id}`);
-
-  const streamingData = await redis.get(`chat:${chat.id}:isStreaming`);
-  if (streamingData) {
-    socket.emit("question_response_chunk", streamingData);
-  }
-
-  const qaPairs = await db.chatQuestion.findMany({
+  const chatPromise = getChat(cid, socket.userId);
+  const streamingPromise = redis.get(`chat:${cid}:isStreaming`);
+  const qaPromise = db.chatQuestion.findMany({
     where: { chatId: cid },
     orderBy: { createdAt: "asc" },
-    include: {
+    select: {
+      id: true,
+      question: true,
+      createdAt: true,
       ChatQuestionAnswer: {
         orderBy: { createdAt: "asc" },
-        include: {
-          WebSearch: true,
+        select: {
+          answer: true,
+          aiModelId: true,
+          credits: true,
+          base64Image: true,
+          WebSearch: { select: { id: true } },
         },
       },
     },
   });
-  io.to(`room:${chat.id}`).emit("qa_pairs", { cid: cid, qaPairs });
+
+  const [chat, streamingData, qaPairs] = await Promise.all([
+    chatPromise,
+    streamingPromise,
+    qaPromise,
+  ]);
+
+  if (!chat) {
+    socket.emit("error", "Chat not found");
+    return;
+  }
+
+  socket.join(`room:${chat.id}`);
+  if (streamingData) {
+    socket.emit("question_response_chunk", streamingData);
+  }
+
+  io.to(`room:${chat.id}`).emit("qa_pairs", { cid, qaPairs });
 };

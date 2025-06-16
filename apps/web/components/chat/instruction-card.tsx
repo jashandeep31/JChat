@@ -15,14 +15,10 @@ import { toast } from "sonner";
 
 interface InstructionCardProps {
   chatId: string;
-  initialInstruction: string;
 }
 
-const InstructionCard: React.FC<InstructionCardProps> = ({
-  chatId,
-  initialInstruction,
-}) => {
-  const [instruction, setInstruction] = useState(initialInstruction || "");
+const InstructionCard: React.FC<InstructionCardProps> = ({ chatId }) => {
+  const [instruction, setInstruction] = useState("");
   const { addChatIntructionMutation } = useChatQuery();
 
   const handleSave = () => {
@@ -46,7 +42,7 @@ const InstructionCard: React.FC<InstructionCardProps> = ({
   };
 
   const handleCancel = () => {
-    setInstruction(initialInstruction || "");
+    setInstruction("");
   };
 
   return (

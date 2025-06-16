@@ -8,7 +8,7 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
-import { Button, buttonVariants } from "@repo/ui/components/button";
+import { Button } from "@repo/ui/components/button";
 import SidebarProjects from "./sidebar-projects";
 import SidebarChats from "./sidebar-chats";
 import Link from "next/link";
@@ -16,10 +16,12 @@ import { useSession } from "next-auth/react";
 import { Search } from "lucide-react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
 import { ThemeToggler } from "./theme-toggler";
+import { useCurrentChat } from "@/context/current-chat-context";
 
 const RootSideBar = () => {
   const { data: session } = useSession();
   const { setOpen } = useContext(SearchDialogContext);
+  const { startNewChat } = useCurrentChat();
   return (
     <div>
       <Sidebar>
@@ -30,9 +32,7 @@ const RootSideBar = () => {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="p-3 space-y-2">
-            <Link href={"/"} className={buttonVariants()}>
-              New Chat
-            </Link>
+            <Button onClick={startNewChat}>New Chat</Button>
             <Button
               variant={"outline"}
               onClick={() => setOpen(true)}

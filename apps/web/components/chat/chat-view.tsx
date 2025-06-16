@@ -5,17 +5,14 @@ import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
 import { ChevronDown, Share2 } from "lucide-react";
-import { useParams } from "next/navigation";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 import StreamBubble from "./stream-bubble";
 import { ShareDropdown } from "./share-dropdown";
-import { Chat } from "@repo/db";
 import InstructionCard from "./instruction-card";
 
-const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
-  const { cid } = useParams<{ cid: string }>();
+const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
   const { chatQuestions, isStreaming, streamingResponse, setIsStreaming } =
-    useChatSocket(cid, {
+    useChatSocket(chatId, {
       questions: [],
     });
   const [showScrollDownButton, setShowScrollDownButton] = useState(false);
@@ -57,10 +54,7 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
       <div className="fixed  top-4 right-4 z-10 flex gap-2 bg-sidebar border rounded-lg p-1.5">
-        <InstructionCard
-          chatId={cid}
-          initialInstruction={chat.instruction || ""}
-        />
+        <InstructionCard chatId={chatId} />
         <ShareDropdown>
           <button
             className="p-2 rounded hover:bg-accent transition-colors duration-200"

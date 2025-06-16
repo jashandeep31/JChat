@@ -1,7 +1,6 @@
 import { db } from "../../lib/db.js";
 import { SocketFunctionParams } from "../../models/types.js";
 import * as z from "zod";
-
 const branchOffSchema = z.object({
   questionId: z.string(),
   cid: z.string(),
@@ -12,68 +11,53 @@ export const branchOffHandler = async ({
   socket,
   io,
 }: SocketFunctionParams) => {
-  const result = branchOffSchema.parse(data);
-
-  const chatQuestion = await db.chatQuestion.findUnique({
-    where: { id: result.questionId },
+  const { questionId, cid } = branchOffSchema.parse(data);
+  socket.emit("branch_chat_started", "");
+  const chatQuestion = await db.chatQuestion.findUniqueOrThrow({
+    where: { id: questionId },
+    select: { createdAt: true },
   });
 
-  if (!chatQuestion) {
-    throw new Error("Chat question not found");
-  }
-
-  const chat = await db.chat.findUnique({
-    where: { id: result.cid },
-    include: {
+  const chat = await db.chat.findUniqueOrThrow({
+    where: { id: cid },
+    select: {
+      name: true,
       ChatQuestion: {
         where: {
-          createdAt: {
-            lte: chatQuestion.createdAt,
-          },
+          createdAt: { lte: new Date(chatQuestion.createdAt.getTime() + 2000) },
         },
-        include: {
-          ChatQuestionAnswer: true,
+        select: {
+          question: true,
+          attachmentId: true,
+          ChatQuestionAnswer: {
+            select: {
+              answer: true,
+              aiModelId: true,
+              credits: true,
+              base64Image: true,
+            },
+          },
         },
       },
     },
   });
 
-  if (!chat) {
-    throw new Error("Chat not found");
-  }
-
-  await db.$transaction(async (tx) => {
-    const newChat = await tx.chat.create({
-      data: {
-        name: `Branch ${chat.name}`,
-        userId: socket.userId,
-        type: "BRANCHED",
-      },
-    });
-
-    // Create ChatQuestions and their Answers manually
-    for (const cq of chat.ChatQuestion) {
-      const newCQ = await tx.chatQuestion.create({
-        data: {
-          chatId: newChat.id,
+  const newChat = await db.chat.create({
+    data: {
+      name: `Branch ${chat.name}`,
+      userId: socket.userId,
+      type: "BRANCHED",
+      ChatQuestion: {
+        create: chat.ChatQuestion.map((cq) => ({
           question: cq.question,
           attachmentId: cq.attachmentId,
-        },
-      });
-
-      if (cq.ChatQuestionAnswer.length > 0) {
-        await tx.chatQuestionAnswer.createMany({
-          data: cq.ChatQuestionAnswer.map((answer) => ({
-            chatQuestionId: newCQ.id,
-            answer: answer.answer,
-            aiModelId: answer.aiModelId,
-            credits: answer.credits,
-            base64Image: answer.base64Image,
-          })),
-        });
-      }
-    }
-
-    socket.emit("chat_created", newChat);
+          ChatQuestionAnswer: {
+            createMany: { data: cq.ChatQuestionAnswer },
+          },
+        })),
+      },
+    },
+    select: { id: true, name: true },
   });
+  socket.emit("branch_chat_created", newChat);
 };

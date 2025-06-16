@@ -31,5 +31,12 @@ app.get("/api/v1", (req: Request & { userId?: string }, res) => {
 });
 app.use("/api/v1", generatePresignedUrlRoutes);
 app.use("/api/v1", attachmentRoutes);
-
+// app.use("/api/v1/delete", async (req, res) => {
+//   await db.chat.deleteMany();
+//   await db.chatQuestion.deleteMany();
+//   await db.chatQuestionAnswer.deleteMany();
+//   await db.chatShareLink.deleteMany();
+//   await db.project.deleteMany();
+//   res.send("Deleted");
+// });
 export default app;

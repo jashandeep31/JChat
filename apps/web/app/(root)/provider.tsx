@@ -15,6 +15,7 @@ export const Provider = ({
   defaultOpen?: boolean;
 }) => {
   const { setOpen } = useContext(SearchDialogContext);
+
   useEffect(() => {
     window.addEventListener("keydown", (e) => {
       if (e.key === "k" && e.ctrlKey) {

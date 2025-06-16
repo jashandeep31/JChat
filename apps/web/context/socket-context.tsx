@@ -6,6 +6,7 @@ import { createContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { BACKEND_URL } from "@/lib/constants";
+import { useCurrentChat } from "./current-chat-context";
 
 export const SocketContext = createContext<Socket | null>(null);
 const SOCKET_URL = BACKEND_URL;
@@ -14,6 +15,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
+  const { setChatId } = useCurrentChat();
   const { appendChat, updateChatName } = useChatQuery();
   const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -27,8 +29,16 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (socket) {
-      socket.on("chat_created", (chat: Chat) => {
+      socket.on("branch_chat_started", () => {
+        router.push(`/branching/`);
+      });
+      socket.on("branch_chat_created", (chat: Chat) => {
         router.push(`/chat/${chat.id}`);
+        setChatId(chat.id);
+        appendChat(chat);
+      });
+      socket.on("chat_created", (chat: Chat) => {
+        setChatId(chat.id);
         appendChat(chat);
       });
       socket.on("chat_name_updated", (chat: Chat) => {
@@ -38,7 +48,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         toast.error(error);
       });
     }
-  }, [socket, router, appendChat, updateChatName]);
+  }, [socket, router, appendChat, updateChatName, setChatId]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
