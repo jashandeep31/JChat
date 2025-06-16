@@ -26,11 +26,7 @@ const page = async () => {
       </div>
       <div className="flex justify-center  ">
         <div className="lg:max-w-[800px] flex-1 w-full">
-          {session?.user ? (
-            <ChatInputBox />
-          ) : (
-            <LoginPromptCard message="Please sign in to use JChat" />
-          )}
+          {session?.user ? <ChatInputBox /> : <LoginPromptCard />}
         </div>
       </div>
     </div>
@@ -39,20 +35,12 @@ const page = async () => {
 
 export default page;
 
-interface LoginPromptCardProps {
-  title?: string;
-  message: string;
-}
-
-export function LoginPromptCard({
-  title = "Login Required",
-  message,
-}: LoginPromptCardProps) {
+function LoginPromptCard() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-2xl">{title}</CardTitle>
-        <CardDescription>{message}</CardDescription>
+        <CardTitle className="text-2xl">Login Required</CardTitle>
+        <CardDescription>Please sign in to use JChat</CardDescription>
       </CardHeader>
       <CardContent>
         <Link
