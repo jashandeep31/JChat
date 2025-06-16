@@ -85,6 +85,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
           ),
           {
+            domain: ".jashan.dev",
             path: "/",
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
