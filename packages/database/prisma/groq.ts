@@ -35,4 +35,26 @@ models.push({
   webAnalysis: true,
 });
 
+models.push({
+  ...baseMode,
+  name: "Llama 3.1",
+  slug: "llama-3.1-8b-instant",
+  tag: "Pro",
+  logo: "https://nationaltechnology.co.uk/images/Meta%20Logo.png",
+  requiresPro: true,
+  credits: 4,
+  webAnalysis: false,
+});
+
+models.push({
+  ...baseMode,
+  name: "Llama 3.0 8B",
+  slug: "llama3-8b-8192",
+  tag: "Pro",
+  logo: "https://nationaltechnology.co.uk/images/Meta%20Logo.png",
+  requiresPro: true,
+  credits: 4,
+  webAnalysis: false,
+});
+
 export const groqModels = models;

@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import { env } from "./lib/env.js";
 const app = express();
 app.use(cookieParser());
+app.use(express.json());
 app.use(
   cors({
     origin: env.FRONTEND_URL,
@@ -21,6 +22,7 @@ app.use("/api/v1", (req: Request & { userId?: string }, res, next) => {
   if (!jwtToken) return next(new Error("Authentication error"));
   const decoded = jwt.verify(jwtToken, env.JWT_SECRET);
   req.userId = (decoded as any).user.id;
+  console.log(`request pazsed`);
   next();
 });
 
@@ -29,14 +31,5 @@ app.get("/api/v1", (req: Request & { userId?: string }, res) => {
 });
 app.use("/api/v1", generatePresignedUrlRoutes);
 app.use("/api/v1", attachmentRoutes);
-
-// app.get("/delete", async (req, res) => {
-//   await db.chatQuestionAnswer.deleteMany();
-//   await db.chatQuestion.deleteMany();
-//   await db.chat.deleteMany();
-//   await db.project.deleteMany();
-
-//   res.send("Deleted");
-// });
 
 export default app;

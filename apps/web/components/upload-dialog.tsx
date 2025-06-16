@@ -53,6 +53,7 @@ export function UploadDialog({
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           name: file?.name,
           contentType: file?.type,
@@ -126,9 +127,15 @@ export function UploadDialog({
           }
         },
       });
-      const res = await axios.post(`${BACKEND_URL}/api/v1/create/attachment`, {
-        attachmentId: result.uploadId,
-      });
+      const res = await axios.post(
+        `${BACKEND_URL}/api/v1/create/attachment`,
+        {
+          attachmentId: result.uploadId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (!res.data.attachment) {
         toast.error("Failed to create attachment");

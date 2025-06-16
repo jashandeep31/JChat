@@ -68,7 +68,7 @@ const AnswerBubble = ({
     <div className="">
       <div className={activeAnswer?.WebSearch?.length > 0 ? "" : "hidden"}>
         <h3 className="text-sm font-semibold">Sources</h3>
-        <div className="overflow-x-auto flex mt-2 gap-4">
+        <div className="overflow-x-auto flex mt-2 gap-4 hide-scrollbar">
           {activeAnswer.WebSearch.map((webSearch) => (
             <Link
               href={webSearch.url}

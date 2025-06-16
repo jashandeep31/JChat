@@ -32,3 +32,16 @@ pre code.hljs {
   opacity: 1;
   background: var(--primary);
 }
+
+/* Class to hide scrollbar while maintaining scroll functionality */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  overflow: auto; /* Maintain scroll functionality */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+  width: 0;
+  height: 0;
+}
