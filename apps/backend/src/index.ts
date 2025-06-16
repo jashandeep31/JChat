@@ -13,7 +13,7 @@ const server = createServer(app);
 redis.flushall();
 export const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: env.FRONTEND_URL,
     credentials: true,
   },
 });
@@ -23,7 +23,7 @@ io.use((socket, next) => {
   const { ["jwt-token"]: jwtToken } = cookie.parse(raw);
   if (!jwtToken) return next(new Error("Authentication error"));
   try {
-    const decoded = jwt.verify(jwtToken, "secret");
+    const decoded = jwt.verify(jwtToken, env.JWT_SECRET);
     socket.userId = (decoded as any).user.id;
     next();
   } catch {

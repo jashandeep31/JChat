@@ -4,6 +4,8 @@ dotenv.config();
 
 export const env = {
   PORT: process.env.PORT,
+  FRONTEND_URL: process.env.FRONTEND_URL as string,
+  JWT_SECRET: process.env.JWT_SECRET as string,
   GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
   GOOGLE_GENERATIVE_AI_API_KEY: process.env
     .GOOGLE_GENERATIVE_AI_API_KEY as string,

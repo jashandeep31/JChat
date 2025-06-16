@@ -69,14 +69,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: user.email,
             name: user.name || user.email.split("@")[0],
             avatar: user.image,
+            credits: 10,
+            proUser: false,
           },
           update: {},
         });
         cookieStore.set(
           "jwt-token",
-          jwt.sign({ user: { id: dbUser.id, email: dbUser.email } }, "secret", {
-            expiresIn: "7d",
-          })
+          jwt.sign(
+            { user: { id: dbUser.id, email: dbUser.email } },
+            process.env.JWT_SECRET!,
+            {
+              expiresIn: "7d",
+            }
+          )
         );
         token.user = {
           id: dbUser.id,
