@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
+import { BACKEND_URL } from "@/lib/constants";
 
 export const SocketContext = createContext<Socket | null>(null);
-const SOCKET_URL = "http://localhost:8000";
+const SOCKET_URL = BACKEND_URL;
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
