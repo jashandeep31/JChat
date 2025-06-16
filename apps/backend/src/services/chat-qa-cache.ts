@@ -29,8 +29,21 @@ export async function getChatQACache(
 
     if (chatQA.length === 0) return null;
 
-    await redis.set(key, JSON.stringify(chatQA), "EX", CHAT_TTL);
-    return chatQA;
+    let newShortnedQa = chatQA.map((qa) => {
+      return {
+        ...qa,
+        question: qa.question.slice(0, 100),
+        ChatQuestionAnswer: qa.ChatQuestionAnswer.map((answer) => {
+          return {
+            ...answer,
+            answer: answer.answer.slice(0, 100),
+          };
+        }),
+      };
+    });
+
+    await redis.set(key, JSON.stringify(newShortnedQa), "EX", CHAT_TTL);
+    return newShortnedQa;
   } catch (err) {
     console.error(`Error fetching chat QA cache for ${cid}:`, err);
     return null;

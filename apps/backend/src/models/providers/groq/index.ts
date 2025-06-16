@@ -29,9 +29,10 @@ export const askGroqQuestion = async ({
     if (question.webSearch) {
       const res = await webSearch(question.question);
       if (res) {
+        const allSnippets = res.map((result) => result.snippet).join("\n\n");
         messages.push({
-          role: "assistant",
-          content: `Here is the web search result: ${JSON.stringify(res)}`,
+          role: "system",
+          content: `Please reffer to this online infromation ${allSnippets}`,
         });
         res.map((result) => {
           webSearches.push({
@@ -42,7 +43,6 @@ export const askGroqQuestion = async ({
         onWebSearchChunk(webSearches);
       }
     }
-
     try {
       const res = streamText({
         model: groq(model.slug),
