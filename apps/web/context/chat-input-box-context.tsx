@@ -63,7 +63,10 @@ export const ChatInputBoxProvider = ({
     }
 
     if (selectedModel === null && modelsQuery.data?.length) {
-      setSelectedModel(modelsQuery.data[0]);
+      setSelectedModel(
+        modelsQuery.data.find((model) => model.slug === "gemini-2.0-flash") ||
+          null
+      );
     }
   }, [modelsQuery.data, selectedModel]);
   const handleModelChange = (model: AiModel) => {
