@@ -30,13 +30,15 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
   }, [resolvedTheme]);
 
   return (
-    <ReactMarkdown
-      components={markdownComponents}
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeRaw, rehypeHighlight]}
-    >
-      {content}
-    </ReactMarkdown>
+    <div className="md:max-w-[800px] w-full ">
+      <ReactMarkdown
+        components={markdownComponents}
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeHighlight]}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 };
 
