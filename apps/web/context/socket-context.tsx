@@ -17,7 +17,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const socketInstance = io(SOCKET_URL);
+    const socketInstance = io(SOCKET_URL, { withCredentials: true });
     setSocket(socketInstance);
     return () => {
       socketInstance.disconnect();

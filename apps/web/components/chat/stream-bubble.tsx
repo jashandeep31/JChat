@@ -13,8 +13,6 @@ const StreamBubble = ({
     reasoning: string;
   };
 }) => {
-  console.log(streamData, "streamData");
-
   const reasoningRef = useRef<HTMLDivElement>(null);
   const reasoningEndRef = useRef<HTMLDivElement>(null);
   // Auto-scroll the reasoning section to bottom whenever content changes without affecting main page scroll

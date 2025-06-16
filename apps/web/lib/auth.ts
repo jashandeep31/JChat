@@ -1,9 +1,48 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import { db } from "./db";
-// import jwt from "jsonwebtoken";
+import Credential from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [Google],
+  providers: [
+    Google,
+    Credential({
+      credentials: {
+        email: {},
+        password: {},
+      },
+      authorize: async (credentials) => {
+        console.log(credentials);
+        const email = credentials?.email;
+        const password = credentials?.password;
+        if (
+          !email ||
+          !password ||
+          typeof email !== "string" ||
+          typeof password !== "string"
+        ) {
+          throw new Error("Invalid credentials.");
+        }
+
+        const user = await db.user.findUnique({
+          where: {
+            email,
+          },
+        });
+        if (!user || !user.password) {
+          throw new Error("Invalid credentials.");
+        }
+        const isPasswordValid = bcrypt.compareSync(password, user.password);
+        if (!isPasswordValid) {
+          throw new Error("Invalid credentials.");
+        }
+        return user;
+      },
+    }),
+  ],
   session: {
     strategy: "jwt",
   },
@@ -15,15 +54,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.user) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         session.user = token.user as any;
-        // session.user.jwt = jwt.sign(
-        //   { user: token.user },
-        //   process.env.JWT_SECRET as string
-        // );
       }
       return session;
     },
 
     async jwt({ token, user }) {
+      const cookieStore = await cookies();
       if (user && user.email) {
         const dbUser = await db.user.upsert({
           where: {
@@ -36,6 +72,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
           update: {},
         });
+        cookieStore.set(
+          "jwt-token",
+          jwt.sign({ user: { id: dbUser.id, email: dbUser.email } }, "secret", {
+            expiresIn: "7d",
+          })
+        );
         token.user = {
           id: dbUser.id,
           name: dbUser.name,
@@ -50,15 +92,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 });
 
 declare module "next-auth" {
-  /**
-   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
   interface Session {
     user: {
       id: string;
       proUser: boolean;
       credits: number;
-      jwt: string;
     } & DefaultSession["user"];
   }
 }

@@ -5,11 +5,12 @@ import { createServer } from "node:http";
 import { socketHandler } from "./sockets/index.js";
 import { initializeQueues } from "./queues/index.js";
 import { redis } from "./lib/db.js";
+import jwt from "jsonwebtoken";
+import cookie from "cookie";
 
 const PORT = env.PORT;
 const server = createServer(app);
 redis.flushall();
-// Initialize Socket.IO
 export const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -18,8 +19,16 @@ export const io = new Server(server, {
 });
 
 io.use((socket, next) => {
-  socket.userId = "1945b260-5c8a-4134-862f-8e255d34c7e6";
-  next();
+  const raw = socket.handshake.headers.cookie || "";
+  const { ["jwt-token"]: jwtToken } = cookie.parse(raw);
+  if (!jwtToken) return next(new Error("Authentication error"));
+  try {
+    const decoded = jwt.verify(jwtToken, "secret");
+    socket.userId = (decoded as any).user.id;
+    next();
+  } catch {
+    next(new Error("Authentication error"));
+  }
 });
 
 // Initialize queues with io instance

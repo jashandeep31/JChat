@@ -2,6 +2,7 @@ import { Button } from "@repo/ui/components/button";
 import React from "react";
 import { auth, signIn } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { CredentialsLoginDialog } from "./creds-login-dialog";
 
 const login = async () => {
   const session = await auth();
@@ -28,11 +29,14 @@ const login = async () => {
             <Button className="block w-full ">Continue with Google</Button>
           </form>
         </div>
+        <div className="mt-4 space-y-4">
+          <CredentialsLoginDialog triggerButtonText="Theo only Login" />
+        </div>
+
         <div className="mt-6">
           <p className="">
-            By logging in, you agree to our{" "}
-            <span className="text-primary">Terms of Service</span> and{" "}
-            <span className="text-primary">Privacy Policy</span>
+            To get Pro Account access login with credentials sent to X account
+            of Theo from @jashandeep31
           </p>
         </div>
       </div>
