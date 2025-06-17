@@ -11,14 +11,14 @@ import {
   CommandList,
 } from "@repo/ui/components/command";
 import { Clock } from "lucide-react";
-import useChatQuery from "@/lib/react-query/use-chat-query";
 import { useContext } from "react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
 import { Chat } from "@repo/db";
+import { useChatsStore } from "@/z-store/chats-store";
 
 export function SearchDialog() {
   const { open, setOpen } = useContext(SearchDialogContext);
-  const { chatsQuery } = useChatQuery();
+  const { chats } = useChatsStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export function SearchDialog() {
             <Clock className="mr-2 h-4 w-4" />
             Recent Chats
           </div>
-          {chatsQuery.data?.map((chat: Chat) => (
+          {chats?.map((chat: Chat) => (
             <CommandItem
               key={chat.id}
               value={chat.name + chat.id}

@@ -111,14 +111,13 @@ export const questionAnswerHandler = async ({
       answer: { ...chatQuestionAnswer, WebSearch: dbWebSearch },
     });
     refreshChatQACache(cid);
+
     const updatedUser = await db.user.update({
       where: {
         id: user.id,
       },
       data: {
-        credits: {
-          decrement: credits,
-        },
+        credits: user.credits - credits > 0 ? user.credits - credits : 0,
       },
     });
     await redis.del(`user:${user.id}`);
