@@ -161,7 +161,7 @@ async function buildSystemContext(cid: string) {
   const messages: { role: "system"; content: string }[] = [];
   const chatQA = await getChatQACache(cid);
 
-  if (chatQA && chatQA.length) {
+  if (chatQA && chatQA.length > 0) {
     for (const { question, ChatQuestionAnswer } of chatQA) {
       const lastAnswer = ChatQuestionAnswer.at(-1)?.answer ?? "";
       messages.push({
