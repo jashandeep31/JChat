@@ -22,7 +22,6 @@ const QuestionBubbleInner = ({ question }: { question: FullQuestion }) => {
   const { setIsStreaming, setStreamingResponse } = useChatContext();
   const [textAreaValue, setTextAreaValue] = useState(question.question);
   const [textareaHeight, setTextareaHeight] = useState("auto");
-  const [textareaWidth, setTextareaWidth] = useState("auto");
   const [isEditing, setIsEditing] = useState(false);
 
   const [isCopied, setIsCopied] = useState(false);
@@ -41,10 +40,8 @@ const QuestionBubbleInner = ({ question }: { question: FullQuestion }) => {
     const questionCard = questionCardRef.current;
     if (questionCard) {
       const currentHeight = questionCard.clientHeight;
-      const currentWidth = questionCard.clientWidth;
-      console.log(currentHeight, currentWidth);
+      console.log(currentHeight);
       setTextareaHeight(`${currentHeight}px`);
-      setTextareaWidth(`${currentWidth + 5}px`);
       setIsEditing(true);
     }
   };
@@ -102,8 +99,8 @@ const QuestionBubbleInner = ({ question }: { question: FullQuestion }) => {
       {isEditing ? (
         <textarea
           ref={textareaRef}
-          className="bg-accent p-3 rounded-md lg:max-w-2/3 outline-none  resize-none  hide-scrollbar"
-          style={{ height: `${textareaHeight}`, width: `${textareaWidth}` }}
+          className="bg-accent p-3 rounded-md lg:max-w-2/3 outline-none  w-full resize-none  hide-scrollbar"
+          style={{ height: `${textareaHeight}` }}
           value={textAreaValue}
           onChange={(e) => setTextAreaValue(e.target.value)}
         />
