@@ -39,6 +39,9 @@ const worker = new Worker(
         data: { name: chatName },
       });
 
+      redis.del(`chat:${chatId}`);
+      redis.set(`chat:${chatId}`, JSON.stringify(updatedChat), "EX", 20 * 60);
+
       // Notify the specific client that requested the chat name update
       if (socketId) {
         const io = getIO();

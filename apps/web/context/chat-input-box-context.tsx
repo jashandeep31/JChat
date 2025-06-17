@@ -54,7 +54,7 @@ export const ChatInputBoxProvider = ({
 
     if (selectedModelSlug && modelsQuery.data) {
       const model = modelsQuery.data.find(
-        (model) => model.slug === selectedModelSlug
+        (model: AiModel) => model.slug === selectedModelSlug
       );
       if (model) {
         setSelectedModel(model);
@@ -64,8 +64,9 @@ export const ChatInputBoxProvider = ({
 
     if (selectedModel === null && modelsQuery.data?.length) {
       setSelectedModel(
-        modelsQuery.data.find((model) => model.slug === "gemini-2.0-flash") ||
-          null
+        modelsQuery.data.find(
+          (model: AiModel) => model.slug === "gemini-2.0-flash"
+        ) || null
       );
     }
   }, [modelsQuery.data, selectedModel]);

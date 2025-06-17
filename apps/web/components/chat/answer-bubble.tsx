@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import MarkdownRenderer from "../markdown-renderer";
-import { FullChatQuestion } from "@/hooks/use-chat-socket";
+import { FullQuestion } from "@/z-store/chat-qa-store";
 import { Button } from "@repo/ui/components/button";
 import {
   Check,
@@ -22,14 +22,13 @@ import { SocketContext } from "@/context/socket-context";
 import useModelsQuery from "@/lib/react-query/use-models-query";
 import { RetryModelSelector } from "../retry-model-selector";
 import { AiModel } from "@repo/db";
-import Link from "next/link";
 
 const AnswerBubble = ({
   question,
   isStreaming,
   setIsStreaming,
 }: {
-  question: FullChatQuestion;
+  question: FullQuestion;
   isStreaming: boolean;
   setIsStreaming: (value: boolean) => void;
 }) => {
@@ -66,7 +65,7 @@ const AnswerBubble = ({
 
   return (
     <div className="">
-      <div
+      {/* <div
         className={
           activeAnswer?.WebSearch?.length > 0 ? "max-w-[800px]" : "hidden"
         }
@@ -90,7 +89,7 @@ const AnswerBubble = ({
               )
           )}
         </div>
-      </div>
+      </div> */}
       {activeAnswer.reasoning && (
         <div>
           <button
@@ -234,11 +233,9 @@ const AnswerNavigation = ({
   activeAnswer,
   setActiveAnswer,
 }: {
-  answers: FullChatQuestion["ChatQuestionAnswer"];
-  activeAnswer: FullChatQuestion["ChatQuestionAnswer"][number];
-  setActiveAnswer: (
-    answer: FullChatQuestion["ChatQuestionAnswer"][number]
-  ) => void;
+  answers: FullQuestion["ChatQuestionAnswer"];
+  activeAnswer: FullQuestion["ChatQuestionAnswer"][number];
+  setActiveAnswer: (answer: FullQuestion["ChatQuestionAnswer"][number]) => void;
 }) => {
   return (
     <div className="flex items-center gap-2">

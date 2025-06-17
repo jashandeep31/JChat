@@ -9,17 +9,35 @@ import { useChatSocket } from "@/hooks/use-chat-socket";
 import StreamBubble from "./stream-bubble";
 import { ShareDropdown } from "./share-dropdown";
 import InstructionCard from "./instruction-card";
+import { useChatQAStore } from "@/z-store/chat-qa-store";
+import { useChatQAPairsQuery } from "@/lib/react-query/use-qa-query";
 
 const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
-  const { chatQuestions, isStreaming, streamingResponse, setIsStreaming } =
-    useChatSocket(chatId, {
-      questions: [],
-    });
   const [showScrollDownButton, setShowScrollDownButton] = useState(false);
   const [isFirstTimeScrolled, setIsFirstTimeScrolled] = useState(false);
   const lastDivRef = useRef<HTMLDivElement>(null);
+  // Fetch initial QAs
+  const { data: initialQAs = [] } = useChatQAPairsQuery(chatId);
+  const addMultipleQuestions = useChatQAStore(
+    (state) => state.addMultipleQuestions
+  );
+  const getQuestionsOfChat = useChatQAStore(
+    (state) => state.getQuestionsOfChat
+  );
+  const chatQuestions = getQuestionsOfChat(chatId);
+
+  const { isStreaming, streamingResponse, setIsStreaming } =
+    useChatSocket(chatId);
+
   useEffect(() => {
-    if (!isFirstTimeScrolled && chatQuestions.length > 0) {
+    const existing = getQuestionsOfChat(chatId);
+    if (initialQAs.length > 0 && existing.length === 0) {
+      addMultipleQuestions(chatId, initialQAs);
+    }
+  }, [chatId, initialQAs, addMultipleQuestions, getQuestionsOfChat]);
+
+  useEffect(() => {
+    if (!isFirstTimeScrolled && chatQuestions && chatQuestions.length > 0) {
       setIsFirstTimeScrolled(true);
       lastDivRef.current?.scrollIntoView({ behavior: "instant" });
     }
@@ -66,7 +84,7 @@ const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
       </div>
       <div className="flex-1 ">
         <div className="mx-auto lg:max-w-1/2 w-full">
-          {chatQuestions.map((chatQuestion) => (
+          {chatQuestions?.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
               <QuestionBubble question={chatQuestion} />
               {chatQuestion.ChatQuestionAnswer.length > 0 &&

@@ -7,6 +7,7 @@ import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { BACKEND_URL } from "@/lib/constants";
 import { useCurrentChat } from "./current-chat-context";
+import { useChatQAStore } from "@/z-store/chat-qa-store";
 
 export const SocketContext = createContext<Socket | null>(null);
 const SOCKET_URL = BACKEND_URL;
@@ -17,6 +18,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const router = useRouter();
   const { setChatId } = useCurrentChat();
   const { appendChat, updateChatName } = useChatQuery();
+  const { addMultipleQuestions, getQuestionsOfChat } = useChatQAStore();
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
@@ -29,14 +31,28 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (socket) {
-      socket.on("branch_chat_started", () => {
-        router.push(`/branching/`);
-      });
-      socket.on("branch_chat_created", (chat: Chat) => {
-        router.push(`/chat/${chat.id}`);
-        setChatId(chat.id);
-        appendChat(chat);
-      });
+      socket.on(
+        "chat_branched",
+        ({
+          from,
+          to,
+          data,
+          tillQuestionId,
+        }: {
+          from: string;
+          to: string;
+          data: Chat;
+          tillQuestionId: string;
+        }) => {
+          router.replace(`/chat/${to}`);
+          appendChat(data);
+          const questions = getQuestionsOfChat(from);
+          const tillQuestionIndex = questions.findIndex(
+            (question) => question.id === tillQuestionId
+          );
+          addMultipleQuestions(to, questions.slice(0, tillQuestionIndex + 1));
+        }
+      );
       socket.on("chat_created", (chat: Chat) => {
         setChatId(chat.id);
         appendChat(chat);

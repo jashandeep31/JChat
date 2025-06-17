@@ -3,15 +3,9 @@
 import { useContext, useEffect, useState, useCallback } from "react";
 import { SocketContext } from "@/context/socket-context";
 import { ChatQuestion, ChatQuestionAnswer, WebSearch } from "@repo/db";
-
-export interface FullChatQuestion extends ChatQuestion {
-  ChatQuestionAnswer: (ChatQuestionAnswer & {
-    WebSearch: WebSearch[];
-  })[];
-}
+import { useChatQAStore } from "@/z-store/chat-qa-store";
 
 export interface ChatSocketState {
-  chatQuestions: FullChatQuestion[];
   isStreaming: boolean;
   streamingResponse: {
     questionId: string;
@@ -29,18 +23,9 @@ export interface UseChatSocketReturn extends ChatSocketState {
   askQuestion: (text: string) => void;
 }
 
-export const useChatSocket = (
-  chatId: string,
-  initialData: {
-    questions: FullChatQuestion[];
-  }
-): UseChatSocketReturn => {
+export const useChatSocket = (chatId: string): UseChatSocketReturn => {
   const socket = useContext(SocketContext);
-
-  const [chatQuestions, setChatQuestions] = useState<FullChatQuestion[]>(
-    initialData.questions
-  );
-
+  const { addQuestion, appendAnswerToQuestion } = useChatQAStore();
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingResponse, setStreamingResponse] = useState<{
     questionId: string;
@@ -70,11 +55,7 @@ export const useChatSocket = (
       question: ChatQuestion;
     }) => {
       const { question } = questionData;
-      setChatQuestions((prev) =>
-        prev.some((q) => q.id === question.id)
-          ? prev
-          : [...prev, { ...question, ChatQuestionAnswer: [] }]
-      );
+      addQuestion(chatId, { ...question, ChatQuestionAnswer: [] });
       setStreamingResponse({
         questionId: question.id,
         data: {
@@ -116,21 +97,7 @@ export const useChatSocket = (
         WebSearch: WebSearch[];
       };
     }) => {
-      setChatQuestions((prev) => {
-        return prev.map((q) => {
-          if (q.id === raw.answer.chatQuestionId) {
-            return {
-              ...q,
-              ChatQuestionAnswer: [
-                ...q.ChatQuestionAnswer,
-                { ...raw.answer, WebSearch: [...raw.answer.WebSearch] },
-              ],
-            };
-          }
-          return q;
-        });
-      });
-      // console.log(raw);
+      appendAnswerToQuestion(raw.cid, raw.answer.chatQuestionId, raw.answer);
       setStreamingResponse(null);
       setIsStreaming(false);
     };
@@ -138,19 +105,15 @@ export const useChatSocket = (
     socket.on("question_created", handleQuestionCreated);
     socket.on("question_response_chunk", handleResponseChunk);
     socket.on("question_answered", handleQuestionAnswered);
-    socket.on("qa_pairs", (qaData) => {
-      setChatQuestions(qaData.qaPairs);
-    });
     return () => {
       socket.off("question_created", handleQuestionCreated);
       socket.off("question_response_chunk", handleResponseChunk);
       socket.off("question_answered", handleQuestionAnswered);
       socket.emit("leave_chat", chatId);
     };
-  }, [socket, chatId]);
+  }, [socket, chatId, addQuestion, appendAnswerToQuestion]);
 
   return {
-    chatQuestions,
     isStreaming,
     streamingResponse,
     askQuestion,

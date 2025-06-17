@@ -1,3 +1,4 @@
+import { getChat } from "../../services/chat-cache.js";
 import { db } from "../../lib/db.js";
 import { SocketFunctionParams } from "../../models/types.js";
 import * as z from "zod";
@@ -12,7 +13,25 @@ export const branchOffHandler = async ({
   io,
 }: SocketFunctionParams) => {
   const { questionId, cid } = branchOffSchema.parse(data);
-  socket.emit("branch_chat_started", "");
+  const cachedChat = await getChat(cid, socket.userId);
+  if (!cachedChat) {
+    socket.emit("error", "Chat not found");
+    return;
+  }
+  const newChat = await db.chat.create({
+    data: {
+      name: `Branch ${cachedChat.name}`,
+      userId: socket.userId,
+      type: "BRANCHED",
+    },
+  });
+  socket.emit("chat_branched", {
+    from: cid,
+    to: newChat.id,
+    tillQuestionId: questionId,
+    data: { ...newChat },
+  });
+
   const chatQuestion = await db.chatQuestion.findUniqueOrThrow({
     where: { id: questionId },
     select: { createdAt: true },
@@ -42,7 +61,8 @@ export const branchOffHandler = async ({
     },
   });
 
-  const newChat = await db.chat.create({
+  await db.chat.update({
+    where: { id: newChat.id },
     data: {
       name: `Branch ${chat.name}`,
       userId: socket.userId,
@@ -57,7 +77,5 @@ export const branchOffHandler = async ({
         })),
       },
     },
-    select: { id: true, name: true },
   });
-  socket.emit("branch_chat_created", newChat);
 };
