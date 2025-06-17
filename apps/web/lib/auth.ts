@@ -15,31 +15,57 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-        console.log(credentials);
-        const email = credentials?.email;
-        const password = credentials?.password;
-        if (
-          !email ||
-          !password ||
-          typeof email !== "string" ||
-          typeof password !== "string"
-        ) {
-          throw new Error("Invalid credentials.");
-        }
+        try {
+          const email = credentials?.email;
+          const password = credentials?.password;
 
-        const user = await db.user.findUnique({
-          where: {
-            email,
-          },
-        });
-        if (!user || !user.password) {
-          throw new Error("Invalid credentials.");
+          if (!email || !password) {
+            throw new Error("Missing email or password");
+          }
+
+          if (typeof email !== "string" || typeof password !== "string") {
+            throw new Error("Email and password must be strings");
+          }
+
+          // await db.user.create({
+          //   data: {
+          //     email,
+          //     name: "Theo",
+          //     credits: 600,
+          //     totalCredits: 600,
+          //     proUser: true,
+          //     avatar:
+          //       "https://lh3.googleusercontent.com/a/ACg8ocJkZLjh-0fCll8H3eHqyCkPeN1_ijDuuH5Gnsu7BRK36Jq7IA=s96-c",
+          //     password: bcrypt.hashSync("password", 10),
+          //   },
+          // });
+
+          const user = await db.user.findUnique({
+            where: {
+              email,
+            },
+          });
+
+          if (!user) {
+            throw new Error(`No user found with email ${email}`);
+          }
+
+          if (!user.password) {
+            throw new Error("User has no password set");
+          }
+
+          const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+          if (!isPasswordValid) {
+            console.error("Auth failed: Invalid password");
+            throw new Error("Invalid password");
+          }
+
+          return user;
+        } catch (error) {
+          console.error("Authentication error:", error);
+          throw error; // Re-throw the error with our detailed message
         }
-        const isPasswordValid = bcrypt.compareSync(password, user.password);
-        if (!isPasswordValid) {
-          throw new Error("Invalid credentials.");
-        }
-        return user;
       },
     }),
   ],
