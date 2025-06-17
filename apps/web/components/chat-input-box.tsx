@@ -117,14 +117,12 @@ const ChatInputBox = ({
     if (isChatBoxActive) {
       window.addEventListener("keypress", (e: KeyboardEvent) => {
         if (isChatBoxActive && e.key === "Enter") {
-          e.preventDefault();
-          onSubmit();
         } else {
           textareaRef.current?.focus();
         }
       });
     }
-  }, [isChatBoxActive, onSubmit]);
+  }, [isChatBoxActive]);
 
   return (
     <div

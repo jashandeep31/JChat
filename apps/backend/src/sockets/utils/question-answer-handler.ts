@@ -85,6 +85,7 @@ export const questionAnswerHandler = async ({
         answer: res.text,
         reasoning: res.reasoning.length > 0 ? res.reasoning : null,
         base64Image: res.images,
+        isWebSearch: res.webSearches.length > 0,
         credits: apiKey ? credits - model.credits : credits,
       },
     });

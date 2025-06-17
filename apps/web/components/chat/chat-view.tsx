@@ -83,7 +83,7 @@ const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
         </ShareDropdown>
       </div>
       <div className="flex-1 ">
-        <div className="mx-auto lg:max-w-1/2 w-full">
+        <div className="mx-auto max-w-[800px]  w-full">
           {chatQuestions?.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
               <QuestionBubble question={chatQuestion} />
@@ -116,7 +116,7 @@ const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
             </button>
           )}
         </div>
-        <div className="mx-auto lg:max-w-1/2 w-full bg-background">
+        <div className="mx-auto lg:max-w-[800px] w-full bg-background">
           <ChatInputBox
             isStreaming={isStreaming}
             setIsStreaming={setIsStreaming}

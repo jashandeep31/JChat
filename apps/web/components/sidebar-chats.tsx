@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useChatQuery from "@/lib/react-query/use-chat-query";
 import { Loader2 } from "lucide-react";
 import {
@@ -34,8 +34,11 @@ import MoveToProjectDialog from "./move-to-project-dialog";
 import ShareDialog from "./share-dialog";
 import { Chat } from "@repo/db";
 import { useCurrentChat } from "@/context/current-chat-context";
+import { useChatsStore } from "@/z-store/chats-store";
 
 const SidebarChats = () => {
+  const { chats, setChats, updateChatName, removeChat, updateChatProject } =
+    useChatsStore();
   const params = useParams();
   const { startNewChat } = useCurrentChat();
   const { isMobile } = useSidebar();
@@ -55,6 +58,12 @@ const SidebarChats = () => {
   } | null>(null);
   const [newChatName, setNewChatName] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState("");
+
+  useEffect(() => {
+    if (chatsQuery.data) {
+      setChats(chatsQuery.data);
+    }
+  }, [setChats, chatsQuery.data]);
 
   const handleDeleteClick = (chat: { id: string; name: string }) => {
     setCurrentChat(chat);
@@ -85,6 +94,7 @@ const SidebarChats = () => {
         chatsQuery.refetch();
         toast.success("Chat deleted successfully", { id: toastId });
         setIsDeleteDialogOpen(false);
+        removeChat(currentChat.id);
       },
       onError: () => {
         toast.error("Failed to delete chat", { id: toastId });
@@ -111,6 +121,7 @@ const SidebarChats = () => {
         onSuccess: () => {
           toast.success("Chat renamed successfully", { id: toastId });
           setIsRenameDialogOpen(false);
+          updateChatName(currentChat.id, newChatName);
         },
         onError: () => {
           toast.error("Failed to rename chat", { id: toastId });
@@ -132,6 +143,7 @@ const SidebarChats = () => {
         onSuccess: () => {
           toast.success("Chat moved successfully", { id: toastId });
           setIsMoveDialogOpen(false);
+          updateChatProject(currentChat.id, selectedProjectId);
         },
         onError: () => {
           toast.error("Failed to move chat", { id: toastId });
@@ -178,64 +190,68 @@ const SidebarChats = () => {
       <SidebarGroup>
         <SidebarGroupLabel>Chats</SidebarGroupLabel>
         <SidebarMenu>
-          {chatsQuery.isPending ? (
+          {chatsQuery.isPending && !chats.length ? (
             <div className="flex items-center justify-center py-3">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              <span className="ml-2 text-xs text-muted-foreground">Loading chats...</span>
+              <span className="ml-2 text-xs text-muted-foreground">
+                Loading chats...
+              </span>
             </div>
-          ) : chatsQuery.data?.map((chat: Chat) => (
-            <SidebarMenuItem
-              key={chat.id}
-              className={`hover:bg-accent rounded-md ${
-                chat.id === params.cid ? "bg-accent" : ""
-              }`}
-            >
-              <SidebarMenuButton className="flex items-center gap-2">
-                <Link
-                  href={`/chat/${chat.id}`}
-                  className="truncate overflow-hidden max-w-full flex items-center gap-2"
-                >
-                  <div className="flex items-center gap-2 ">
-                    {chat.type === "BRANCHED" && (
-                      <GitBranch className="w-4 h-4" />
-                    )}
-                    {chat.name}
-                  </div>
-                </Link>
-              </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <DropdownMenuItem onClick={() => handleRenameClick(chat)}>
-                    <Pencil className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Rename</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleShareClick(chat)}>
-                    <Share className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Share</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleMoveClick(chat)}>
-                    <FolderCheck className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Move to Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => handleDeleteClick(chat)}>
-                    <Trash2 className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Delete</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))}
+          ) : (
+            chats.map((chat: Chat) => (
+              <SidebarMenuItem
+                key={chat.id}
+                className={`hover:bg-accent rounded-md ${
+                  chat.id === params.cid ? "bg-accent" : ""
+                }`}
+              >
+                <SidebarMenuButton className="flex items-center gap-2">
+                  <Link
+                    href={`/chat/${chat.id}`}
+                    className="truncate overflow-hidden max-w-full flex items-center gap-2"
+                  >
+                    <div className="flex items-center gap-2 ">
+                      {chat.type === "BRANCHED" && (
+                        <GitBranch className="w-4 h-4" />
+                      )}
+                      {chat.name}
+                    </div>
+                  </Link>
+                </SidebarMenuButton>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuAction showOnHover>
+                      <MoreHorizontal />
+                      <span className="sr-only">More</span>
+                    </SidebarMenuAction>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-48"
+                    side={isMobile ? "bottom" : "right"}
+                    align={isMobile ? "end" : "start"}
+                  >
+                    <DropdownMenuItem onClick={() => handleRenameClick(chat)}>
+                      <Pencil className="w-4 h-4 mr-2 text-muted-foreground" />
+                      <span>Rename</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleShareClick(chat)}>
+                      <Share className="w-4 h-4 mr-2 text-muted-foreground" />
+                      <span>Share</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleMoveClick(chat)}>
+                      <FolderCheck className="w-4 h-4 mr-2 text-muted-foreground" />
+                      <span>Move to Project</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleDeleteClick(chat)}>
+                      <Trash2 className="w-4 h-4 mr-2 text-muted-foreground" />
+                      <span>Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            ))
+          )}
         </SidebarMenu>
       </SidebarGroup>
     </>

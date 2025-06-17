@@ -6,7 +6,6 @@ import { redis } from "../../lib/db.js";
 import { questionAnswerHandler } from "../utils/question-answer-handler.js";
 import { getAttachment } from "../../services/attachment-cache.js";
 import { getUser } from "../../services/user-cache.js";
-import { v4 as uuidv4 } from "uuid";
 const newChatSchema = z.object({
   question: z.string().min(10),
   modelSlug: z.string(),
@@ -23,34 +22,25 @@ export const newChatHandler = async ({
   const parsedData = JSON.parse(data);
   const result = newChatSchema.safeParse(parsedData);
   const user = await getUser(socket.userId);
-  const chatId = uuidv4();
 
   if (!result.success) {
     socket.emit("error", result.error.message);
     return;
   }
-  const tempChat = {
-    id: chatId,
-    name: "New Chat",
-    userId: socket.userId,
-    ...(result.data.projectId ? { projectId: result.data.projectId } : {}),
-  };
-  redis.set(`chat:${chatId}`, JSON.stringify(tempChat), "EX", 20 * 60);
-  if (result.data.projectId) {
-    socket.emit("project_chat_created", tempChat);
-  } else {
-    socket.emit("chat_created", tempChat);
-  }
-
   const chat = await db.chat.create({
     data: {
-      id: chatId,
       name: "New Chat",
       userId: socket.userId,
       ...(result.data.projectId ? { projectId: result.data.projectId } : {}),
     },
   });
+
   redis.set(`chat:${chat.id}`, JSON.stringify(chat), "EX", 20 * 60);
+  if (result.data.projectId) {
+    socket.emit("project_chat_created", chat);
+  } else {
+    socket.emit("chat_created", chat);
+  }
 
   const attachmentData = parsedData.attachmentId
     ? await getAttachment(parsedData.attachmentId)

@@ -1,5 +1,4 @@
 "use client";
-import useChatQuery from "@/lib/react-query/use-chat-query";
 import { Chat } from "@repo/db";
 import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import { toast } from "sonner";
 import { BACKEND_URL } from "@/lib/constants";
 import { useCurrentChat } from "./current-chat-context";
 import { useChatQAStore } from "@/z-store/chat-qa-store";
+import { useChatsStore } from "@/z-store/chats-store";
 
 export const SocketContext = createContext<Socket | null>(null);
 const SOCKET_URL = BACKEND_URL;
@@ -17,7 +17,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const { setChatId } = useCurrentChat();
-  const { appendChat, updateChatName } = useChatQuery();
+  const { updateChatName, addChat } = useChatsStore();
   const { addMultipleQuestions, getQuestionsOfChat } = useChatQAStore();
   const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -45,7 +45,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
           tillQuestionId: string;
         }) => {
           router.replace(`/chat/${to}`);
-          appendChat(data);
+          addChat(data);
           const questions = getQuestionsOfChat(from);
           const tillQuestionIndex = questions.findIndex(
             (question) => question.id === tillQuestionId
@@ -54,22 +54,32 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       );
       socket.on("chat_created", (chat: Chat) => {
+        console.log(`we had created the new chat  ${chat.id}`);
         setChatId(chat.id);
-        appendChat(chat);
+        addChat(chat);
       });
       socket.on("project_chat_created", (chat: Chat) => {
+        console.log(`we had created the new project chat ${chat.id}`);
         setChatId(chat.id);
+        addChat(chat);
         router.push(`/chat/${chat.id}`);
-        appendChat(chat);
       });
       socket.on("chat_name_updated", (chat: Chat) => {
-        updateChatName(chat);
+        updateChatName(chat.id, chat.name);
       });
       socket.on("error", (error: string) => {
         toast.error(error);
       });
     }
-  }, [socket, router, appendChat, updateChatName, setChatId]);
+  }, [
+    socket,
+    router,
+    addChat,
+    updateChatName,
+    setChatId,
+    getQuestionsOfChat,
+    addMultipleQuestions,
+  ]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
