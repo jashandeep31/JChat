@@ -41,6 +41,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         setChatId(chat.id);
         appendChat(chat);
       });
+      socket.on("project_chat_created", (chat: Chat) => {
+        setChatId(chat.id);
+        router.push(`/chat/${chat.id}`);
+        appendChat(chat);
+      });
       socket.on("chat_name_updated", (chat: Chat) => {
         updateChatName(chat);
       });

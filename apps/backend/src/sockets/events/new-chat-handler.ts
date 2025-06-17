@@ -36,7 +36,11 @@ export const newChatHandler = async ({
     ...(result.data.projectId ? { projectId: result.data.projectId } : {}),
   };
   redis.set(`chat:${chatId}`, JSON.stringify(tempChat), "EX", 20 * 60);
-  socket.emit("chat_created", tempChat);
+  if (result.data.projectId) {
+    socket.emit("project_chat_created", tempChat);
+  } else {
+    socket.emit("chat_created", tempChat);
+  }
 
   const chat = await db.chat.create({
     data: {

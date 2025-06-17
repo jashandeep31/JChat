@@ -29,7 +29,13 @@ const StreamBubble = ({
 
   return (
     <div>
-      <div className={streamData.webSearches?.length > 0 ? "" : "hidden"}>
+      <div
+        className={
+          streamData.webSearches?.length > 0
+            ? "max-w-[800px] overflow-hidden"
+            : "hidden"
+        }
+      >
         <h3 className="text-sm font-semibold">Sources</h3>
         <div className="overflow-x-auto flex mt-2 gap-4">
           {streamData.webSearches?.map((webSearch) => (

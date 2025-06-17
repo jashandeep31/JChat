@@ -34,6 +34,7 @@ export const CurrentChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const startNewChat = () => {
     setChatId(null);
     router.push("/");
+    console.log(`i am called`);
   };
   return (
     <CurrentChatContext.Provider value={{ chatId, setChatId, startNewChat }}>

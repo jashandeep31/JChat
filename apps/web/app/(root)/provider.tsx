@@ -6,6 +6,7 @@ import { SearchDialogContext } from "@/context/search-dialog-context";
 import { SearchDialog } from "@/components/search-dialog";
 import { useRouter } from "next/navigation";
 import RootSideBar from "@/components/root-sidebar";
+import { useCurrentChat } from "@/context/current-chat-context";
 
 export const Provider = ({
   children,
@@ -14,25 +15,33 @@ export const Provider = ({
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) => {
+  const { startNewChat } = useCurrentChat();
   const { setOpen } = useContext(SearchDialogContext);
 
   useEffect(() => {
     window.addEventListener("keydown", (e) => {
-      if (e.key === "k" && e.ctrlKey) {
+      if ((e.key === "k" || e.key === "K") && e.ctrlKey) {
         e.preventDefault();
         setOpen(true);
+      } else if (e.key === "o" && e.ctrlKey && e.shiftKey) {
+        e.preventDefault();
+        startNewChat();
       }
     });
 
     return () => {
       window.removeEventListener("keydown", (e) => {
-        if (e.key === "k" && e.ctrlKey) {
+        if ((e.key === "k" || e.key === "K") && e.ctrlKey) {
           e.preventDefault();
           setOpen(false);
         }
+        if (e.key === "o" && e.ctrlKey && e.shiftKey) {
+          e.preventDefault();
+          startNewChat();
+        }
       });
     };
-  }, [setOpen]);
+  }, [setOpen, startNewChat]);
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>

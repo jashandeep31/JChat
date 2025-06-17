@@ -13,7 +13,7 @@ import SidebarProjects from "./sidebar-projects";
 import SidebarChats from "./sidebar-chats";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Search } from "lucide-react";
+import { Command, Search } from "lucide-react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
 import { ThemeToggler } from "./theme-toggler";
 import { useCurrentChat } from "@/context/current-chat-context";
@@ -32,7 +32,7 @@ const RootSideBar = () => {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="p-3 space-y-2">
-            <Button onClick={startNewChat}>New Chat</Button>
+            <Button onClick={startNewChat}>New Chat </Button>
             <Button
               variant={"outline"}
               onClick={() => setOpen(true)}
@@ -41,8 +41,8 @@ const RootSideBar = () => {
               <span className="flex items-center gap-2">
                 <Search /> Search
               </span>
-              <span className="text-xs text-muted-foreground cursor-pointer">
-                Ctrl + K
+              <span className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                <Command className="w-4 h-4" /> + K
               </span>
             </Button>
           </SidebarGroup>

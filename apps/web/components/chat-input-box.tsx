@@ -7,7 +7,13 @@ import {
 import { Button } from "@repo/ui/components/button";
 import { ArrowUp, Globe, Loader2, Paperclip, X } from "lucide-react";
 import { useParams } from "next/navigation";
-import React, { useEffect, useRef, useContext } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useContext,
+  useState,
+  useCallback,
+} from "react";
 import { SelectAIModel } from "./select-ai-model";
 import { UploadDialog } from "./upload-dialog";
 import {
@@ -31,6 +37,8 @@ const ChatInputBox = ({
   const socket = useContext(SocketContext);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parentDivRef = useRef<HTMLDivElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+  const [isChatBoxActive, setIsChatBoxActive] = useState(false);
   const { userQuery } = useUserQuery();
 
   const {
@@ -64,13 +72,13 @@ const ChatInputBox = ({
     }
   }, [question]);
 
-  const onSubmit = () => {
+  const onSubmit = useCallback(() => {
     handleSubmit({
       setIsStreaming,
       socket,
       params,
     });
-  };
+  }, [handleSubmit, setIsStreaming, socket, params]);
 
   useEffect(() => {
     if (!selectedModel || !selectedModel.imageAnalysis) {
@@ -84,15 +92,50 @@ const ChatInputBox = ({
     }
   }, [selectedModel, setIsWebSearchEnabled]);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        chatBoxRef.current &&
+        !chatBoxRef.current.contains(e.target as Node) &&
+        isChatBoxActive
+      ) {
+        setIsChatBoxActive(false);
+      } else if (
+        chatBoxRef.current &&
+        chatBoxRef.current.contains(e.target as Node)
+      ) {
+        setIsChatBoxActive(true);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [chatBoxRef, isChatBoxActive]);
+
+  useEffect(() => {
+    window.addEventListener("keypress", (e: KeyboardEvent) => {
+      if (isChatBoxActive && e.key === "Enter") {
+        e.preventDefault();
+        onSubmit();
+      } else {
+        textareaRef.current?.focus();
+      }
+    });
+  }, [isChatBoxActive, onSubmit]);
+
   return (
-    <div className="border-2 border-primary p-4 rounded-md w-full flex gap-2 flex-col">
+    <div
+      ref={chatBoxRef}
+      className={`border-2 border-b-0 rounded-b-none border-${isChatBoxActive ? "primary" : "accent"} p-4 rounded-md w-full flex gap-2 flex-col`}
+    >
       <div ref={parentDivRef} className="flex-1" style={{ minHeight: "50px" }}>
         <textarea
           ref={textareaRef}
           className="border-0 outline-0 resize-none w-full flex-1"
           style={{
             overflowY: "auto",
-            minHeight: "70px",
+            minHeight: "50px",
           }}
           placeholder="Ask anything..."
           value={question}

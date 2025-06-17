@@ -1,35 +1,15 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SocketProvider } from "@/context/socket-context";
 import { ChatInputBoxProvider } from "@/context/chat-input-box-context";
 import { SessionProvider } from "next-auth/react";
 import { SearchDialogContextProvider } from "@/context/search-dialog-context";
-import {
-  CurrentChatProvider,
-  useCurrentChat,
-} from "@/context/current-chat-context";
+import { CurrentChatProvider } from "@/context/current-chat-context";
 
 const queryClient = new QueryClient();
 const Provider = ({ children }: { children: React.ReactNode }) => {
-  const { startNewChat } = useCurrentChat();
-
-  useEffect(() => {
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "O" && e.ctrlKey && e.shiftKey) {
-        e.preventDefault();
-        startNewChat();
-      }
-    });
-
-    return () => {
-      window.removeEventListener("keydown", (e) => {
-        if (e.key === "o" && e.ctrlKey && e.shiftKey) {
-        }
-      });
-    };
-  }, [startNewChat]);
   return (
     <ThemeProvider
       attribute="class"
