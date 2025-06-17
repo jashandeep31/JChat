@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useChatQuery from "@/lib/react-query/use-chat-query";
+import { Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -177,7 +178,12 @@ const SidebarChats = () => {
       <SidebarGroup>
         <SidebarGroupLabel>Chats</SidebarGroupLabel>
         <SidebarMenu>
-          {chatsQuery.data?.map((chat: Chat) => (
+          {chatsQuery.isPending ? (
+            <div className="flex items-center justify-center py-3">
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              <span className="ml-2 text-xs text-muted-foreground">Loading chats...</span>
+            </div>
+          ) : chatsQuery.data?.map((chat: Chat) => (
             <SidebarMenuItem
               key={chat.id}
               className={`hover:bg-accent rounded-md ${

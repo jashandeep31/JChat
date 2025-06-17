@@ -6,7 +6,7 @@ export const markdownComponents = {
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1
       className={cn(
-        "mt-1 scroll-m-20 text-3xl font-bold tracking-tight",
+        "mt-3 scroll-m-20 text-3xl font-bold tracking-tight",
         className
       )}
       {...props}
