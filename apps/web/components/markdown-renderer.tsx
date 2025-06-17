@@ -30,7 +30,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
   }, [resolvedTheme]);
 
   return (
-    <div className="md:max-w-[800px] w-full ">
+    <div className="max-w-[800px]">
       <ReactMarkdown
         components={markdownComponents}
         remarkPlugins={[remarkGfm]}

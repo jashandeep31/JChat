@@ -13,18 +13,10 @@ export const joinChatHandler = async ({
   const qaPromise = db.chatQuestion.findMany({
     where: { chatId: cid },
     orderBy: { createdAt: "asc" },
-    select: {
-      id: true,
-      question: true,
-      createdAt: true,
+    include: {
       ChatQuestionAnswer: {
-        orderBy: { createdAt: "asc" },
-        select: {
-          answer: true,
-          aiModelId: true,
-          credits: true,
-          base64Image: true,
-          WebSearch: { select: { id: true } },
+        include: {
+          WebSearch: true,
         },
       },
     },

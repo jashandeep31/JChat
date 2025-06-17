@@ -66,22 +66,29 @@ const AnswerBubble = ({
 
   return (
     <div className="">
-      <div className={activeAnswer?.WebSearch?.length > 0 ? "" : "hidden"}>
+      <div
+        className={
+          activeAnswer?.WebSearch?.length > 0 ? "max-w-[800px]" : "hidden"
+        }
+      >
         <h3 className="text-sm font-semibold">Sources</h3>
         <div className="overflow-x-auto flex mt-2 gap-4 hide-scrollbar">
-          {activeAnswer.WebSearch.map((webSearch) => (
-            <Link
-              href={webSearch.url}
-              target="_blank"
-              key={webSearch.id}
-              className="max-w-36 border rounded-md p-2 bg-accent hover:border-primary transition-colors border-accent"
-            >
-              <p className="text-sm font-semibold truncate">
-                {webSearch.title}
-              </p>
-              <p className="text-xs truncate">{webSearch.url}</p>
-            </Link>
-          ))}
+          {activeAnswer.WebSearch.map(
+            (webSearch) =>
+              webSearch.url && (
+                <Link
+                  href={webSearch.url}
+                  target="_blank"
+                  key={webSearch.url}
+                  className="max-w-36 border rounded-md p-2 bg-accent hover:border-primary transition-colors border-accent"
+                >
+                  <p className="text-sm font-semibold truncate">
+                    {webSearch.title}
+                  </p>
+                  <p className="text-xs truncate">{webSearch.url}</p>
+                </Link>
+              )
+          )}
         </div>
       </div>
       {activeAnswer.reasoning && (

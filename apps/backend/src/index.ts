@@ -8,18 +8,6 @@ import { redis } from "./lib/db.js";
 import jwt from "jsonwebtoken";
 import cookie from "cookie";
 
-// Global unhandled error handlers
-process.on("uncaughtException", (error) => {
-  console.error("UNCAUGHT EXCEPTION! 💥 Shutting down gracefully...");
-  console.error(error.name, error.message, error.stack);
-  // Continue running the server despite the error
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("UNHANDLED REJECTION! 💥", reason);
-  // Continue running the server despite the error
-});
-
 const PORT = env.PORT;
 const server = createServer(app);
 redis.flushall();
