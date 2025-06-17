@@ -56,7 +56,7 @@ const RootSideBar = () => {
               className="flex items-center gap-2 p-2 rounded-md hover:bg-accent"
             >
               <div className="flex items-center gap-2">
-                <span className="text-2xl text-white  bg-primary p-2 w-10 h-10 rounded-full flex items-center justify-center">
+                <span className="text-2xl dark:text-black text-white  bg-primary p-2 w-10 h-10 rounded-full flex items-center justify-center">
                   {session.user.name?.[0]}
                 </span>
                 <div className="flex flex-col">
