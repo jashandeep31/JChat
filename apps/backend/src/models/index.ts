@@ -10,6 +10,7 @@ import { getChat } from "../services/chat-cache.js";
 import { askGroqQuestion } from "./providers/groq/index.js";
 import { getProject } from "../services/project-cache.js";
 import { getApi } from "../services/api-cache.js";
+import { askAnthropicQuestion } from "./providers/anthropic/index.js";
 
 export interface ProviderFunctionParams {
   question: ChatQuestion;
@@ -40,6 +41,7 @@ const providers: Record<string, any | undefined> = {
   google: askGeminiQuestion,
   openai: askOpenAIQuestion,
   groq: askGroqQuestion,
+  anthropic: askAnthropicQuestion,
 };
 export const askQuestion = async (
   chatQuestion: ChatQuestion,

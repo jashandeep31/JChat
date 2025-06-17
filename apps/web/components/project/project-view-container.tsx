@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Project } from "@repo/db";
 
-import useProjectQuery, { useProjectChats } from "@/lib/react-query/use-project-query";
+import useProjectQuery from "@/lib/react-query/use-project-query";
 import useChatQuery from "@/lib/react-query/use-chat-query";
 import ChatInputBox from "../chat-input-box";
 import DeleteDialog from "../delete-dialog";
@@ -19,39 +19,46 @@ import ProjectChatsList from "./project-chats-list";
 import ProjectInstructionDialog from "./project-instruction-dialog";
 import RenameProjectDialog from "./project-rename-dialog";
 import DeleteProjectDialog from "./project-delete-dialog";
+import { useChatsStore } from "@/z-store/chats-store";
 
 const ProjectViewContainer = ({ project }: { project: Project }) => {
   const router = useRouter();
-  const { data: chats } = useProjectChats(project.id);
+  const { chats, updateChatName, removeChat, updateChatProject } =
+    useChatsStore();
+  const projectChats = chats.filter((chat) => chat.projectId === project.id);
   const { deleteProjectMutation, updateProjectMutation } = useProjectQuery();
-  const { deleteChatMutation, renameChatMutation, moveChatMutation } = useChatQuery();
-  
+  const { deleteChatMutation, renameChatMutation, moveChatMutation } =
+    useChatQuery();
+
   // Project state
   const [instructionDialogState, setInstructionDialogState] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
-  
+
   // Chat management state
   const [isChatRenameDialogOpen, setIsChatRenameDialogOpen] = useState(false);
   const [isChatDeleteDialogOpen, setIsChatDeleteDialogOpen] = useState(false);
   const [isChatMoveDialogOpen, setIsChatMoveDialogOpen] = useState(false);
   const [isChatShareDialogOpen, setIsChatShareDialogOpen] = useState(false);
-  const [currentChat, setCurrentChat] = useState<{id: string; name: string} | null>(null);
+  const [currentChat, setCurrentChat] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [newChatName, setNewChatName] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState("");
-  
+
   // Handle project rename click
   const handleRenameClick = () => {
     setNewProjectName(project.name);
     setIsRenameDialogOpen(true);
   };
-  
+
   // Handle project delete click
   const handleDeleteClick = () => {
     setIsDeleteDialogOpen(true);
   };
-  
+
   // Chat management handlers
   const handleChatRenameClick = (chat: { id: string; name: string }) => {
     setCurrentChat(chat);
@@ -69,7 +76,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
     setSelectedProjectId(""); // Reset selected project
     setIsChatMoveDialogOpen(true);
   };
-  
+
   const handleChatShareClick = (chat: { id: string; name: string }) => {
     setCurrentChat(chat);
     setIsChatShareDialogOpen(true);
@@ -86,6 +93,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
         onSuccess: () => {
           toast.success("Chat renamed successfully", { id: toastId });
           setIsChatRenameDialogOpen(false);
+          updateChatName(currentChat.id, newChatName);
         },
         onError: () => {
           toast.error("Failed to rename chat", { id: toastId });
@@ -102,6 +110,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
       onSuccess: () => {
         toast.success("Chat deleted successfully", { id: toastId });
         setIsChatDeleteDialogOpen(false);
+        removeChat(currentChat.id);
       },
       onError: () => {
         toast.error("Failed to delete chat", { id: toastId });
@@ -122,6 +131,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
         onSuccess: () => {
           toast.success("Chat moved successfully", { id: toastId });
           setIsChatMoveDialogOpen(false);
+          updateChatProject(currentChat.id, selectedProjectId);
         },
         onError: () => {
           toast.error("Failed to move chat", { id: toastId });
@@ -129,12 +139,12 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
       }
     );
   };
-  
+
   // Handle rename submit
   const handleRenameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProjectName.trim()) return;
-    
+
     const toastId = toast.loading("Renaming project...");
     updateProjectMutation.mutate(
       {
@@ -152,7 +162,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
       }
     );
   };
-  
+
   // Handle delete project
   const handleDeleteProject = () => {
     const toastId = toast.loading("Deleting project...");
@@ -167,16 +177,16 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
       },
     });
   };
-  
+
   return (
     <div className="p-4">
       <div className="flex items-center flex-col py-12">
-        <ProjectHeader 
+        <ProjectHeader
           projectName={project.name}
           onRenameClick={handleRenameClick}
           onDeleteClick={handleDeleteClick}
         />
-        
+
         <div className="mt-6 lg:min-w-[800px]">
           <ChatInputBox />
           <div className="mt-6">
@@ -185,7 +195,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
               onOpenInstructionDialog={() => setInstructionDialogState(true)}
             />
           </div>
-          
+
           {/* Project-related dialogs */}
           <ProjectInstructionDialog
             open={instructionDialogState}
@@ -193,7 +203,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
             projectId={project.id}
             projectInstruction={project.instruction}
           />
-          
+
           <RenameProjectDialog
             open={isRenameDialogOpen}
             onOpenChange={setIsRenameDialogOpen}
@@ -202,7 +212,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
             onSubmit={handleRenameSubmit}
             isLoading={updateProjectMutation.isPending}
           />
-          
+
           <DeleteProjectDialog
             open={isDeleteDialogOpen}
             onOpenChange={setIsDeleteDialogOpen}
@@ -210,7 +220,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
             onDelete={handleDeleteProject}
             isLoading={deleteProjectMutation.isPending}
           />
-          
+
           {/* Chat-related dialogs */}
           {currentChat && (
             <>
@@ -221,14 +231,14 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
                 onChatNameChange={setNewChatName}
                 onSubmit={handleChatRenameSubmit}
               />
-              
+
               <DeleteDialog
                 open={isChatDeleteDialogOpen}
                 onOpenChange={setIsChatDeleteDialogOpen}
                 onDelete={handleChatDelete}
                 isLoading={deleteChatMutation.isPending}
               />
-              
+
               <MoveToProjectDialog
                 open={isChatMoveDialogOpen}
                 onOpenChange={setIsChatMoveDialogOpen}
@@ -238,7 +248,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
                 onSubmit={handleChatMove}
                 isLoading={moveChatMutation.isPending}
               />
-              
+
               <ShareDialog
                 open={isChatShareDialogOpen}
                 onOpenChange={setIsChatShareDialogOpen}
@@ -249,7 +259,7 @@ const ProjectViewContainer = ({ project }: { project: Project }) => {
 
           {/* Chats List */}
           <ProjectChatsList
-            chats={chats}
+            chats={projectChats}
             onChatRenameClick={handleChatRenameClick}
             onChatMoveClick={handleChatMoveClick}
             onChatDeleteClick={handleChatDeleteClick}

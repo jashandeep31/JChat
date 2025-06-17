@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Button } from "@repo/ui/components/button";
 import { Copy, Check, File, Edit2 } from "lucide-react";
 import {
@@ -23,7 +23,6 @@ const QuestionBubbleInner = ({ question }: { question: FullQuestion }) => {
   const [textAreaValue, setTextAreaValue] = useState(question.question);
   const [textareaHeight, setTextareaHeight] = useState("auto");
   const [isEditing, setIsEditing] = useState(false);
-
   const [isCopied, setIsCopied] = useState(false);
   const { data: attachment } = getAttachmentQuery(
     question.attachmentId || null
@@ -75,6 +74,29 @@ const QuestionBubbleInner = ({ question }: { question: FullQuestion }) => {
     });
     setIsEditing(false);
   };
+
+  useEffect(() => {
+    if (isEditing) {
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && isEditing) {
+          setIsEditing(false);
+        }
+      });
+    } else {
+      window.removeEventListener("keydown", (e) => {
+        if (e.key === "Escape" && isEditing) {
+          setIsEditing(false);
+        }
+      });
+    }
+    return () => {
+      window.removeEventListener("keydown", (e) => {
+        if (e.key === "Escape" && isEditing) {
+          setIsEditing(false);
+        }
+      });
+    };
+  }, [isEditing]);
 
   return (
     <div className="flex mb-4 flex-col items-end ">

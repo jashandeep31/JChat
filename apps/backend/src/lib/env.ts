@@ -9,6 +9,7 @@ export const env = {
   REDIS_HOST: process.env.REDIS_HOST as string,
   REDIS_PORT: process.env.REDIS_PORT as string,
   REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY as string,
   GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
   GOOGLE_GENERATIVE_AI_API_KEY: process.env
     .GOOGLE_GENERATIVE_AI_API_KEY as string,

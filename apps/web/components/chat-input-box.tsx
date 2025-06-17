@@ -6,7 +6,7 @@ import {
 } from "@/context/chat-input-box-context";
 import { Button } from "@repo/ui/components/button";
 import { ArrowUp, Globe, Loader2, Paperclip, X } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import React, {
   useEffect,
   useRef,
@@ -32,6 +32,7 @@ const ChatInputBox = ({
   isStreaming?: boolean;
   setIsStreaming?: (value: boolean) => void;
 }) => {
+  const pathname = usePathname();
   const session = useSession();
   const params = useParams();
   const socket = useContext(SocketContext);
@@ -127,7 +128,7 @@ const ChatInputBox = ({
   return (
     <div
       ref={chatBoxRef}
-      className={`border-2 border-b-0 rounded-b-none border-${isChatBoxActive ? "primary" : "accent"} p-4 rounded-md w-full flex gap-2 flex-col`}
+      className={`border-2  ${!pathname.includes("project") ? " rounded-b-none   border-b-0 " : ""} border-${isChatBoxActive ? "primary" : "accent"} p-4 rounded-md w-full flex gap-2 flex-col`}
     >
       <div ref={parentDivRef} className="flex-1" style={{ minHeight: "50px" }}>
         <textarea

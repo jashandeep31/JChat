@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader2, SlidersHorizontal } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@repo/ui/components/dropdown-menu";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
-import useChatQuery from "@/lib/react-query/use-chat-query";
+import useChatQuery, { getChatQuery } from "@/lib/react-query/use-chat-query";
 import { toast } from "sonner";
 
 interface InstructionCardProps {
@@ -20,6 +20,13 @@ interface InstructionCardProps {
 const InstructionCard: React.FC<InstructionCardProps> = ({ chatId }) => {
   const [instruction, setInstruction] = useState("");
   const { addChatIntructionMutation } = useChatQuery();
+  const { data } = getChatQuery(chatId);
+
+  useEffect(() => {
+    if (instruction === "") {
+      setInstruction(data?.instruction || "");
+    }
+  }, [data, instruction]);
 
   const handleSave = () => {
     const toastId = toast.loading("Saving instruction...");

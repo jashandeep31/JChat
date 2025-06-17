@@ -40,7 +40,7 @@ export const ChatInputBoxProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [question, setQuestion] = useState("what is next js in 10 words");
+  const [question, setQuestion] = useState("");
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
   const [selectedModel, setSelectedModel] = useState<AiModel | null>(null);
   const { modelsQuery } = useModelsQuery();

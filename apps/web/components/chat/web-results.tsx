@@ -13,7 +13,7 @@ const WebResults = ({ answerId }: { answerId: string }) => {
       }
     >
       <h3 className="text-sm font-semibold">Sources</h3>
-      <div className="overflow-x-auto flex mt-2 gap-4">
+      <div className="overflow-x-auto hide-scrollbar flex mt-2 gap-4">
         {webSearch?.map((webSearch) => (
           <Link
             href={webSearch.url}

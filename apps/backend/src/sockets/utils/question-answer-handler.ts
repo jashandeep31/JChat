@@ -5,6 +5,8 @@ import { askQuestion } from "../../models/index.js";
 import { getUser } from "../../services/user-cache.js";
 import { getApi } from "../../services/api-cache.js";
 import { refreshChatQACache } from "../../services/chat-qa-cache.js";
+import { getChat } from "../../services/chat-cache.js";
+
 const aiModels = await db.aiModel.findMany();
 
 export const questionAnswerHandler = async ({
@@ -120,6 +122,23 @@ export const questionAnswerHandler = async ({
         credits: user.credits - credits > 0 ? user.credits - credits : 0,
       },
     });
+    const chat = await getChat(cid, user.id);
+    if (chat) {
+      const updated = await db.chat.update({
+        where: {
+          id: chat.id,
+        },
+        data: {
+          updatedAt: new Date(),
+        },
+      });
+      await redis.set(
+        `chat:${chat.id}`,
+        JSON.stringify(updated),
+        "EX",
+        20 * 60
+      );
+    }
     await redis.del(`user:${user.id}`);
     await redis.set(
       `user:${user.id}`,
