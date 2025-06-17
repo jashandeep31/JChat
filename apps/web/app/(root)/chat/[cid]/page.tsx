@@ -3,6 +3,7 @@ import ChatView from "@/components/chat/chat-view";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getChat } from "@/actions/chats";
+import { ChatContextProvider } from "@/context/chat-context";
 
 const page = async ({ params }: { params: Promise<{ cid: string }> }) => {
   const session = await auth();
@@ -14,6 +15,10 @@ const page = async ({ params }: { params: Promise<{ cid: string }> }) => {
     redirect("/");
   }
 
-  return <ChatView chatId={(await params).cid} />;
+  return (
+    <ChatContextProvider chatId={(await params).cid}>
+      <ChatView chatId={(await params).cid} />
+    </ChatContextProvider>
+  );
 };
 export default page;

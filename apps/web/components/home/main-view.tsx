@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useCurrentChat } from "@/context/current-chat-context";
 import ChatView from "../chat/chat-view";
 import { useRouter } from "next/navigation";
+import { ChatContextProvider } from "@/context/chat-context";
 
 const MainView = () => {
   const router = useRouter();
@@ -21,7 +22,11 @@ const MainView = () => {
   if (session.status === "loading") {
     return null;
   } else if (chatId && session.status === "authenticated") {
-    return <ChatView chatId={chatId} />;
+    return (
+      <ChatContextProvider chatId={chatId}>
+        <ChatView chatId={chatId} />
+      </ChatContextProvider>
+    );
   } else {
     return (
       <div className="flex flex-col min-h-screen md:p-0 p-4">

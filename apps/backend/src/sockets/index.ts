@@ -5,6 +5,8 @@ import { chatQuestionHandler } from "./events/chat-question-handler.js";
 import { Server } from "socket.io";
 import { reAnswerRequestHandler } from "./events/re-answer-handler.js";
 import { branchOffHandler } from "./events/branch-off-handler.js";
+import { editedQuestionHandler } from "./events/edited-question-handler.js";
+import { leaveChatHandler } from "./events/leave-chat-handler.js";
 
 export const socketHandler = (socket: Socket, io: Server) => {
   try {
@@ -21,6 +23,12 @@ export const socketHandler = (socket: Socket, io: Server) => {
     });
     socket.on("branch_off", (data) => {
       branchOffHandler({ socket, io, data });
+    });
+    socket.on("edited_question", (data) => {
+      editedQuestionHandler({ socket, io, data });
+    });
+    socket.on("leave_chat", (data) => {
+      leaveChatHandler({ socket, io, data });
     });
   } catch (e) {
     socket.emit("error", "Something went wrong");

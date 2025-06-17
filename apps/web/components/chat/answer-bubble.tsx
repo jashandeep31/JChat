@@ -233,16 +233,6 @@ const AnswerNavigation = ({
   </div>
 );
 
-export const AnswerBubble = React.memo(AnswerBubbleInner, (prev, next) => {
-  const sameQ = prev.question.id === next.question.id;
-  const sameStream = prev.isStreaming === next.isStreaming;
-  const prevLen = prev.question.ChatQuestionAnswer.length;
-  const nextLen = next.question.ChatQuestionAnswer.length;
-  const sameCount = prevLen === nextLen;
-  const lastPrev = prev.question.ChatQuestionAnswer[prevLen - 1];
-  const lastNext = next.question.ChatQuestionAnswer[nextLen - 1];
-  const sameLast = lastPrev === lastNext;
-  return sameQ && sameStream && sameCount && sameLast;
-});
+const AnswerBubble = React.memo(AnswerBubbleInner);
 
 export default AnswerBubble;

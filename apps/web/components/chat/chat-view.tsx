@@ -5,12 +5,12 @@ import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
 import { ChevronDown, Share2 } from "lucide-react";
-import { useChatSocket } from "@/hooks/use-chat-socket";
 import StreamBubble from "./stream-bubble";
 import { ShareDropdown } from "./share-dropdown";
 import InstructionCard from "./instruction-card";
 import { useChatQAStore } from "@/z-store/chat-qa-store";
 import { useChatQAPairsQuery } from "@/lib/react-query/use-qa-query";
+import { useChatContext } from "@/context/chat-context";
 
 const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
   const [showScrollDownButton, setShowScrollDownButton] = useState(false);
@@ -26,8 +26,7 @@ const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
   );
   const chatQuestions = getQuestionsOfChat(chatId);
 
-  const { isStreaming, streamingResponse, setIsStreaming } =
-    useChatSocket(chatId);
+  const { isStreaming, streamingResponse, setIsStreaming } = useChatContext();
 
   useEffect(() => {
     const existing = getQuestionsOfChat(chatId);

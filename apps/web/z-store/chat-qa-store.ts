@@ -18,6 +18,11 @@ interface ChatQAStore {
     questionId: string,
     answer: ChatQuestionAnswer
   ) => void;
+  updateQuestion: (
+    chatId: string,
+    questionId: string,
+    question: FullQuestion
+  ) => void;
 }
 
 export const useChatQAStore = create<ChatQAStore>((set, get) => ({
@@ -78,6 +83,23 @@ export const useChatQAStore = create<ChatQAStore>((set, get) => ({
       const exists = q.ChatQuestionAnswer.some((a) => a.id === answer.id);
       if (exists) return q;
       return { ...q, ChatQuestionAnswer: [...q.ChatQuestionAnswer, answer] };
+    });
+    set({ allQuestions: { ...allQuestions, [chatId]: updatedQs } });
+    if (currentChatId === chatId) {
+      set({ questions: updatedQs });
+    }
+  },
+
+  updateQuestion: (
+    chatId: string,
+    questionId: string,
+    question: FullQuestion
+  ) => {
+    const { allQuestions, currentChatId } = get();
+    const chatQs = allQuestions[chatId] || [];
+    const updatedQs = chatQs.map((q) => {
+      if (q.id !== questionId) return q;
+      return question;
     });
     set({ allQuestions: { ...allQuestions, [chatId]: updatedQs } });
     if (currentChatId === chatId) {

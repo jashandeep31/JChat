@@ -1,11 +1,18 @@
 "use client";
 
-import { useContext, useEffect, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { SocketContext } from "@/context/socket-context";
 import { ChatQuestion, ChatQuestionAnswer, WebSearch } from "@repo/db";
 import { useChatQAStore } from "@/z-store/chat-qa-store";
 
-export interface ChatSocketState {
+export interface ChatState {
   isStreaming: boolean;
   streamingResponse: {
     questionId: string;
@@ -16,26 +23,38 @@ export interface ChatSocketState {
       webSearches: { title: string; url: string }[];
     };
   } | null;
+  setStreamingResponse: (
+    value: {
+      questionId: string;
+      data: {
+        text: string;
+        images: string;
+        reasoning: string;
+        webSearches: { title: string; url: string }[];
+      };
+    } | null
+  ) => void;
   setIsStreaming: (value: boolean) => void;
-}
-
-export interface UseChatSocketReturn extends ChatSocketState {
   askQuestion: (text: string) => void;
 }
 
-export const useChatSocket = (chatId: string): UseChatSocketReturn => {
+const ChatContext = createContext<ChatState | undefined>(undefined);
+
+export interface ChatContextProviderProps {
+  chatId: string;
+  children: ReactNode;
+}
+
+export const ChatContextProvider: React.FC<ChatContextProviderProps> = ({
+  chatId,
+  children,
+}) => {
   const socket = useContext(SocketContext);
   const { addQuestion, appendAnswerToQuestion } = useChatQAStore();
+
   const [isStreaming, setIsStreaming] = useState(false);
-  const [streamingResponse, setStreamingResponse] = useState<{
-    questionId: string;
-    data: {
-      text: string;
-      images: string;
-      reasoning: string;
-      webSearches: { title: string; url: string }[];
-    };
-  } | null>(null);
+  const [streamingResponse, setStreamingResponse] =
+    useState<ChatState["streamingResponse"]>(null);
 
   const askQuestion = useCallback(
     (text: string) => {
@@ -58,12 +77,7 @@ export const useChatSocket = (chatId: string): UseChatSocketReturn => {
       addQuestion(chatId, { ...question, ChatQuestionAnswer: [] });
       setStreamingResponse({
         questionId: question.id,
-        data: {
-          text: "",
-          images: "",
-          reasoning: "",
-          webSearches: [],
-        },
+        data: { text: "", images: "", reasoning: "", webSearches: [] },
       });
     };
 
@@ -79,7 +93,7 @@ export const useChatSocket = (chatId: string): UseChatSocketReturn => {
         questionId: string;
       } = JSON.parse(chunkData);
 
-      setStreamingResponse(() => ({
+      setStreamingResponse({
         questionId: parsed.questionId,
         data: {
           text: parsed.data.text,
@@ -87,15 +101,13 @@ export const useChatSocket = (chatId: string): UseChatSocketReturn => {
           reasoning: parsed.data.reasoning,
           webSearches: parsed.data.webSearches,
         },
-      }));
+      });
       setIsStreaming(true);
     };
 
     const handleQuestionAnswered = (raw: {
       cid: string;
-      answer: ChatQuestionAnswer & {
-        WebSearch: WebSearch[];
-      };
+      answer: ChatQuestionAnswer & { WebSearch: WebSearch[] };
     }) => {
       appendAnswerToQuestion(raw.cid, raw.answer.chatQuestionId, raw.answer);
       setStreamingResponse(null);
@@ -105,6 +117,7 @@ export const useChatSocket = (chatId: string): UseChatSocketReturn => {
     socket.on("question_created", handleQuestionCreated);
     socket.on("question_response_chunk", handleResponseChunk);
     socket.on("question_answered", handleQuestionAnswered);
+
     return () => {
       socket.off("question_created", handleQuestionCreated);
       socket.off("question_response_chunk", handleResponseChunk);
@@ -113,10 +126,31 @@ export const useChatSocket = (chatId: string): UseChatSocketReturn => {
     };
   }, [socket, chatId, addQuestion, appendAnswerToQuestion]);
 
-  return {
-    isStreaming,
-    streamingResponse,
-    askQuestion,
-    setIsStreaming,
-  };
+  return (
+    <ChatContext.Provider
+      value={{
+        isStreaming,
+        streamingResponse,
+        setIsStreaming,
+        setStreamingResponse,
+        askQuestion,
+      }}
+    >
+      {children}
+    </ChatContext.Provider>
+  );
 };
+
+/**
+ * Hook to access chat-socket state & actions.
+ * Must be used within a ChatSocketProvider.
+ */
+export function useChatContext(): ChatState {
+  const ctx = useContext(ChatContext);
+  if (!ctx) {
+    throw new Error(
+      "useChatSocketContext must be used within a ChatSocketProvider"
+    );
+  }
+  return ctx;
+}
