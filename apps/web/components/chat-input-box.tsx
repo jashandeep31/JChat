@@ -114,17 +114,6 @@ const ChatInputBox = ({
     };
   }, [chatBoxRef, isChatBoxActive]);
 
-  useEffect(() => {
-    if (isChatBoxActive) {
-      window.addEventListener("keypress", (e: KeyboardEvent) => {
-        if (isChatBoxActive && e.key === "Enter") {
-        } else {
-          textareaRef.current?.focus();
-        }
-      });
-    }
-  }, [isChatBoxActive]);
-
   return (
     <div
       ref={chatBoxRef}
