@@ -40,7 +40,7 @@ export const ChatInputBoxProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [question, setQuestion] = useState("what is next js in 10 words");
+  const [question, setQuestion] = useState("");
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
   const [selectedModel, setSelectedModel] = useState<AiModel | null>(null);
   const { modelsQuery } = useModelsQuery();
@@ -54,7 +54,7 @@ export const ChatInputBoxProvider = ({
 
     if (selectedModelSlug && modelsQuery.data) {
       const model = modelsQuery.data.find(
-        (model) => model.slug === selectedModelSlug
+        (model: AiModel) => model.slug === selectedModelSlug
       );
       if (model) {
         setSelectedModel(model);
@@ -63,7 +63,11 @@ export const ChatInputBoxProvider = ({
     }
 
     if (selectedModel === null && modelsQuery.data?.length) {
-      setSelectedModel(modelsQuery.data[0]);
+      setSelectedModel(
+        modelsQuery.data.find(
+          (model: AiModel) => model.slug === "gemini-2.0-flash"
+        ) || null
+      );
     }
   }, [modelsQuery.data, selectedModel]);
   const handleModelChange = (model: AiModel) => {
@@ -107,6 +111,7 @@ export const ChatInputBoxProvider = ({
             attachmentId: attachmentInfo?.id,
           })
         );
+        setIsStreaming?.(true);
       } else if (params?.pid) {
         socket.emit(
           "new_chat",
@@ -118,6 +123,7 @@ export const ChatInputBoxProvider = ({
             projectId: params.pid,
           })
         );
+        setIsStreaming?.(true);
       } else {
         socket.emit(
           "new_chat",
@@ -128,6 +134,7 @@ export const ChatInputBoxProvider = ({
             attachmentId: attachmentInfo?.uploadId,
           })
         );
+        setIsStreaming?.(true);
       }
     } catch (error) {
       // In case of error, make sure to set streaming to false

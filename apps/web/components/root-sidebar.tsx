@@ -13,13 +13,15 @@ import SidebarProjects from "./sidebar-projects";
 import SidebarChats from "./sidebar-chats";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Search } from "lucide-react";
+import { Command, Search } from "lucide-react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
 import { ThemeToggler } from "./theme-toggler";
+import { useCurrentChat } from "@/context/current-chat-context";
 
 const RootSideBar = () => {
   const { data: session } = useSession();
   const { setOpen } = useContext(SearchDialogContext);
+  const { startNewChat } = useCurrentChat();
   return (
     <div>
       <Sidebar>
@@ -30,9 +32,7 @@ const RootSideBar = () => {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="p-3 space-y-2">
-            <Link href={"/"} className={buttonVariants()}>
-              New Chat
-            </Link>
+            <Button onClick={startNewChat}>New Chat </Button>
             <Button
               variant={"outline"}
               onClick={() => setOpen(true)}
@@ -41,8 +41,8 @@ const RootSideBar = () => {
               <span className="flex items-center gap-2">
                 <Search /> Search
               </span>
-              <span className="text-xs text-muted-foreground cursor-pointer">
-                Ctrl + K
+              <span className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                <Command className="w-4 h-4" /> + K
               </span>
             </Button>
           </SidebarGroup>
@@ -56,7 +56,7 @@ const RootSideBar = () => {
               className="flex items-center gap-2 p-2 rounded-md hover:bg-accent"
             >
               <div className="flex items-center gap-2">
-                <span className="text-2xl text-white  bg-primary p-2 w-10 h-10 rounded-full flex items-center justify-center">
+                <span className="text-2xl dark:text-black text-white  bg-primary p-2 w-10 h-10 rounded-full flex items-center justify-center">
                   {session.user.name?.[0]}
                 </span>
                 <div className="flex flex-col">
@@ -72,7 +72,7 @@ const RootSideBar = () => {
           ) : (
             <Link
               href={"/login"}
-              className="flex items-center gap-2 p-2 rounded-md hover:bg-accent text-center border justify-center"
+              className={buttonVariants({ variant: "secondary" })}
             >
               Login
             </Link>

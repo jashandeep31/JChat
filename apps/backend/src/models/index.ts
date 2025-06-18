@@ -10,6 +10,7 @@ import { getChat } from "../services/chat-cache.js";
 import { askGroqQuestion } from "./providers/groq/index.js";
 import { getProject } from "../services/project-cache.js";
 import { getApi } from "../services/api-cache.js";
+import { askAnthropicQuestion } from "./providers/anthropic/index.js";
 
 export interface ProviderFunctionParams {
   question: ChatQuestion;
@@ -40,6 +41,7 @@ const providers: Record<string, any | undefined> = {
   google: askGeminiQuestion,
   openai: askOpenAIQuestion,
   groq: askGroqQuestion,
+  anthropic: askAnthropicQuestion,
 };
 export const askQuestion = async (
   chatQuestion: ChatQuestion,
@@ -155,25 +157,30 @@ export const askQuestion = async (
   });
 
   await redis.del(redisKey);
+
   return { text, images, webSearches, reasoning };
 };
 async function buildSystemContext(cid: string) {
   const messages: { role: "system"; content: string }[] = [];
   const chatQA = await getChatQACache(cid);
 
-  if (chatQA && chatQA.length) {
+  if (chatQA && chatQA.length > 0) {
     for (const { question, ChatQuestionAnswer } of chatQA) {
       const lastAnswer = ChatQuestionAnswer.at(-1)?.answer ?? "";
+      if (lastAnswer.length > 2) {
+        messages.push({
+          role: "system",
+          content: `User asked: "${question}"\nAI responded: "${lastAnswer}"`,
+        });
+      }
+    }
+    if (messages.length > 0) {
       messages.push({
         role: "system",
-        content: `User asked: "${question}"\nAI responded: "${lastAnswer}"`,
+        content:
+          "Use the above conversation context to answer the next question.",
       });
     }
-    messages.push({
-      role: "system",
-      content:
-        "Use the above conversation context to answer the next question.",
-    });
   }
 
   return messages;

@@ -88,7 +88,6 @@ export const askGeminiQuestion = async ({
           onImageChunk(part.base64);
           break;
         case "source":
-          console.log(part.source);
           break;
       }
     }

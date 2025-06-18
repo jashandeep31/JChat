@@ -82,7 +82,6 @@ export function CredentialsLoginDialog({
       password,
       redirect: false,
     });
-    console.log(res, email, password);
     if (res.error === null || res.error === undefined) {
       router.push("/");
     } else {

@@ -4,25 +4,66 @@ import React, { useEffect, useRef, useState } from "react";
 import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
-import { ChevronDown, Share2 } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useChatSocket } from "@/hooks/use-chat-socket";
+import { ChevronDown, Loader2, Share2 } from "lucide-react";
 import StreamBubble from "./stream-bubble";
 import { ShareDropdown } from "./share-dropdown";
-import { Chat } from "@repo/db";
 import InstructionCard from "./instruction-card";
+import { useChatQAStore } from "@/z-store/chat-qa-store";
+import { useChatQAPairsQuery } from "@/lib/react-query/use-qa-query";
+import { useChatContext } from "@/context/chat-context";
 
-const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
-  const { cid } = useParams<{ cid: string }>();
-  const { chatQuestions, isStreaming, streamingResponse, setIsStreaming } =
-    useChatSocket(cid, {
-      questions: [],
-    });
+const ChatView: React.FC<{ chatId: string; isNew?: boolean }> = ({
+  chatId,
+  isNew = false,
+}) => {
   const [showScrollDownButton, setShowScrollDownButton] = useState(false);
   const [isFirstTimeScrolled, setIsFirstTimeScrolled] = useState(false);
   const lastDivRef = useRef<HTMLDivElement>(null);
+  // Fetch initial QAs
+  const { data: initialQAs = [], isLoading } = useChatQAPairsQuery(chatId);
+  const addMultipleQuestions = useChatQAStore(
+    (state) => state.addMultipleQuestions
+  );
+  const getQuestionsOfChat = useChatQAStore(
+    (state) => state.getQuestionsOfChat
+  );
+  const chatQuestions = getQuestionsOfChat(chatId);
+
+  const {
+    isStreaming,
+    streamingResponse,
+    setIsStreaming,
+    setStreamingResponse,
+  } = useChatContext();
+
   useEffect(() => {
-    if (!isFirstTimeScrolled && chatQuestions.length > 0) {
+    const questions = getQuestionsOfChat(chatId);
+    if (
+      questions.length === 1 &&
+      questions[0].ChatQuestionAnswer.length === 0
+    ) {
+      setIsStreaming(true);
+      setStreamingResponse({
+        questionId: questions[0].id,
+        data: {
+          text: "",
+          images: "",
+          reasoning: "",
+          webSearches: [],
+        },
+      });
+    }
+  }, [isNew, getQuestionsOfChat, setIsStreaming, chatId, setStreamingResponse]);
+
+  useEffect(() => {
+    const existing = getQuestionsOfChat(chatId);
+    if (initialQAs.length > 0 && existing.length === 0) {
+      addMultipleQuestions(chatId, initialQAs);
+    }
+  }, [chatId, initialQAs, addMultipleQuestions, getQuestionsOfChat]);
+
+  useEffect(() => {
+    if (!isFirstTimeScrolled && chatQuestions && chatQuestions.length > 0) {
       setIsFirstTimeScrolled(true);
       lastDivRef.current?.scrollIntoView({ behavior: "instant" });
     }
@@ -57,10 +98,7 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
   return (
     <div className="flex-1 flex flex-col p-4 pb-0">
       <div className="fixed  top-4 right-4 z-10 flex gap-2 bg-sidebar border rounded-lg p-1.5">
-        <InstructionCard
-          chatId={cid}
-          initialInstruction={chat.instruction || ""}
-        />
+        <InstructionCard chatId={chatId} />
         <ShareDropdown>
           <button
             className="p-2 rounded hover:bg-accent transition-colors duration-200"
@@ -71,8 +109,21 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
         </ShareDropdown>
       </div>
       <div className="flex-1 ">
-        <div className="mx-auto lg:max-w-1/2 w-full">
-          {chatQuestions.map((chatQuestion) => (
+        <div className="mx-auto max-w-[800px]  w-full">
+          {isLoading && chatQuestions.length === 0 && (
+            <div className="flex mt-24 justify-center items-center h-full">
+              <p>Loading chats</p>
+              <Loader2 className="animate-spin" />
+            </div>
+          )}
+
+          {!isLoading && chatQuestions?.length === 0 && (
+            <div className="flex justify-center items-center h-full">
+              <p>No chats found</p>
+            </div>
+          )}
+
+          {chatQuestions?.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
               <QuestionBubble question={chatQuestion} />
               {chatQuestion.ChatQuestionAnswer.length > 0 &&
@@ -104,7 +155,7 @@ const ChatView: React.FC<{ chat: Chat }> = ({ chat }) => {
             </button>
           )}
         </div>
-        <div className="mx-auto lg:max-w-1/2 w-full bg-background">
+        <div className="mx-auto lg:max-w-[800px] w-full bg-background">
           <ChatInputBox
             isStreaming={isStreaming}
             setIsStreaming={setIsStreaming}

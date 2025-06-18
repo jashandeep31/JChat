@@ -28,7 +28,6 @@ export const ProfileView = () => {
   const router = useRouter();
   const session = useSession();
   const { userQuery } = useUserQuery();
-  console.log(userQuery.data);
 
   if (session.status === "loading") {
     return null;

@@ -6,8 +6,14 @@ import {
 } from "@/context/chat-input-box-context";
 import { Button } from "@repo/ui/components/button";
 import { ArrowUp, Globe, Loader2, Paperclip, X } from "lucide-react";
-import { useParams } from "next/navigation";
-import React, { useEffect, useRef, useContext } from "react";
+import { useParams, usePathname } from "next/navigation";
+import React, {
+  useEffect,
+  useRef,
+  useContext,
+  useState,
+  useCallback,
+} from "react";
 import { SelectAIModel } from "./select-ai-model";
 import { UploadDialog } from "./upload-dialog";
 import {
@@ -26,11 +32,14 @@ const ChatInputBox = ({
   isStreaming?: boolean;
   setIsStreaming?: (value: boolean) => void;
 }) => {
+  const pathname = usePathname();
   const session = useSession();
   const params = useParams();
   const socket = useContext(SocketContext);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const parentDivRef = useRef<HTMLDivElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+  const [isChatBoxActive, setIsChatBoxActive] = useState(false);
   const { userQuery } = useUserQuery();
 
   const {
@@ -64,13 +73,13 @@ const ChatInputBox = ({
     }
   }, [question]);
 
-  const onSubmit = () => {
+  const onSubmit = useCallback(() => {
     handleSubmit({
       setIsStreaming,
       socket,
       params,
     });
-  };
+  }, [handleSubmit, setIsStreaming, socket, params]);
 
   useEffect(() => {
     if (!selectedModel || !selectedModel.imageAnalysis) {
@@ -84,15 +93,39 @@ const ChatInputBox = ({
     }
   }, [selectedModel, setIsWebSearchEnabled]);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        chatBoxRef.current &&
+        !chatBoxRef.current.contains(e.target as Node) &&
+        isChatBoxActive
+      ) {
+        setIsChatBoxActive(false);
+      } else if (
+        chatBoxRef.current &&
+        chatBoxRef.current.contains(e.target as Node)
+      ) {
+        setIsChatBoxActive(true);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [chatBoxRef, isChatBoxActive]);
+
   return (
-    <div className="border-2 border-primary p-4 rounded-md w-full flex gap-2 flex-col">
+    <div
+      ref={chatBoxRef}
+      className={`border-2  ${!pathname.includes("project") ? " rounded-b-none   border-b-0 " : ""} border-${isChatBoxActive ? "primary" : "accent"} p-4 rounded-md w-full flex gap-2 flex-col`}
+    >
       <div ref={parentDivRef} className="flex-1" style={{ minHeight: "50px" }}>
         <textarea
           ref={textareaRef}
           className="border-0 outline-0 resize-none w-full flex-1"
           style={{
             overflowY: "auto",
-            minHeight: "70px",
+            minHeight: "50px",
           }}
           placeholder="Ask anything..."
           value={question}
@@ -112,18 +145,25 @@ const ChatInputBox = ({
             setSelectedModel={setSelectedModel}
             models={models}
           />
-          {userQuery.data?.credits && userQuery.data?.credits <= 15 && (
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full hidden md:block">
-                  Low Credits
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Upgrade or buy more credits</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
+          {userQuery.data?.credits !== undefined &&
+            userQuery.data.credits <= 15 && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge
+                    className={`rounded-full hidden md:block ${
+                      userQuery.data.credits <= 0
+                        ? "border-red-500 text-red-500 bg-red-50"
+                        : "border-orange-500 text-orange-500 bg-orange-50"
+                    }`}
+                  >
+                    {userQuery.data.credits <= 0 ? "No Credits" : "Low Credits"}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Upgrade or buy more credits</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
         </div>
         <div className="flex gap-2 items-center">
           {selectedModel?.webAnalysis && (
@@ -236,7 +276,6 @@ const AttachmentInfoComponent = ({
   attachmentInfo: AttachmentInfo;
   setAttachmentInfo: (attachmentInfo: AttachmentInfo) => void;
 }) => {
-  console.log(attachmentInfo);
   return (
     <div>
       {attachmentInfo && (

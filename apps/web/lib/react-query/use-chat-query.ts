@@ -19,8 +19,10 @@ const useChatQuery = () => {
       const chats = await getChats();
       return chats;
     },
+    staleTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
+    refetchOnMount: false,
+    refetchInterval: false,
   });
 
   const updateChatName = (chat: Chat) => {
@@ -55,17 +57,11 @@ const useChatQuery = () => {
     mutationFn: async (chatId: string) => {
       return await deleteChat(chatId);
     },
-    onSuccess: () => {
-      chatsQuery.refetch();
-    },
   });
 
   const renameChatMutation = useMutation({
     mutationFn: async ({ chatId, name }: { chatId: string; name: string }) => {
       return await renameChat(chatId, name);
-    },
-    onSuccess: () => {
-      chatsQuery.refetch();
     },
   });
 
@@ -79,9 +75,6 @@ const useChatQuery = () => {
     }) => {
       return await moveChat(chatId, projectId);
     },
-    onSuccess: () => {
-      chatsQuery.refetch();
-    },
   });
 
   const addChatIntructionMutation = useMutation({
@@ -93,9 +86,6 @@ const useChatQuery = () => {
       instruction: string;
     }) => {
       return await addChatInstruction(chatId, instruction);
-    },
-    onSuccess: () => {
-      chatsQuery.refetch();
     },
   });
 

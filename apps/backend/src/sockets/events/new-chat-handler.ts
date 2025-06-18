@@ -6,7 +6,9 @@ import { redis } from "../../lib/db.js";
 import { questionAnswerHandler } from "../utils/question-answer-handler.js";
 import { getAttachment } from "../../services/attachment-cache.js";
 import { getUser } from "../../services/user-cache.js";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuid } from "uuid";
+import { ChatQuestion } from "@repo/db";
+
 const newChatSchema = z.object({
   question: z.string().min(10),
   modelSlug: z.string(),
@@ -23,57 +25,65 @@ export const newChatHandler = async ({
   const parsedData = JSON.parse(data);
   const result = newChatSchema.safeParse(parsedData);
   const user = await getUser(socket.userId);
-  const chatId = uuidv4();
-
+  if (!user) {
+    socket.emit("error", "User not found");
+    return;
+  }
   if (!result.success) {
     socket.emit("error", result.error.message);
     return;
   }
-  const tempChat = {
-    id: chatId,
-    name: "New Chat",
-    userId: socket.userId,
-    ...(result.data.projectId ? { projectId: result.data.projectId } : {}),
-  };
-  redis.set(`chat:${chatId}`, JSON.stringify(tempChat), "EX", 20 * 60);
-  socket.emit("chat_created", tempChat);
-
   const chat = await db.chat.create({
     data: {
-      id: chatId,
       name: "New Chat",
       userId: socket.userId,
       ...(result.data.projectId ? { projectId: result.data.projectId } : {}),
     },
   });
-  redis.set(`chat:${chat.id}`, JSON.stringify(chat), "EX", 20 * 60);
 
+  const tempUuid = uuid();
+
+  const tempQuesiton: ChatQuestion = {
+    id: tempUuid,
+    question: result.data.question,
+    credits: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    chatId: chat.id,
+    webSearch: result.data.isWebSearchEnabled && user.proUser,
+    attachmentId: null,
+  };
+
+  if (result.data.projectId) {
+    socket.emit("project_chat_created", { chat, question: tempQuesiton });
+  } else {
+    socket.emit("chat_created", { chat, question: tempQuesiton });
+  }
+
+  redis.set(`chat:${chat.id}`, JSON.stringify(chat), "EX", 20 * 60);
   const attachmentData = parsedData.attachmentId
     ? await getAttachment(parsedData.attachmentId)
     : null;
   const chatQuestion = await db.chatQuestion.create({
     data: {
+      id: tempUuid,
       chatId: chat.id,
       question: result.data.question,
-      ...(attachmentData && user?.proUser
-        ? { attachmentId: attachmentData.id }
-        : {}),
-      webSearch: result.data.isWebSearchEnabled && user?.proUser,
+      attachmentId: attachmentData && user.proUser ? attachmentData.id : null,
+      webSearch: result.data.isWebSearchEnabled && user.proUser,
     },
   });
-
   io.to(`room:${chat.id}`).emit("question_created", {
     cid: chat.id,
     question: chatQuestion,
   });
 
-  const current = Date.now();
   await renameChatQueue.add("rename-chat", {
     chatId: chat.id,
     question: result.data.question,
     socketId: socket.id,
   });
-  console.log(Date.now() - current, "ms is taken");
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   await questionAnswerHandler({
     chatQuestion,
     modelSlug: result.data.modelSlug,

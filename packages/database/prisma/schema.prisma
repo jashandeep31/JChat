@@ -113,7 +113,7 @@ model ChatQuestion {
 model ChatQuestionAnswer {
   id             String  @id @default(uuid())
   chatQuestionId String
-  base64Image    String?
+  imageUrl       String?
   answer         String
   reasoning      String?
   credits        Float   @default(0)
@@ -124,6 +124,7 @@ model ChatQuestionAnswer {
 
   chatQuestion ChatQuestion @relation(fields: [chatQuestionId], references: [id], onDelete: Cascade)
   aiModel      AiModel      @relation(fields: [aiModelId], references: [id])
+  isWebSearch  Boolean      @default(false)
   WebSearch    WebSearch[]
 }
 

@@ -3,6 +3,7 @@ import { companies, companySlugs } from "./companies";
 import { openaiModels } from "./openai";
 import { googleModels } from "./gemini";
 import { groqModels } from "./groq";
+import { anthropicModels } from "./anthropic";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +18,12 @@ async function main() {
     });
   }
 
-  const models = [...openaiModels, ...googleModels, ...groqModels];
+  const models = [
+    ...openaiModels,
+    ...googleModels,
+    ...groqModels,
+    ...anthropicModels,
+  ];
   for (const { companySlug, ...model } of models) {
     const company = await prisma.company.findUnique({
       where: {

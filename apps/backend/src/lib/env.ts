@@ -5,10 +5,13 @@ dotenv.config();
 export const env = {
   PORT: process.env.PORT,
   FRONTEND_URL: process.env.FRONTEND_URL as string,
+  ALLOWED_URLS: process.env.ALLOWED_URLS as string,
   JWT_SECRET: process.env.JWT_SECRET as string,
   REDIS_HOST: process.env.REDIS_HOST as string,
   REDIS_PORT: process.env.REDIS_PORT as string,
   REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
+  REDIS_USERNAME: process.env.REDIS_USERNAME as string,
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY as string,
   GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
   GOOGLE_GENERATIVE_AI_API_KEY: process.env
     .GOOGLE_GENERATIVE_AI_API_KEY as string,

@@ -1,4 +1,4 @@
-export const companySlugs = ["open-ai", "google", "groq"] as const;
+export const companySlugs = ["open-ai", "google", "groq", "anthropic"] as const;
 
 export const companies: {
   name: string;
@@ -20,5 +20,10 @@ export const companies: {
     name: "Groq",
     slug: "groq",
     logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1A7gaDDexpewHghrUhXhUUw-RFxR4uIIbKf209FNVERmz0ov-BiEHige7skkVLzF40cA&usqp=CAU",
+  },
+  {
+    name: "Anthropic",
+    slug: "anthropic",
+    logo: "https://img.icons8.com/fluent/512/claude.png",
   },
 ] as const;

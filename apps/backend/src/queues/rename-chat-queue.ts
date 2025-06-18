@@ -10,8 +10,6 @@ export const renameChatQueue = new Queue("rename-chat-queue", {
 const worker = new Worker(
   "rename-chat-queue",
   async (job: Job<{ chatId: string; question: string; socketId: string }>) => {
-    console.log("Processing rename chat job for chat ID:", job.data.chatId);
-
     if (!job.data) {
       console.error("No data provided in job");
       return null;
@@ -38,6 +36,9 @@ const worker = new Worker(
         where: { id: chatId },
         data: { name: chatName },
       });
+
+      redis.del(`chat:${chatId}`);
+      redis.set(`chat:${chatId}`, JSON.stringify(updatedChat), "EX", 20 * 60);
 
       // Notify the specific client that requested the chat name update
       if (socketId) {

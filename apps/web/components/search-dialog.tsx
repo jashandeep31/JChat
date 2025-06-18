@@ -11,14 +11,14 @@ import {
   CommandList,
 } from "@repo/ui/components/command";
 import { Clock } from "lucide-react";
-import useChatQuery from "@/lib/react-query/use-chat-query";
 import { useContext } from "react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
 import { Chat } from "@repo/db";
+import { useChatsStore } from "@/z-store/chats-store";
 
 export function SearchDialog() {
   const { open, setOpen } = useContext(SearchDialogContext);
-  const { chatsQuery } = useChatQuery();
+  const { chats } = useChatsStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -36,14 +36,14 @@ export function SearchDialog() {
     }
   }, [open]);
 
-  const handleSelect = (chat: Chat) => {
+  const handleSelect = async (chat: Chat) => {
     setOpen(false);
     router.push(`/chat/${chat.id}`);
   };
 
-  const handleNewChat = (query: string) => {
+  const handleNewChat = () => {
     setOpen(false);
-    router.push(`/chat/new?q=${encodeURIComponent(query)}`);
+    router.push(`/`);
   };
 
   return (
@@ -57,7 +57,7 @@ export function SearchDialog() {
                 .querySelector('[aria-selected="true"]')
                 ?.getAttribute("data-value");
               if (!selectedValue) {
-                handleNewChat(e.currentTarget.value);
+                handleNewChat();
               }
             }
           }}
@@ -73,7 +73,7 @@ export function SearchDialog() {
             <Clock className="mr-2 h-4 w-4" />
             Recent Chats
           </div>
-          {chatsQuery.data?.map((chat: Chat) => (
+          {chats?.map((chat: Chat) => (
             <CommandItem
               key={chat.id}
               value={chat.name + chat.id}

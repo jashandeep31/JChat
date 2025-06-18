@@ -27,7 +27,6 @@ router
       expiresAt: Date;
       publicUrl: string;
     };
-    console.log(metaData);
     const attachment = await db.attachment.create({
       data: {
         uploadId: attachmentId,

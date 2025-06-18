@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import MarkdownRenderer from "../markdown-renderer";
-import { FullChatQuestion } from "@/hooks/use-chat-socket";
+import { FullQuestion } from "@/z-store/chat-qa-store";
 import { Button } from "@repo/ui/components/button";
 import {
   Check,
@@ -22,14 +22,14 @@ import { SocketContext } from "@/context/socket-context";
 import useModelsQuery from "@/lib/react-query/use-models-query";
 import { RetryModelSelector } from "../retry-model-selector";
 import { AiModel } from "@repo/db";
-import Link from "next/link";
+import WebResults from "./web-results";
 
-const AnswerBubble = ({
+const AnswerBubbleInner = ({
   question,
   isStreaming,
   setIsStreaming,
 }: {
-  question: FullChatQuestion;
+  question: FullQuestion;
   isStreaming: boolean;
   setIsStreaming: (value: boolean) => void;
 }) => {
@@ -47,14 +47,12 @@ const AnswerBubble = ({
     ) {
       setActiveAnswer(answers[answers.length - 1]);
     }
-  }, [question, answers, activeAnswer]);
+  }, [answers, activeAnswer]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(activeAnswer.answer);
     setIsCopied(true);
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 2000);
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   const handleBranchOff = () => {
@@ -65,37 +63,16 @@ const AnswerBubble = ({
   };
 
   return (
-    <div className="">
-      <div className={activeAnswer?.WebSearch?.length > 0 ? "" : "hidden"}>
-        <h3 className="text-sm font-semibold">Sources</h3>
-        <div className="overflow-x-auto flex mt-2 gap-4 hide-scrollbar">
-          {activeAnswer.WebSearch.map((webSearch) => (
-            <Link
-              href={webSearch.url}
-              target="_blank"
-              key={webSearch.id}
-              className="max-w-36 border rounded-md p-2 bg-accent hover:border-primary transition-colors border-accent"
-            >
-              <p className="text-sm font-semibold truncate">
-                {webSearch.title}
-              </p>
-              <p className="text-xs truncate">{webSearch.url}</p>
-            </Link>
-          ))}
-        </div>
-      </div>
+    <div>
+      {activeAnswer.isWebSearch && <WebResults answerId={activeAnswer.id} />}
+
       {activeAnswer.reasoning && (
         <div>
           <button
             onClick={() => setIsReasoningOpen(!isReasoningOpen)}
             className="flex items-center gap-2 font-medium hover:bg-accent p-2 rounded"
           >
-            Reasoning{" "}
-            {isReasoningOpen ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}{" "}
+            Reasoning {isReasoningOpen ? <ChevronUp /> : <ChevronDown />}
           </button>
           {isReasoningOpen && (
             <div className="mt-2 border p-2 rounded bg-accent px-3">
@@ -104,84 +81,76 @@ const AnswerBubble = ({
           )}
         </div>
       )}
+
       <MarkdownRenderer content={activeAnswer.answer} />
-      {activeAnswer.base64Image && (
+
+      {activeAnswer.imageUrl && (
         <div className="mt-6 max-w-[500px] relative">
-          {/*  eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="rounded-md"
-            src={"data:image/png;base64," + activeAnswer.base64Image}
-            alt=""
+            src={activeAnswer.imageUrl}
+            alt="Generated"
           />
-          <Button
-            variant="outline"
-            size="sm"
-            className="absolute z-10 bottom-2 right-2 "
-            onClick={() => {
-              const link = document.createElement("a");
-              link.href = "data:image/png;base64," + activeAnswer.base64Image;
-              link.download = `jchat-image-${new Date().getTime()}.png`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
+          <a
+            href={activeAnswer.imageUrl}
+            download
+            className="absolute bottom-2 right-2"
           >
-            <Download className="w-4 h-4" />
-          </Button>
+            <Button variant="outline" size="sm">
+              <Download className="mr-1 h-4 w-4" />
+              Download
+            </Button>
+          </a>
         </div>
       )}
 
-      <div className="flex mt-6 items-center gap-2 ">
+      <div className="flex mt-6 items-center gap-2">
         <CustomTooltip content="Copy">
-          <Button
-            variant={"ghost"}
-            size={"sm"}
-            onClick={() => copyToClipboard()}
-          >
+          <Button variant="ghost" size="sm" onClick={copyToClipboard}>
             {isCopied ? <Check /> : <Copy />}
           </Button>
         </CustomTooltip>
-        <div className="flex items-center ">
-          <RetryModelSelector
-            questionId={question.id}
-            isStreaming={isStreaming}
-            setIsStreaming={setIsStreaming}
-            chatId={question.chatId}
-            socket={socket}
-          >
-            <button className="hover:bg-accent p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
-              <CustomTooltip content="Retry Message">
+
+        <RetryModelSelector
+          questionId={question.id}
+          isStreaming={isStreaming}
+          setIsStreaming={setIsStreaming}
+          chatId={question.chatId}
+          socket={socket}
+        >
+          <button className="hover:bg-accent p-2 rounded disabled:opacity-50">
+            <CustomTooltip content="Retry Message">
+              <span>
                 <RotateCcw className="w-4 h-4" />
-              </CustomTooltip>
-            </button>
-          </RetryModelSelector>
-        </div>
+              </span>
+            </CustomTooltip>
+          </button>
+        </RetryModelSelector>
+
         <CustomTooltip content="Branch Off">
-          <Button
-            onClick={() => handleBranchOff()}
-            variant={"ghost"}
-            size={"sm"}
-          >
+          <Button variant="ghost" size="sm" onClick={handleBranchOff}>
             <Split className="rotate-180" />
           </Button>
         </CustomTooltip>
-        <div className="md:hidden hidden lg:block">
+
+        <div className="hidden lg:flex items-center gap-2">
           <CustomTooltip content="Model used / Credits used">
             <div className="flex items-center gap-2">
-              {/*  eslint-disable-next-line @next/next/no-img-element */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={
                   modelsQuery.data?.find(
-                    (model: AiModel) => model.id === activeAnswer.aiModelId
+                    (m: AiModel) => m.id === activeAnswer.aiModelId
                   )?.logo || ""
                 }
-                className="w-4 h-4 rounded-full "
+                className="w-4 h-4 rounded-full"
                 alt=""
               />
               <p className="text-xs">
                 {
                   modelsQuery.data?.find(
-                    (model: AiModel) => model.id === activeAnswer.aiModelId
+                    (m: AiModel) => m.id === activeAnswer.aiModelId
                   )?.name
                 }{" "}
                 / {activeAnswer.credits}
@@ -189,6 +158,7 @@ const AnswerBubble = ({
             </div>
           </CustomTooltip>
         </div>
+
         <div className="flex items-center gap-2 ml-auto">
           <AnswerNavigation
             answers={answers}
@@ -209,62 +179,55 @@ const CustomTooltip = ({
   children: React.ReactNode;
   content: string;
   className?: string;
-}) => {
-  return (
-    <div className={className}>
-      <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side="bottom">
-          <p>{content}</p>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-  );
-};
+}) => (
+  <div className={className}>
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="bottom">
+        <p>{content}</p>
+      </TooltipContent>
+    </Tooltip>
+  </div>
+);
 
 const AnswerNavigation = ({
   answers,
   activeAnswer,
   setActiveAnswer,
 }: {
-  answers: FullChatQuestion["ChatQuestionAnswer"];
-  activeAnswer: FullChatQuestion["ChatQuestionAnswer"][number];
-  setActiveAnswer: (
-    answer: FullChatQuestion["ChatQuestionAnswer"][number]
-  ) => void;
-}) => {
-  return (
-    <div className="flex items-center gap-2">
-      <CustomTooltip content="Previous Answer">
-        <button
-          className="p-1 hover:bg-accent  rounded disabled:opacity-50"
-          onClick={() =>
-            setActiveAnswer(answers[answers.indexOf(activeAnswer) - 1])
-          }
-          disabled={answers.indexOf(activeAnswer) === 0}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-      </CustomTooltip>
-      <p className="text-xs">
-        {answers.indexOf(activeAnswer) !== -1
-          ? answers.indexOf(activeAnswer) + 1
-          : 1}{" "}
-        of {answers.length}
-      </p>
-      <CustomTooltip content="Next Answer">
-        <button
-          className="p-1 hover:bg-accent  rounded disabled:opacity-50"
-          onClick={() =>
-            setActiveAnswer(answers[answers.indexOf(activeAnswer) + 1])
-          }
-          disabled={answers.indexOf(activeAnswer) === answers.length - 1}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </CustomTooltip>
-    </div>
-  );
-};
+  answers: FullQuestion["ChatQuestionAnswer"];
+  activeAnswer: FullQuestion["ChatQuestionAnswer"][number];
+  setActiveAnswer: (ans: FullQuestion["ChatQuestionAnswer"][number]) => void;
+}) => (
+  <div className="flex items-center gap-2">
+    <CustomTooltip content="Previous Answer">
+      <button
+        className="p-1 hover:bg-accent rounded disabled:opacity-50"
+        onClick={() =>
+          setActiveAnswer(answers[answers.indexOf(activeAnswer) - 1])
+        }
+        disabled={answers.indexOf(activeAnswer) === 0}
+      >
+        <ChevronLeft />
+      </button>
+    </CustomTooltip>
+    <p className="text-xs">
+      {answers.indexOf(activeAnswer) + 1} of {answers.length}
+    </p>
+    <CustomTooltip content="Next Answer">
+      <button
+        className="p-1 hover:bg-accent rounded disabled:opacity-50"
+        onClick={() =>
+          setActiveAnswer(answers[answers.indexOf(activeAnswer) + 1])
+        }
+        disabled={answers.indexOf(activeAnswer) === answers.length - 1}
+      >
+        <ChevronRight />
+      </button>
+    </CustomTooltip>
+  </div>
+);
+
+const AnswerBubble = React.memo(AnswerBubbleInner);
 
 export default AnswerBubble;

@@ -7,7 +7,6 @@ import { CredentialsLoginDialog } from "./creds-login-dialog";
 const login = async () => {
   const session = await auth();
   if (session?.user) {
-    // console.log(session);
     redirect("/");
   }
   return (

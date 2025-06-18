@@ -36,11 +36,7 @@ export const DangerZone = () => (
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            disabled
-            onClick={() => console.log("Account deletion confirmed")}
-            className="bg-red-600 hover:bg-red-700"
-          >
+          <AlertDialogAction disabled className="bg-red-600 hover:bg-red-700">
             Delete (coming soon)
           </AlertDialogAction>
         </AlertDialogFooter>

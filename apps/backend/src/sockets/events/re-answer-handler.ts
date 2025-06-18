@@ -46,7 +46,6 @@ export const reAnswerRequestHandler = async ({
       userId: socket.userId,
     });
   } catch (e) {
-    console.log(e);
     socket.emit("error", "Something went wrong in the request");
   }
 };

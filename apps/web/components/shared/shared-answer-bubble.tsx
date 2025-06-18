@@ -12,7 +12,7 @@ import {
 interface ChatQuestionAnswer {
   id: string;
   answer: string;
-  base64Image?: string | null;
+  imageUrl?: string | null;
 }
 
 export const SharedAnswerBubble = ({
@@ -37,12 +37,12 @@ export const SharedAnswerBubble = ({
         <MarkdownRenderer content={activeAnswer.answer} />
       </div>
 
-      {activeAnswer.base64Image && (
+      {activeAnswer.imageUrl && (
         <div className="mt-6 max-w-[500px]">
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="rounded-md"
-            src={"data:image/png;base64," + activeAnswer.base64Image}
+            src={activeAnswer.imageUrl}
             alt="Generated image"
           />
         </div>
