@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ChatInputBox from "../chat-input-box";
 import QuestionBubble from "./question-bubble";
 import AnswerBubble from "./answer-bubble";
-import { ChevronDown, Share2 } from "lucide-react";
+import { ChevronDown, Loader2, Share2 } from "lucide-react";
 import StreamBubble from "./stream-bubble";
 import { ShareDropdown } from "./share-dropdown";
 import InstructionCard from "./instruction-card";
@@ -20,7 +20,7 @@ const ChatView: React.FC<{ chatId: string; isNew?: boolean }> = ({
   const [isFirstTimeScrolled, setIsFirstTimeScrolled] = useState(false);
   const lastDivRef = useRef<HTMLDivElement>(null);
   // Fetch initial QAs
-  const { data: initialQAs = [] } = useChatQAPairsQuery(chatId);
+  const { data: initialQAs = [], isLoading } = useChatQAPairsQuery(chatId);
   const addMultipleQuestions = useChatQAStore(
     (state) => state.addMultipleQuestions
   );
@@ -110,6 +110,19 @@ const ChatView: React.FC<{ chatId: string; isNew?: boolean }> = ({
       </div>
       <div className="flex-1 ">
         <div className="mx-auto max-w-[800px]  w-full">
+          {isLoading && chatQuestions.length === 0 && (
+            <div className="flex mt-24 justify-center items-center h-full">
+              <p>Loading chats</p>
+              <Loader2 className="animate-spin" />
+            </div>
+          )}
+
+          {!isLoading && chatQuestions?.length === 0 && (
+            <div className="flex justify-center items-center h-full">
+              <p>No chats found</p>
+            </div>
+          )}
+
           {chatQuestions?.map((chatQuestion) => (
             <div key={chatQuestion.id} className="my-12">
               <QuestionBubble question={chatQuestion} />
