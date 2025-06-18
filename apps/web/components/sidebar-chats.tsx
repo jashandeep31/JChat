@@ -35,6 +35,8 @@ import { Chat } from "@repo/db";
 import { useCurrentChat } from "@/context/current-chat-context";
 import { useChatsStore } from "@/z-store/chats-store";
 import { isSameDay } from "date-fns";
+import { useChatQAStore } from "@/z-store/chat-qa-store";
+import { useChatQAPairsQueryNew } from "@/lib/react-query/use-qa-query";
 
 const SidebarChats = () => {
   const { chats, setChats, updateChatName, removeChat, updateChatProject } =
@@ -284,12 +286,33 @@ const ChatRenderer = ({
   isMobile: boolean;
 }) => {
   const params = useParams();
+  const [hovered, setHovered] = useState(false);
+  const { getQuestionsOfChat, addMultipleQuestions } = useChatQAStore();
+  const { data: questions } = useChatQAPairsQueryNew(chat.id, {
+    enabled: hovered,
+    staleTime: 5 * 60_000,
+  });
+
+  useEffect(() => {
+    if (questions && questions.length > 0) {
+      addMultipleQuestions(chat.id, questions);
+    }
+    return () => {};
+  }, [questions, addMultipleQuestions, chat.id]);
+
   return (
     <SidebarMenuItem
       key={chat.id}
       className={`hover:bg-accent rounded-md ${
         chat.id === params.cid ? "bg-accent" : ""
       }`}
+      onMouseEnter={() => {
+        const preQuestions = getQuestionsOfChat(chat.id);
+        if (preQuestions.length === 0) {
+          setHovered(true);
+        }
+      }}
+      onMouseLeave={() => setHovered(false)}
     >
       <SidebarMenuButton className="flex items-center gap-2">
         <Link

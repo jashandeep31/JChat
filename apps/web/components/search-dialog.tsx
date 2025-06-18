@@ -36,14 +36,15 @@ export function SearchDialog() {
     }
   }, [open]);
 
-  const handleSelect = (chat: Chat) => {
+  const handleSelect = async (chat: Chat) => {
     setOpen(false);
+    await new Promise((resolve) => setTimeout(resolve, 200));
     router.push(`/chat/${chat.id}`);
   };
 
-  const handleNewChat = (query: string) => {
+  const handleNewChat = () => {
     setOpen(false);
-    router.push(`/chat/new?q=${encodeURIComponent(query)}`);
+    router.push(`/`);
   };
 
   return (
@@ -57,7 +58,7 @@ export function SearchDialog() {
                 .querySelector('[aria-selected="true"]')
                 ?.getAttribute("data-value");
               if (!selectedValue) {
-                handleNewChat(e.currentTarget.value);
+                handleNewChat();
               }
             }
           }}
