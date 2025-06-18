@@ -4,7 +4,6 @@ import { SidebarProvider, useSidebar } from "@repo/ui/components/sidebar";
 import { PanelLeft, Plus, Search } from "lucide-react";
 import { SearchDialogContext } from "@/context/search-dialog-context";
 import { SearchDialog } from "@/components/search-dialog";
-import { useRouter } from "next/navigation";
 import RootSideBar from "@/components/root-sidebar";
 import { useCurrentChat } from "@/context/current-chat-context";
 
@@ -23,7 +22,10 @@ export const Provider = ({
       if ((e.key === "k" || e.key === "K") && e.ctrlKey) {
         e.preventDefault();
         setOpen(true);
-      } else if (e.key === "o" && e.ctrlKey && e.shiftKey) {
+      } else if (
+        (e.key === "o" && e.ctrlKey && e.shiftKey) ||
+        (e.key === "O" && e.ctrlKey && e.shiftKey)
+      ) {
         e.preventDefault();
         startNewChat();
       }
@@ -35,7 +37,10 @@ export const Provider = ({
           e.preventDefault();
           setOpen(false);
         }
-        if (e.key === "o" && e.ctrlKey && e.shiftKey) {
+        if (
+          (e.key === "o" && e.ctrlKey && e.shiftKey) ||
+          (e.key === "O" && e.ctrlKey && e.shiftKey)
+        ) {
           e.preventDefault();
           startNewChat();
         }
@@ -54,8 +59,8 @@ export const Provider = ({
 };
 
 const SideBarControls = () => {
-  const router = useRouter();
   const { open, toggleSidebar } = useSidebar();
+  const { startNewChat } = useCurrentChat();
 
   const { setOpen: setSearchOpen } = useContext(SearchDialogContext);
   return (
@@ -84,7 +89,9 @@ const SideBarControls = () => {
         <button
           className="p-2 rounded hover:bg-accent transition-colors duration-200"
           aria-label="Add new"
-          onClick={() => router.push("/")}
+          onClick={() => {
+            startNewChat();
+          }}
         >
           <Plus className="w-4 h-4" />
         </button>

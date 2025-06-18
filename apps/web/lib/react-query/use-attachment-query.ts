@@ -13,9 +13,8 @@ const useAttachmentQuery = () => {
     queryFn: async () => {
       return await getAttachments();
     },
-    staleTime: 5 * 60 * 1000, //5min
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   const deleteAttachmentMutation = useMutation({

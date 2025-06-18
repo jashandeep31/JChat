@@ -23,6 +23,7 @@ import useCompanyQuery from "@/lib/react-query/use-company-query";
 import type { AiModel, Company } from "@repo/db";
 import { Socket } from "socket.io-client";
 import { toast } from "sonner";
+import { useChatContext } from "@/context/chat-context";
 
 type ExtendedAiModel = AiModel & {
   company: Company;
@@ -58,6 +59,7 @@ export function RetryModelSelector({
 }: RetryModelSelectorProps) {
   const { modelsQuery } = useModelsQuery();
   const { companiesQuery } = useCompanyQuery();
+  const { setStreamingResponse } = useChatContext();
 
   // Group models by company ID
   const modelsByCompany = React.useMemo(() => {
@@ -123,6 +125,15 @@ export function RetryModelSelector({
       questionId,
       cid: chatId,
       modelSlug: model.slug,
+    });
+    setStreamingResponse({
+      questionId,
+      data: {
+        text: "",
+        images: "",
+        reasoning: "",
+        webSearches: [],
+      },
     });
   };
 

@@ -10,7 +10,7 @@ const useUserQuery = () => {
       const user = await getUser();
       return user;
     },
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
   return { userQuery };
