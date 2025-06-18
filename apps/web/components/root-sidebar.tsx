@@ -8,7 +8,7 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@repo/ui/components/sidebar";
-import { Button } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
 import SidebarProjects from "./sidebar-projects";
 import SidebarChats from "./sidebar-chats";
 import Link from "next/link";
@@ -72,7 +72,7 @@ const RootSideBar = () => {
           ) : (
             <Link
               href={"/login"}
-              className="flex items-center gap-2 p-2 rounded-md hover:bg-accent text-center border justify-center"
+              className={buttonVariants({ variant: "secondary" })}
             >
               Login
             </Link>

@@ -19,13 +19,15 @@ export function LoginPromptCard() {
         <CardDescription>Please sign in to use JChat</CardDescription>
       </CardHeader>
       <CardContent>
-        <Link
-          href="/login"
-          className={cn(buttonVariants({ variant: "default" }))}
-        >
-          <LogIn className="mr-2 h-5 w-5" />
-          Sign In
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/login"
+            className={cn(buttonVariants({ variant: "default" }))}
+          >
+            <LogIn className="mr-2 h-5 w-5" />
+            Sign Up
+          </Link>
+        </div>
       </CardContent>
       <CardFooter className="text-xs text-muted-foreground">
         <p>
