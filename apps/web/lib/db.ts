@@ -17,12 +17,11 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.db = db;
 }
 
+// Initialize Redis with connection pooling
 export const redis = new Redis({
   host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT), // e.g. 25061
-  username: process.env.REDIS_USERNAME || "default",
-  password: process.env.REDIS_PASSWORD,
-  tls: {},
+  port: Number(process.env.REDIS_PORT),
+  password: process.env.REDIS_PASSWORD || undefined,
   maxRetriesPerRequest: null,
 });
 
