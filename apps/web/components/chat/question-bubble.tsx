@@ -130,7 +130,7 @@ const QuestionBubbleInner = ({ question }: { question: FullQuestion }) => {
           ref={questionCardRef}
           className="bg-accent p-3 rounded-md lg:max-w-2/3 "
         >
-          {question.question}
+          {question.question} {question.id}
         </div>
       )}
 

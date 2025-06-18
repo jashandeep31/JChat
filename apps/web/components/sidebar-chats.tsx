@@ -308,7 +308,7 @@ const ChatRenderer = ({
       }`}
       onMouseEnter={() => {
         const preQuestions = getQuestionsOfChat(chat.id);
-        if (preQuestions.length === 0) {
+        if (preQuestions.length === 0 && chat.type === "DIRECT") {
           setHovered(true);
         }
       }}

@@ -25,12 +25,6 @@ export const branchOffHandler = async ({
       type: "BRANCHED",
     },
   });
-  socket.emit("chat_branched", {
-    from: cid,
-    to: newChat.id,
-    tillQuestionId: questionId,
-    data: { ...newChat },
-  });
 
   const chatQuestion = await db.chatQuestion.findUniqueOrThrow({
     where: { id: questionId },
@@ -59,6 +53,13 @@ export const branchOffHandler = async ({
         },
       },
     },
+  });
+
+  socket.emit("chat_branched", {
+    from: cid,
+    to: newChat.id,
+    tillQuestionId: questionId,
+    data: { ...newChat },
   });
 
   await db.chat.update({

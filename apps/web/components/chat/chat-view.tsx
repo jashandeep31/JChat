@@ -56,11 +56,11 @@ const ChatView: React.FC<{ chatId: string; isNew?: boolean }> = ({
   }, [isNew, getQuestionsOfChat, setIsStreaming, chatId, setStreamingResponse]);
 
   useEffect(() => {
-    const existing = getQuestionsOfChat(chatId);
-    if (initialQAs.length > 0 && existing.length === 0) {
+    if (initialQAs.length > 0 && chatQuestions.length === 0) {
+      console.log(chatQuestions.length, initialQAs.length);
       addMultipleQuestions(chatId, initialQAs);
     }
-  }, [chatId, initialQAs, addMultipleQuestions, getQuestionsOfChat]);
+  }, [chatId, initialQAs, addMultipleQuestions, chatQuestions]);
 
   useEffect(() => {
     if (!isFirstTimeScrolled && chatQuestions && chatQuestions.length > 0) {

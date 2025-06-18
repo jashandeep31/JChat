@@ -34,10 +34,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       socket.on(
         "chat_branched",
         ({
-          from,
+          // from,
           to,
           data,
-          tillQuestionId,
+          // tillQuestionId,
         }: {
           from: string;
           to: string;
@@ -46,11 +46,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         }) => {
           router.push(`/chat/${to}`);
           addChat(data);
-          const questions = getQuestionsOfChat(from);
-          const tillQuestionIndex = questions.findIndex(
-            (question) => question.id === tillQuestionId
-          );
-          addMultipleQuestions(to, questions.slice(0, tillQuestionIndex + 1));
+          // const questions = getQuestionsOfChat(from);
+          // const tillQuestionIndex = questions.findIndex(
+          //   (question) => question.id === tillQuestionId
+          // );
+          // addMultipleQuestions(to, questions.slice(0, tillQuestionIndex + 1));
         }
       );
       socket.on(
@@ -65,12 +65,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       socket.on(
         "project_chat_created",
-        ({ chat }: { chat: Chat; question: ChatQuestion }) => {
+        ({ chat, question }: { chat: Chat; question: ChatQuestion }) => {
           setChatId(chat.id);
           addChat(chat);
-          // addMultipleQuestions(chat.id, [
-          //   { ...question, ChatQuestionAnswer: [] },
-          // ]);
+          addMultipleQuestions(chat.id, [
+            { ...question, ChatQuestionAnswer: [] },
+          ]);
           router.push(`/chat/${chat.id}`);
         }
       );
