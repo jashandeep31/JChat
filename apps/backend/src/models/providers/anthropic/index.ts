@@ -1,6 +1,11 @@
 import { ProviderFunctionParams } from "../../index.js";
 import { env } from "../../../lib/env.js";
 import Anthropic from "@anthropic-ai/sdk";
+import { getAttachment } from "../../../services/attachment-cache.js";
+import {
+  ContentBlockParam,
+  MessageParam,
+} from "@anthropic-ai/sdk/resources/messages.mjs";
 export const askAnthropicQuestion = async ({
   question,
   model,
@@ -19,9 +24,51 @@ export const askAnthropicQuestion = async ({
       apiKey: apiKey || env.ANTHROPIC_API_KEY,
     });
 
+    console.log(messages);
+    let content: ContentBlockParam[] = [];
+    if (question.attachmentId) {
+      const attachment = await getAttachment(question.attachmentId);
+      if (attachment && attachment.type === "IMAGE") {
+        content.push({
+          type: "image",
+          source: {
+            type: "url",
+            url: attachment.publicUrl,
+          },
+        });
+      } else if (attachment && attachment.type === "PDF") {
+        content.push({
+          type: "document",
+          source: {
+            type: "url",
+            url: attachment.publicUrl,
+          },
+        });
+      }
+    }
+    content.push({
+      type: "text",
+      text: question.question,
+    });
+    messages.push({
+      role: "user",
+      content: content as any,
+    });
+    const filteredMessages: MessageParam[] = messages.reduce((acc, message) => {
+      if (message.role === "user" || message.role === "assistant") {
+        acc.push(message as MessageParam);
+      } else if (message.role === "system") {
+        acc.push({
+          role: "assistant",
+          content: message.content,
+        });
+      }
+      return acc;
+    }, [] as MessageParam[]);
+
     const res = await anthropic.messages.create({
-      messages: [{ role: "user", content: question.question }],
-      model: "claude-3-7-sonnet-latest",
+      messages: filteredMessages,
+      model: model.slug,
       max_tokens: 4000,
       stream: true,
       ...(model.reasoning

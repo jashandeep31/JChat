@@ -156,11 +156,25 @@ const ChatInputBox = ({
             setSelectedModel={setSelectedModel}
             models={models}
           />
-          {userQuery.data?.credits && userQuery.data?.credits <= 15 && (
+          {userQuery.data?.credits &&
+            userQuery.data?.credits <= 15 &&
+            userQuery.data?.credits > 0 && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full hidden md:block">
+                    Low Credits
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Upgrade or buy more credits</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          {userQuery.data?.credits && userQuery.data?.credits <= 0 && (
             <Tooltip>
               <TooltipTrigger>
                 <Badge className="border-red-500 text-red-500 bg-red-50 rounded-full hidden md:block">
-                  Low Credits
+                  No Credits
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>

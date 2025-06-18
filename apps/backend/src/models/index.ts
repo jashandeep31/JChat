@@ -166,16 +166,20 @@ async function buildSystemContext(cid: string) {
   if (chatQA && chatQA.length > 0) {
     for (const { question, ChatQuestionAnswer } of chatQA) {
       const lastAnswer = ChatQuestionAnswer.at(-1)?.answer ?? "";
+      if (lastAnswer.length > 2) {
+        messages.push({
+          role: "system",
+          content: `User asked: "${question}"\nAI responded: "${lastAnswer}"`,
+        });
+      }
+    }
+    if (messages.length > 0) {
       messages.push({
         role: "system",
-        content: `User asked: "${question}"\nAI responded: "${lastAnswer}"`,
+        content:
+          "Use the above conversation context to answer the next question.",
       });
     }
-    messages.push({
-      role: "system",
-      content:
-        "Use the above conversation context to answer the next question.",
-    });
   }
 
   return messages;
