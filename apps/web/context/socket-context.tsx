@@ -65,12 +65,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       socket.on(
         "project_chat_created",
-        ({ chat, question }: { chat: Chat; question: ChatQuestion }) => {
+        ({ chat }: { chat: Chat; question: ChatQuestion }) => {
           setChatId(chat.id);
           addChat(chat);
-          addMultipleQuestions(chat.id, [
-            { ...question, ChatQuestionAnswer: [] },
-          ]);
+          // addMultipleQuestions(chat.id, [
+          //   { ...question, ChatQuestionAnswer: [] },
+          // ]);
           router.push(`/chat/${chat.id}`);
         }
       );
