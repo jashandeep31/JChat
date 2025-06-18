@@ -1,5 +1,5 @@
 import { PrismaClient } from "@repo/db";
-import { Redis } from "ioredis";
+import Valkey from "iovalkey";
 
 // Prevent multiple instances of Prisma Client in development
 const globalForPrisma = global as unknown as { db: PrismaClient };
@@ -18,10 +18,12 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // Initialize Redis with connection pooling
-export const redis = new Redis({
-  host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT),
-  password: process.env.REDIS_PASSWORD || undefined,
+export const redis = new Valkey({
+  host: process.env.VALKEY_HOST ?? process.env.REDIS_HOST, // keep legacy fallbacks
+  port: Number(process.env.VALKEY_PORT ?? process.env.REDIS_PORT ?? 6379),
+  password: process.env.VALKEY_PASSWORD ?? process.env.REDIS_PASSWORD,
+  // DigitalOcean clusters enforce TLS; pass an empty object to enable it.
+  tls: process.env.VALKEY_TLS === "false" ? undefined : {},
   maxRetriesPerRequest: null,
 });
 
