@@ -49,14 +49,14 @@ app.get("/api/v1", (req: Request & { userId?: string }, res) => {
 });
 app.use("/api/v1", generatePresignedUrlRoutes);
 app.use("/api/v1", attachmentRoutes);
-app.use("/api/v1/delete", async (req, res) => {
-  await db.chat.deleteMany();
-  await db.chatQuestion.deleteMany();
-  await db.chatQuestionAnswer.deleteMany();
-  await db.chatShareLink.deleteMany();
-  await db.project.deleteMany();
-  res.send("Deleted");
-});
+// app.use("/api/v1/delete", async (req, res) => {
+//   await db.chat.deleteMany();
+//   await db.chatQuestion.deleteMany();
+//   await db.chatQuestionAnswer.deleteMany();
+//   await db.chatShareLink.deleteMany();
+//   await db.project.deleteMany();
+//   res.send("Deleted");
+// });
 // Global error handling middleware
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.error(`Global error handler caught:`, err);
