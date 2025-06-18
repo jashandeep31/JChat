@@ -1,5 +1,5 @@
 "use client";
-import { Chat } from "@repo/db";
+import { Chat, ChatQuestion } from "@repo/db";
 import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
@@ -53,15 +53,27 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
           addMultipleQuestions(to, questions.slice(0, tillQuestionIndex + 1));
         }
       );
-      socket.on("chat_created", (chat: Chat) => {
-        setChatId(chat.id);
-        addChat(chat);
-      });
-      socket.on("project_chat_created", (chat: Chat) => {
-        setChatId(chat.id);
-        addChat(chat);
-        router.push(`/chat/${chat.id}`);
-      });
+      socket.on(
+        "chat_created",
+        ({ chat, question }: { chat: Chat; question: ChatQuestion }) => {
+          setChatId(chat.id);
+          addChat(chat);
+          addMultipleQuestions(chat.id, [
+            { ...question, ChatQuestionAnswer: [] },
+          ]);
+        }
+      );
+      socket.on(
+        "project_chat_created",
+        ({ chat, question }: { chat: Chat; question: ChatQuestion }) => {
+          setChatId(chat.id);
+          addChat(chat);
+          addMultipleQuestions(chat.id, [
+            { ...question, ChatQuestionAnswer: [] },
+          ]);
+          router.push(`/chat/${chat.id}`);
+        }
+      );
       socket.on("chat_name_updated", (chat: Chat) => {
         updateChatName(chat.id, chat.name);
       });

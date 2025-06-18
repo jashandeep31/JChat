@@ -61,7 +61,23 @@ export const useChatQAStore = create<ChatQAStore>((set, get) => ({
 
   addQuestion: (chatId: string, question: FullQuestion) => {
     const { allQuestions } = get();
-    const updated = [...(allQuestions[chatId] || []), question];
+    const chatQuestions = allQuestions[chatId] || [];
+
+    // Check if a question with the same ID already exists
+    const existingQuestionIndex = chatQuestions.findIndex(
+      (q) => q.id === question.id
+    );
+
+    let updated;
+    if (existingQuestionIndex !== -1) {
+      // Update the existing question instead of adding a new one
+      updated = [...chatQuestions];
+      updated[existingQuestionIndex] = question;
+    } else {
+      // Add the new question
+      updated = [...chatQuestions, question];
+    }
+
     set({
       allQuestions: { ...allQuestions, [chatId]: updated },
     });
