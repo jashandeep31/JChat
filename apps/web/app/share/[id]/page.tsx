@@ -15,12 +15,12 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (!chatShareLink) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-center p-8 bg-card rounded-lg shadow border border-border">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             Chat Not Found
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground">
             The shared chat you&apos;re looking for doesn&apos;t exist or has
             been removed.
           </p>
@@ -47,12 +47,12 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (!chat) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-center p-8 bg-card rounded-lg shadow border border-border">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             Chat Not Found
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground">
             The shared chat you&apos;re looking for doesn&apos;t exist or has
             been removed.
           </p>
@@ -62,7 +62,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-10">
+    <div className="min-h-screen bg-background pb-10">
       <SharedChatHeader
         title={chat.name}
         createdAt={chat.createdAt}
@@ -75,7 +75,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
             {chat.ChatQuestion.map((question) => (
               <div
                 key={question.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden"
+                className="bg-card rounded-lg shadow-sm overflow-hidden"
               >
                 <div className=" ">
                   <SharedQuestionBubble content={question.question} />
@@ -87,11 +87,11 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
             ))}
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 p-8 text-center rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          <div className="bg-card p-8 text-center rounded-lg shadow-sm border border-border">
+            <h3 className="text-lg font-medium text-foreground mb-2">
               No Messages Found
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               This shared chat doesn&apos;t contain any messages.
             </p>
           </div>

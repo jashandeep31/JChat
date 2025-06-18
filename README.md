@@ -1,84 +1,75 @@
-# Turborepo starter
+# JChat
 
-This Turborepo starter is maintained by the Turborepo core team.
+JChat is a modern chat application built with advanced features for seamless communication. This application supports real-time messaging, image sharing with download capabilities, and markdown rendering.
 
-## Using this example
+## Features
 
-Run the following command:
+- Real-time messaging
+- User authentication and profiles
+- Image sharing with download functionality
+- Markdown support via next-mdx-remote-client
+- Bring your own Key
+- Chat share
 
-```sh
-npx create-turbo@latest
-```
+## Prerequisites
 
-## What's inside?
+- Node.js (v16 or higher)
+- PostgreSQL Database
+- Redis Database
+- PNPM package manager
 
-This Turborepo includes the following packages/apps:
+## Setup Instructions
 
-### Apps and Packages
+### Installation
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+1. Clone the repository
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+   ```bash
+   git clone https://github.com/jashandeep31/JChat.git
+   cd JChat
+   ```
 
-### Utilities
+2. Install dependencies
+   ```bash
+   pnpm install
+   ```
 
-This Turborepo has some additional tools already setup for you:
+### Environment Configuration
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+The project requires three separate environment files:
 
-### Build
+1. Copy all `.env.example` files to their corresponding `.env` files in these folders:
 
-To build all apps and packages, run the following command:
+   - `backend/`
+   - `database/`
+   - `web/`
 
-```
-cd my-turborepo
-pnpm build
-```
+   For each folder:
 
-### Develop
+   ```bash
+   cp <folder>/.env.example <folder>/.env
+   ```
 
-To develop all apps and packages, run the following command:
+2. Update each `.env` file with your specific configuration values.
 
-```
-cd my-turborepo
+### Running the Application
+
+Start the development server:
+
+```bash
 pnpm dev
 ```
 
-### Remote Caching
+The application should now be running on the configured port (typically http://localhost:3000).
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## Technologies Used
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+- Next.js
+- TypeScript
+- PostgreSQL
+- Redis
+- next-mdx-remote-client
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## License
 
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+MIT
