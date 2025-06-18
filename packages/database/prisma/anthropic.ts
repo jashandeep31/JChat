@@ -27,18 +27,6 @@ const models: Model[] = [];
 
 models.push({
   ...baseMode,
-  name: "Claude 3.5 Haiku",
-  slug: "claude-3-5-haiku-latest",
-  tag: "Latest",
-  requiresPro: true,
-  credits: 20,
-  pdfAnalysis: true,
-  imageAnalysis: true,
-  webAnalysis: true,
-});
-
-models.push({
-  ...baseMode,
   name: "Claude 3.7 Sonnet",
   slug: "claude-3-7-sonnet-latest",
   tag: "Latest",
