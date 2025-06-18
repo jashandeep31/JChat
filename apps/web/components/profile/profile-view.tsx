@@ -85,6 +85,10 @@ export const ProfileView = () => {
               total={userQuery.data?.totalCredits}
             />
             <KeyboardShortcutsCard />
+
+            <div className="text-xs flex justify-end">
+              <p>Version: 0.0.1</p>
+            </div>
           </aside>
 
           <section className="lg:col-span-9">
