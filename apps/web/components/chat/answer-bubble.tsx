@@ -10,6 +10,7 @@ import {
   ChevronUp,
   Copy,
   Download,
+  Loader2,
   RotateCcw,
   Split,
 } from "lucide-react";
@@ -40,6 +41,7 @@ const AnswerBubbleInner = ({
   const [activeAnswer, setActiveAnswer] = useState(answers[answers.length - 1]);
   const [isCopied, setIsCopied] = useState(false);
   const [isReasoningOpen, setIsReasoningOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (
@@ -61,6 +63,28 @@ const AnswerBubbleInner = ({
       questionId: question.id,
       cid: question.chatId,
     });
+  };
+
+  const handleDownload = async () => {
+    if (!activeAnswer.imageUrl) return;
+    setIsDownloading(true);
+    try {
+      const res = await fetch(activeAnswer.imageUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const filename = activeAnswer.imageUrl.split("/").pop() || "image";
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed", err);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -97,16 +121,19 @@ const AnswerBubbleInner = ({
               style={{ width: "100%", height: "auto" }}
             />
           </div>
-          <a
-            href={activeAnswer.imageUrl}
-            download
-            className="absolute bottom-2 right-2"
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="absolute bottom-2 right-2 flex items-center gap-1"
           >
-            <Button variant="outline" size="sm">
-              <Download className="mr-1 h-4 w-4" />
-              Download
-            </Button>
-          </a>
+            {isDownloading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       )}
 
