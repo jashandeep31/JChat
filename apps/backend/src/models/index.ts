@@ -157,6 +157,7 @@ export const askQuestion = async (
   });
 
   await redis.del(redisKey);
+
   return { text, images, webSearches, reasoning };
 };
 async function buildSystemContext(cid: string) {

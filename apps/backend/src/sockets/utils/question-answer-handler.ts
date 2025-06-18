@@ -6,6 +6,8 @@ import { getUser } from "../../services/user-cache.js";
 import { getApi } from "../../services/api-cache.js";
 import { refreshChatQACache } from "../../services/chat-qa-cache.js";
 import { getChat } from "../../services/chat-cache.js";
+import { uploadBase64Image } from "../../models/utils/converters.js";
+import { v4 as uuid } from "uuid";
 
 const aiModels = await db.aiModel.findMany();
 
@@ -80,13 +82,23 @@ export const questionAnswerHandler = async ({
       });
       return;
     }
+
+    let imageUrl = "";
+    if (res.images) {
+      const updatedImages = await uploadBase64Image(res.images, {
+        path: "/ai/generate/",
+        originalName: `${uuid()}-genrated.png`,
+      });
+      imageUrl = updatedImages.publicUrl;
+    }
+
     const chatQuestionAnswer = await db.chatQuestionAnswer.create({
       data: {
         aiModelId: model.id,
         chatQuestionId: chatQuestion.id,
         answer: res.text,
         reasoning: res.reasoning.length > 0 ? res.reasoning : null,
-        base64Image: res.images,
+        imageUrl: imageUrl,
         isWebSearch: res.webSearches.length > 0,
         credits: apiKey ? credits - model.credits : credits,
       },

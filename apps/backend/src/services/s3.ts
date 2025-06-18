@@ -14,6 +14,37 @@ const s3Client = new S3Client({
     secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
   },
 });
+
+export const uploadtoS3 = async (
+  path: string,
+  name: string,
+  contentType: "image/jpeg" | "image/png" | "image/webp" | "application/pdf",
+  fileBuffer: Buffer
+) => {
+  try {
+    const uploadId = uuidv4();
+    const filename = `${uploadId}-${name}`;
+    const key = `${path}/${filename}`;
+    const command = new PutObjectCommand({
+      Bucket: env.S3_BUCKET,
+      Key: key,
+      Body: fileBuffer,
+      ContentType: contentType,
+    });
+    await s3Client.send(command);
+    const publicUrl = `https://${env.S3_BUCKET}.s3.${env.S3_REGION}.amazonaws.com/${key}`;
+    return {
+      publicUrl,
+      key,
+      uploadId,
+      filename,
+    };
+  } catch (error) {
+    console.error("S3 upload error:", error);
+    throw error;
+  }
+};
+
 export const generatePresignedUrl = async (
   path: string,
   name: string,

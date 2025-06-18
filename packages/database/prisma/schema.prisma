@@ -113,7 +113,7 @@ model ChatQuestion {
 model ChatQuestionAnswer {
   id             String  @id @default(uuid())
   chatQuestionId String
-  base64Image    String?
+  imageUrl       String?
   answer         String
   reasoning      String?
   credits        Float   @default(0)

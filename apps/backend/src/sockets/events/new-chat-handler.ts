@@ -83,6 +83,7 @@ export const newChatHandler = async ({
     question: result.data.question,
     socketId: socket.id,
   });
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   await questionAnswerHandler({
     chatQuestion,
     modelSlug: result.data.modelSlug,

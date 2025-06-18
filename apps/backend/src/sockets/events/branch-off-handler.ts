@@ -53,7 +53,7 @@ export const branchOffHandler = async ({
               answer: true,
               aiModelId: true,
               credits: true,
-              base64Image: true,
+              imageUrl: true,
             },
           },
         },

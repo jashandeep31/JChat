@@ -24,7 +24,7 @@ const MainView = () => {
   } else if (chatId && session.status === "authenticated") {
     return (
       <ChatContextProvider chatId={chatId}>
-        <ChatView chatId={chatId} />
+        <ChatView chatId={chatId} isNew={true} />
       </ChatContextProvider>
     );
   } else {

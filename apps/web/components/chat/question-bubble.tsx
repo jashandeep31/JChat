@@ -214,5 +214,5 @@ const CustomTooltip = ({
   );
 };
 
-const QuestionBubble = React.memo(QuestionBubbleInner);
+const QuestionBubble = QuestionBubbleInner;
 export default QuestionBubble;

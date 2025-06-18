@@ -84,29 +84,24 @@ const AnswerBubbleInner = ({
 
       <MarkdownRenderer content={activeAnswer.answer} />
 
-      {activeAnswer.base64Image && (
+      {activeAnswer.imageUrl && (
         <div className="mt-6 max-w-[500px] relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="rounded-md"
-            src={`data:image/png;base64,${activeAnswer.base64Image}`}
+            src={activeAnswer.imageUrl}
             alt="Generated"
           />
-          <Button
-            variant="outline"
-            size="sm"
+          <a
+            href={activeAnswer.imageUrl}
+            download
             className="absolute bottom-2 right-2"
-            onClick={() => {
-              const link = document.createElement("a");
-              link.href = `data:image/png;base64,${activeAnswer.base64Image}`;
-              link.download = `jchat-image-${Date.now()}.png`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
           >
-            <Download />
-          </Button>
+            <Button variant="outline" size="sm">
+              <Download className="mr-1 h-4 w-4" />
+              Download
+            </Button>
+          </a>
         </div>
       )}
 

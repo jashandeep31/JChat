@@ -12,7 +12,10 @@ import { useChatQAStore } from "@/z-store/chat-qa-store";
 import { useChatQAPairsQuery } from "@/lib/react-query/use-qa-query";
 import { useChatContext } from "@/context/chat-context";
 
-const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
+const ChatView: React.FC<{ chatId: string; isNew?: boolean }> = ({
+  chatId,
+  isNew = false,
+}) => {
   const [showScrollDownButton, setShowScrollDownButton] = useState(false);
   const [isFirstTimeScrolled, setIsFirstTimeScrolled] = useState(false);
   const lastDivRef = useRef<HTMLDivElement>(null);
@@ -26,7 +29,31 @@ const ChatView: React.FC<{ chatId: string }> = ({ chatId }) => {
   );
   const chatQuestions = getQuestionsOfChat(chatId);
 
-  const { isStreaming, streamingResponse, setIsStreaming } = useChatContext();
+  const {
+    isStreaming,
+    streamingResponse,
+    setIsStreaming,
+    setStreamingResponse,
+  } = useChatContext();
+
+  useEffect(() => {
+    const questions = getQuestionsOfChat(chatId);
+    if (
+      questions.length === 1 &&
+      questions[0].ChatQuestionAnswer.length === 0
+    ) {
+      setIsStreaming(true);
+      setStreamingResponse({
+        questionId: questions[0].id,
+        data: {
+          text: "",
+          images: "",
+          reasoning: "",
+          webSearches: [],
+        },
+      });
+    }
+  }, [isNew, getQuestionsOfChat, setIsStreaming, chatId, setStreamingResponse]);
 
   useEffect(() => {
     const existing = getQuestionsOfChat(chatId);
