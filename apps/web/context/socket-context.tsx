@@ -44,7 +44,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
           data: Chat;
           tillQuestionId: string;
         }) => {
-          router.replace(`/chat/${to}`);
+          router.push(`/chat/${to}`);
           addChat(data);
           const questions = getQuestionsOfChat(from);
           const tillQuestionIndex = questions.findIndex(
