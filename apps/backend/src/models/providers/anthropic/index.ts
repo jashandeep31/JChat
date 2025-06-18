@@ -68,13 +68,13 @@ export const askAnthropicQuestion = async ({
     const res = await anthropic.messages.create({
       messages: filteredMessages,
       model: model.slug,
-      max_tokens: 4000,
+      max_tokens: 15000,
       stream: true,
       ...(model.reasoning
         ? {
             thinking: {
               type: "enabled",
-              budget_tokens: 2000,
+              budget_tokens: 10000,
             },
           }
         : {}),

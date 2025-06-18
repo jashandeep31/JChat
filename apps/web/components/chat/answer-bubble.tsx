@@ -23,6 +23,7 @@ import useModelsQuery from "@/lib/react-query/use-models-query";
 import { RetryModelSelector } from "../retry-model-selector";
 import { AiModel } from "@repo/db";
 import WebResults from "./web-results";
+import Image from "next/image";
 
 const AnswerBubbleInner = ({
   question,
@@ -86,12 +87,16 @@ const AnswerBubbleInner = ({
 
       {activeAnswer.imageUrl && (
         <div className="mt-6 max-w-[500px] relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className="rounded-md"
-            src={activeAnswer.imageUrl}
-            alt="Generated"
-          />
+          <div className="relative w-full max-w-[500px] h-auto">
+            <Image
+              className="rounded-md"
+              src={activeAnswer.imageUrl}
+              alt="Generated image"
+              width={500}
+              height={500}
+              style={{ width: "100%", height: "auto" }}
+            />
+          </div>
           <a
             href={activeAnswer.imageUrl}
             download
