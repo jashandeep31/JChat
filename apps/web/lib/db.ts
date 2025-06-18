@@ -1,5 +1,5 @@
 import { PrismaClient } from "@repo/db";
-import { Redis } from "iovalkey";
+import { Redis } from "ioredis";
 
 // Prevent multiple instances of Prisma Client in development
 const globalForPrisma = global as unknown as { db: PrismaClient };
