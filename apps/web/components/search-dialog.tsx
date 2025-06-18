@@ -38,7 +38,6 @@ export function SearchDialog() {
 
   const handleSelect = async (chat: Chat) => {
     setOpen(false);
-    await new Promise((resolve) => setTimeout(resolve, 200));
     router.push(`/chat/${chat.id}`);
   };
 
