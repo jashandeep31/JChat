@@ -111,6 +111,7 @@ export const ChatInputBoxProvider = ({
             attachmentId: attachmentInfo?.id,
           })
         );
+        setIsStreaming?.(true);
       } else if (params?.pid) {
         socket.emit(
           "new_chat",
@@ -122,6 +123,7 @@ export const ChatInputBoxProvider = ({
             projectId: params.pid,
           })
         );
+        setIsStreaming?.(true);
       } else {
         socket.emit(
           "new_chat",
@@ -132,6 +134,7 @@ export const ChatInputBoxProvider = ({
             attachmentId: attachmentInfo?.uploadId,
           })
         );
+        setIsStreaming?.(true);
       }
     } catch (error) {
       // In case of error, make sure to set streaming to false
