@@ -1,5 +1,5 @@
 import { PrismaClient } from "@repo/db";
-import { Redis } from "ioredis";
+import { Redis } from "iovalkey";
 
 // Prevent multiple instances of Prisma Client in development
 const globalForPrisma = global as unknown as { db: PrismaClient };
@@ -17,12 +17,12 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.db = db;
 }
 
-// Initialize Redis with connection pooling
 export const redis = new Redis({
   host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT),
-  password: process.env.REDIS_PASSWORD || undefined,
-  username: process.env.REDIS_USERNAME || undefined,
+  port: Number(process.env.REDIS_PORT), // e.g. 25061
+  username: process.env.REDIS_USERNAME || "default",
+  password: process.env.REDIS_PASSWORD,
+  tls: {},
   maxRetriesPerRequest: null,
 });
 

@@ -3,9 +3,10 @@ import { generateText } from "ai";
 import { Job, Queue, Worker } from "bullmq";
 import { db, redis } from "../lib/db.js";
 import { getIO } from "./index.js";
+import { Redis } from "ioredis";
 
 export const renameChatQueue = new Queue("rename-chat-queue", {
-  connection: redis,
+  connection: redis as unknown as Redis,
 });
 const worker = new Worker(
   "rename-chat-queue",
@@ -52,7 +53,7 @@ const worker = new Worker(
       throw error; // This will mark the job as failed
     }
   },
-  { connection: redis }
+  { connection: redis as unknown as Redis }
 );
 
 export default worker;

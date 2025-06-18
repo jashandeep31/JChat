@@ -20,6 +20,10 @@ export const io = new Server(server, {
     credentials: true,
   },
 });
+
+await redis.set("test", "test");
+console.log(`we didi it 
+  `);
 io.use((socket, next) => {
   try {
     const raw = socket.handshake.headers.cookie || "";
