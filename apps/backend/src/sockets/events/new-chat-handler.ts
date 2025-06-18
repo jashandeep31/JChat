@@ -67,7 +67,6 @@ export const newChatHandler = async ({
     question: result.data.question,
     socketId: socket.id,
   });
-  console.log(Date.now() - current, "ms is taken");
   await questionAnswerHandler({
     chatQuestion,
     modelSlug: result.data.modelSlug,

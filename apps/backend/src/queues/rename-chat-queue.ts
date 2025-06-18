@@ -10,8 +10,6 @@ export const renameChatQueue = new Queue("rename-chat-queue", {
 const worker = new Worker(
   "rename-chat-queue",
   async (job: Job<{ chatId: string; question: string; socketId: string }>) => {
-    console.log("Processing rename chat job for chat ID:", job.data.chatId);
-
     if (!job.data) {
       console.error("No data provided in job");
       return null;

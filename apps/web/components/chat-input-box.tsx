@@ -283,7 +283,6 @@ const AttachmentInfoComponent = ({
   attachmentInfo: AttachmentInfo;
   setAttachmentInfo: (attachmentInfo: AttachmentInfo) => void;
 }) => {
-  console.log(attachmentInfo);
   return (
     <div>
       {attachmentInfo && (

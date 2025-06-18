@@ -96,7 +96,6 @@ export const askOpenAIQuestion = async ({
       tools: question.webSearch ? [{ type: "web_search_preview" }] : [],
     });
     for await (const chunk of respStream) {
-      console.log(JSON.stringify(chunk));
       if (chunk.type === "response.reasoning_summary_text.delta") {
         reasoning += chunk.delta;
         onReasoningChunk(chunk.delta as string);

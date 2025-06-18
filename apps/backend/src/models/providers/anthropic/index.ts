@@ -24,7 +24,6 @@ export const askAnthropicQuestion = async ({
       apiKey: apiKey || env.ANTHROPIC_API_KEY,
     });
 
-    console.log(messages);
     let content: ContentBlockParam[] = [];
     if (question.attachmentId) {
       const attachment = await getAttachment(question.attachmentId);
@@ -91,7 +90,6 @@ export const askAnthropicQuestion = async ({
     });
 
     for await (const chunk of res) {
-      console.log(chunk);
       if (chunk.type === "content_block_delta") {
         const delta_type = chunk.delta.type;
         if (delta_type === "text_delta") {

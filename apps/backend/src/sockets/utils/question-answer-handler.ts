@@ -147,7 +147,6 @@ export const questionAnswerHandler = async ({
       20 * 60
     );
   } catch (error) {
-    console.log(error);
     io.to(`room:${cid}`).emit("error", "Something went wrong");
   }
 };

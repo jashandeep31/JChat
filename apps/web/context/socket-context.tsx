@@ -54,12 +54,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       );
       socket.on("chat_created", (chat: Chat) => {
-        console.log(`we had created the new chat  ${chat.id}`);
         setChatId(chat.id);
         addChat(chat);
       });
       socket.on("project_chat_created", (chat: Chat) => {
-        console.log(`we had created the new project chat ${chat.id}`);
         setChatId(chat.id);
         addChat(chat);
         router.push(`/chat/${chat.id}`);

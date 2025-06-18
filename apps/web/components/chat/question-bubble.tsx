@@ -39,7 +39,6 @@ const QuestionBubbleInner = ({ question }: { question: FullQuestion }) => {
     const questionCard = questionCardRef.current;
     if (questionCard) {
       const currentHeight = questionCard.clientHeight;
-      console.log(currentHeight);
       setTextareaHeight(`${currentHeight}px`);
       setIsEditing(true);
     }

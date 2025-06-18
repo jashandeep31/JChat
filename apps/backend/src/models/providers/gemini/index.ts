@@ -55,7 +55,6 @@ export const askGeminiQuestion = async ({
       });
 
       for await (const chunk of response) {
-        console.log(JSON.stringify(chunk));
         text += chunk.text || "";
         onChunk(chunk.text || "");
         const candidate = chunk.candidates?.[0];

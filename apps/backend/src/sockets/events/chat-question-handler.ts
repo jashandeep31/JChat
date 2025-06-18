@@ -53,7 +53,6 @@ export const chatQuestionHandler = async ({
       userId: socket.userId,
     });
   } catch (error) {
-    console.log(error);
     socket.emit("error", "Something went wrong");
   }
 };

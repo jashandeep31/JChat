@@ -30,7 +30,6 @@ app.use("/api/v1", (req: Request & { userId?: string }, res, next) => {
     try {
       const decoded = jwt.verify(jwtToken, env.JWT_SECRET);
       req.userId = (decoded as any).user.id;
-      console.log(`request parsed`);
       next();
     } catch (error) {
       if (error instanceof Error) {

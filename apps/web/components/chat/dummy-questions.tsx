@@ -95,11 +95,7 @@ const DummyQuestions = () => {
   // Function to handle tab navigation
   const handleTabChange = (categoryId: string) => {
     setActiveTab(categoryId);
-    const category = categories.find((cat) => cat.id === categoryId);
-    if (category) {
-      console.log(`Selected category: ${category.label}`);
-      // You can add your specific function call here
-    }
+    categories.find((cat) => cat.id === categoryId);
   };
 
   // Get the examples for the selected category

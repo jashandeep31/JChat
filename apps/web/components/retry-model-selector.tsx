@@ -144,7 +144,9 @@ export function RetryModelSelector({
 
   if (!companiesWithModels.length) {
     return (
-      <div className="p-4 text-sm text-muted-foreground">No models available.</div>
+      <div className="p-4 text-sm text-muted-foreground">
+        No models available.
+      </div>
     );
   }
 
@@ -207,9 +209,6 @@ export function RetryModelSelector({
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    console.log(
-                                      `Action: ${action.tooltip} for ${model.name}`
-                                    );
                                   }}
                                   className="p-1 rounded-full bg-secondary hover:bg-secondary/80"
                                 >

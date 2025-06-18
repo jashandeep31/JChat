@@ -15,9 +15,7 @@ export const socketHandler = (socket: Socket, io: Server) => {
     socket.on("chat_question", (data) =>
       chatQuestionHandler({ socket, io, data })
     );
-    socket.on("disconnect", () => {
-      console.log("user disconnected");
-    });
+    socket.on("disconnect", () => {});
     socket.on("re_answer", (data) => {
       reAnswerRequestHandler({ socket, io, data });
     });

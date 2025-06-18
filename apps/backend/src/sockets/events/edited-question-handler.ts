@@ -49,7 +49,6 @@ export const editedQuestionHandler = async ({
       userId: socket.userId,
     });
   } catch (e) {
-    console.log(e);
     socket.emit("error", "Something went wrong with question edit`");
   }
 };
