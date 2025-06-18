@@ -11,13 +11,15 @@ import cookie from "cookie";
 const PORT = env.PORT;
 const server = createServer(app);
 redis.flushall();
+const ALLOWED_URLS =
+  process.env.ALLOWED_URLS?.split(",").map((u) => u.trim()) ?? [];
+
 export const io = new Server(server, {
   cors: {
-    origin: env.FRONTEND_URL,
+    origin: ALLOWED_URLS,
     credentials: true,
   },
 });
-
 io.use((socket, next) => {
   try {
     const raw = socket.handshake.headers.cookie || "";

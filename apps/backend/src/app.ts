@@ -16,9 +16,11 @@ import { env } from "./lib/env.js";
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
+const ALLOWED_URLS =
+  process.env.ALLOWED_URLS?.split(",").map((u) => u.trim()) ?? [];
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: ALLOWED_URLS,
     credentials: true,
   })
 );
