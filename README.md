@@ -4,12 +4,21 @@ JChat is a modern chat application built with advanced features for seamless com
 
 ## Features
 
-- Real-time messaging
-- User authentication and profiles
-- Image sharing with download functionality
-- Markdown support via next-mdx-remote-client
-- Bring your own Key
-- Chat share
+- ✅ Chat with Various LLMs
+- ✅ Authentication & Sync
+- ✅ Browser Friendly
+- ✅ Easy to Try
+- ✅ Attachment Support
+- ✅ Image Generation Support
+- ✅ Syntax Highlighting
+- ✅ Resumable Streams
+- ✅ Chat Branching
+- ✅ Chat Sharing
+- ✅ Web Search
+- ✅ Bring Your Own Key
+- ❌ Mobile App
+- ✅ Projects
+- ✅ Custom Instruction for Chat and projects
 
 ## Prerequisites
 
